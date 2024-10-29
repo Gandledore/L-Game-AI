@@ -52,3 +52,15 @@ class L_piece():
             self.long_leg_direction = self.orientation_map[self.short_leg_direction][y>2]
         
         self.p0,self.p1,self.p2,self.p3 = self.compute_L_coords()
+    
+    def newPos(self,x:int,y:int,d:str):
+        self.x = x
+        self.y = y
+        self.short_leg_direction = d
+        
+        if self.short_leg_direction in ['N','S']:
+            self.long_leg_direction = self.orientation_map[self.short_leg_direction][x>2]
+        elif self.short_leg_direction in ['E','W']:
+            self.long_leg_direction = self.orientation_map[self.short_leg_direction][y>2]
+        
+        self.p0,self.p1,self.p2,self.p3 = self.compute_L_coords()

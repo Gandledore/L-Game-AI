@@ -7,13 +7,46 @@ class Game:
     def __init__(self):
         self.state = gamestate(); 
         self.gamemode = 0 #0 = human vs human, 1 = human vs agent, 2 = agent vs agent
-        self.player = 0; 
+        self.player = 0 # 0 and 1
     
     def getLegalMoves(state):
         return None
-    def getInput():
-        inputs = input();
-        return inputs;
+    
+    def getInput(self):
+        if self.gamemode == 0:
+            wholeMoves = input(f"Player {self.player}: Enter xl1 yl1 dl1 tx ty tx ty: ")
+        try:
+            move_parts = wholeMoves.split()
+
+            Lx, Ly = int(move_parts[0]), int(move_parts[1])
+            Ld = move_parts[2]
+
+            Tx, Ty, newTx, newTy = int(move_parts[3]), int(move_parts[4]), int(move_parts[5]), int(move_parts[6])
+        
+            
+            if self.gamemode == 0 and self.player == 0:
+                self.state.L1.newPos(Lx, Ly, Ld)
+                self.player = 1
+            else:
+                self.state.L2.newPos(Lx, Ly, Ld)
+                self.player = 0
+
+            if (Tx !=0 or Ty!=0 or newTx!=0 or newTy!=0):
+                    if (self.state.T1.x == Tx and self.state.T1.y == Ty):
+                        self.state.T1.x = newTx
+                        self.state.T1.y = newTy
+                    if (self.state.T2.x == Tx and self.state.T2.y == Ty):
+                        self.state.T2.x = newTx
+                        self.state.T2.y = newTy
+
+            self.display()
+
+   
+                    
+        except ValueError as e:
+            print(f"Invalid input: {e}.")
+            return self.getInput()  
+
     def display(self):
         board = np.full((4, 4), "XX") # 4 by 4 of empty string
         
@@ -29,7 +62,7 @@ class Game:
         T2x, T2y = self.state.T2.get_position()
         board[T2y - 1, T2x - 1] = "T2"
 
-        
+
         rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
         #left wall then the row then the ending right wall
         # f"{cell:>2}" align cell to the right > with a width of 2 spaces. 
@@ -42,6 +75,7 @@ class Game:
     def getSuccessor(state, player):
         return True
     def isGoal():
+        
         return True
     def setGamemode(mode):
         self.gamemode = mode;
@@ -51,6 +85,12 @@ class Game:
 
 if __name__ == "__main__":
     test = Game()
+
     test.display()
+    test.getInput()
+
+    test.display()
+    test.getInput()
+
         
 
