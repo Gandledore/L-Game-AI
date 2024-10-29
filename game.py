@@ -76,12 +76,13 @@ class Game:
         
     def getSuccessor(state, player):
         return True
-    def isGoal():
-        
+    
+    def isGoal(self):
         return True
+    
     def setGamemode(self):
         modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
-        self.gamemode = modeInput;
+        self.gamemode = modeInput
     
     def applyAction(action):
         return None

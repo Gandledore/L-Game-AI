@@ -5,12 +5,16 @@ def play():
     game = Game()
     firstPlayer = True
 
-    # assigning players 1 and 2 based on gamemode?
+    # for now: all human
+    # later: assigning players 1 and 2 based on gamemode?
     # handle swapping in the middle?
     player_1 = game.state.L1
     player_2 = game.state.L2
 
+    game.setGamemode()
+
     while True:
+        game.display()
         if game.gamemode == 0:
             if firstPlayer:
                 print("Player 1's turn")
@@ -21,17 +25,18 @@ def play():
         else:
             print(f"Player {game.player}'s turn")
 
-        move = game.getInput()
-        if move is None:
+        game.getInput()
+        
+        # if move is None:
+        #     break
+
+        # game.display()
+        firstPlayer = not firstPlayer
+
+        if game.isGoal():
+            print(f"Player {game.player} wins!")
             break
 
-        if game.player == 0:
-            player_1.newPos(*move)
-        else:
-            player_2.newPos(*move)
-
-        game.display()
-        firstPlayer = not firstPlayer
 
 if __name__ == "__main__":
     play()
@@ -50,3 +55,9 @@ if __name__ == "__main__":
 
 #         firstPlayer = not firstPlayer
 #         game.display()
+
+
+        # if game.player == 0:
+        #     player_1.newPos(move)
+        # else:
+        #     player_2.newPos(move)
