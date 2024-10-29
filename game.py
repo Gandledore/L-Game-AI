@@ -14,7 +14,7 @@ class Game:
     
     def getInput(self):
         if self.gamemode == 0:
-            wholeMoves = input(f"Player {self.player}: Enter xl1 yl1 dl1 tx ty tx ty: ")
+            wholeMoves = input(f"Player {self.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         try:
             move_parts = wholeMoves.split()
 
