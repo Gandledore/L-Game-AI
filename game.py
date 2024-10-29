@@ -1,4 +1,4 @@
-from base_structs import gamestate, displayer
+from base_structs.gamestate import gamestate # imports as class 
 import numpy as np
 
 # Class Game
@@ -12,13 +12,19 @@ class Game:
     def getLegalMoves(state):
         return None
     def getInput():
-        input = input();
-        return input;
-    def display(state):
-        board = np.full((4, 4), " ") # 4 by 4 of empty string
-        formatted_rows = np.array2string(board, separator="|", formatter={'str_kind': lambda x: f"{x:>2}"})
-        horizontal_separator = " -------------\n"
-        print(horizontal_separator + horizontal_separator.join(formatted_rows.splitlines()) + "\n" + horizontal_separator)
+        inputs = input();
+        return inputs;
+    def display(self):
+        board = np.full((4, 4), "XX") # 4 by 4 of empty string
+        
+        rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
+        #left wall then the row then the ending right wall
+        # f"{cell:>2}" align cell to the right > with a width of 2 spaces. 
+
+        horizontal_separator = "-------------\n"
+        
+        board_str = horizontal_separator + f"\n{horizontal_separator}".join(rows) + "\n" + horizontal_separator
+        print(board_str)
         
     def getSuccessor(state, player):
         return True
@@ -30,5 +36,8 @@ class Game:
         return None
 
 
+if __name__ == "__main__":
+    test = Game()
+    test.display()
         
 

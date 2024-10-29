@@ -1,5 +1,5 @@
-import L_piece
-import token_piece
+from base_structs.L_piece import L_piece
+from base_structs.token_piece import token_piece
 
 class gamestate():
     def __init__(self):
