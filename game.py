@@ -17,7 +17,7 @@ class Game:
     def display(self):
         board = np.full((4, 4), "XX") # 4 by 4 of empty string
         
-        print(self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3)
+        # print(self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3)
         for px, py in [self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3]:
             board[py-1, px-1] = "L1" 
         for px, py in [self.state.L2.p0, self.state.L2.p1, self.state.L2.p2, self.state.L2.p3]:
@@ -30,7 +30,6 @@ class Game:
         board[T2y - 1, T2x - 1] = "T2"
 
         
-
         rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
         #left wall then the row then the ending right wall
         # f"{cell:>2}" align cell to the right > with a width of 2 spaces. 
