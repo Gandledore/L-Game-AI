@@ -17,17 +17,17 @@ class Game:
     def display(self):
         board = np.full((4, 4), "XX") # 4 by 4 of empty string
         
-       
+        print(self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3)
         for px, py in [self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3]:
-            board[3 - (py - 1), px - 1] = "L1" 
+            board[py-1, px-1] = "L1" 
         for px, py in [self.state.L2.p0, self.state.L2.p1, self.state.L2.p2, self.state.L2.p3]:
-            board[3 - (py - 1), px - 1] = "L2" 
+            board[py-1, px-1] = "L2" 
       
         T1x, T1y = self.state.T1.get_position()
-        board[3 - (T1y - 1), T1x - 1] = "T1"
+        board[T1y - 1, T1x - 1] = "T1"
 
         T2x, T2y = self.state.T2.get_position()
-        board[3 - (T2y - 1), T2x - 1] = "T2"
+        board[T2y - 1, T2x - 1] = "T2"
 
         
 
