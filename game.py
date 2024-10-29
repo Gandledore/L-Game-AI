@@ -35,9 +35,11 @@ class Game:
                     if (self.state.T1.x == Tx and self.state.T1.y == Ty):
                         self.state.T1.x = newTx
                         self.state.T1.y = newTy
-                    if (self.state.T2.x == Tx and self.state.T2.y == Ty):
+                    elif (self.state.T2.x == Tx and self.state.T2.y == Ty):
                         self.state.T2.x = newTx
                         self.state.T2.y = newTy
+                    else:
+                        print("No coin at (",Tx,", ", Ty, ")")
 
             self.display()
 
@@ -77,15 +79,17 @@ class Game:
     def isGoal():
         
         return True
-    def setGamemode(mode):
-        self.gamemode = mode;
+    def setGamemode(self):
+        modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
+        self.gamemode = modeInput;
+    
     def applyAction(action):
         return None
 
 
 if __name__ == "__main__":
     test = Game()
-
+    test.setGamemode()
     test.display()
     test.getInput()
 
