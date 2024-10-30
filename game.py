@@ -14,7 +14,7 @@ class Game:
     
     def getInput(self):
         if self.gamemode == 0:
-            wholeMoves = input(f"Player {self.player}: Enter xl1 yl1 dl1 tx ty tx ty: ")
+            wholeMoves = input(f"Player {self.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         try:
             move_parts = wholeMoves.split()
 
@@ -76,12 +76,13 @@ class Game:
         
     def getSuccessor(state, player):
         return True
-    def isGoal():
-        
+    
+    def isGoal(self):
         return True
+    
     def setGamemode(self):
         modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
-        self.gamemode = modeInput;
+        self.gamemode = modeInput
     
     def applyAction(action):
         return None
