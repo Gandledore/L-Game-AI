@@ -25,10 +25,17 @@ class Game:
         
             
             if self.gamemode == 0 and self.player == 0:
-                self.state.L1.newPos(Lx, Ly, Ld)
+                # self.state.L1.newPos(Lx, Ly, Ld)
+                self.state.L1.x = Lx
+                self.state.L1.y = Ly
+                self.state.L1.short_leg_direction = Ld
+                self.state.L1.compute_L_coords()
                 self.player = 1
             else:
-                self.state.L2.newPos(Lx, Ly, Ld)
+                self.state.L2.x = Lx
+                self.state.L2.y = Ly
+                self.state.L2.short_leg_direction = Ld
+                self.state.L2.compute_L_coords()
                 self.player = 0
 
             if (Tx !=0 or Ty!=0 or newTx!=0 or newTy!=0):
