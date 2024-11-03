@@ -33,9 +33,9 @@ def play():
         # game.display()
         firstPlayer = not firstPlayer
 
-        if game.isGoal():
-            print(f"Player {game.player} wins!")
-            break
+        # if game.isGoal():
+        #     print(f"Player {game.player} wins!")
+        #     break
 
 
 if __name__ == "__main__":
