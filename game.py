@@ -10,11 +10,12 @@ class Game:
         self.player = 0 # 0 and 1
     
     def getLegalMoves(state):
+        # get array save ingame as a set set(l1.coords) smae ofr l2
         return None
     
     def getInput(self):
         if self.gamemode == 0:
-            wholeMoves = input(f"Player {self.player}: Enter xl1 yl1 dl1 tx ty tx ty: ")
+            wholeMoves = input(f"Player {self.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         try:
             move_parts = wholeMoves.split()
 
@@ -25,10 +26,17 @@ class Game:
         
             
             if self.gamemode == 0 and self.player == 0:
-                self.state.L1.newPos(Lx, Ly, Ld)
+                # self.state.L1.newPos(Lx, Ly, Ld)
+                self.state.L1.x = Lx
+                self.state.L1.y = Ly
+                self.state.L1.short_leg_direction = Ld
+                self.state.L1.compute_L_coords()
                 self.player = 1
             else:
-                self.state.L2.newPos(Lx, Ly, Ld)
+                self.state.L2.x = Lx
+                self.state.L2.y = Ly
+                self.state.L2.short_leg_direction = Ld
+                self.state.L2.compute_L_coords()
                 self.player = 0
 
             if (Tx !=0 or Ty!=0 or newTx!=0 or newTy!=0):
@@ -76,12 +84,13 @@ class Game:
         
     def getSuccessor(state, player):
         return True
-    def isGoal():
-        
+    
+    def isGoal(self):
         return True
+    
     def setGamemode(self):
         modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
-        self.gamemode = modeInput;
+        self.gamemode = modeInput
     
     def applyAction(action):
         return None
