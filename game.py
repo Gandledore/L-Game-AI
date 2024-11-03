@@ -10,6 +10,7 @@ class Game:
         self.player = 0 # 0 and 1
     
     def getLegalMoves(state):
+        # get array save ingame as a set set(l1.coords) smae ofr l2
         return None
     
     def getInput(self):
