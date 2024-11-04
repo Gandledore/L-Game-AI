@@ -58,11 +58,11 @@ class Game:
             return self.getInput()  
 
     def display(self):
-        board = np.full((4, 4), "XX") # 4 by 4 of empty string
+        board = np.full((4, 4), "  ") # 4 by 4 of empty string
         
         # print(self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3)
         for px, py in [self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3]:
-            board[py-1, px-1] = "L1" 
+            board[py-1, px-1] = "L1"
         for px, py in [self.state.L2.p0, self.state.L2.p1, self.state.L2.p2, self.state.L2.p3]:
             board[py-1, px-1] = "L2" 
       
