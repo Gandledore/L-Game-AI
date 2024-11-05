@@ -3,35 +3,27 @@ from game import Game
 
 def play():
     game = Game()
-    firstPlayer = True
 
     # for now: all human
     # later: assigning players 1 and 2 based on gamemode?
     # handle swapping in the middle?
-    player_1 = game.state.L1
-    player_2 = game.state.L2
+    # player_1 = game.state.L1
+    # player_2 = game.state.L2
 
     game.setGamemode()
 
     while True:
         game.display()
-        if game.gamemode == 0:
-            if firstPlayer:
-                print("Player 1's turn")
-                game.player = 0
-            else:
-                print("Player 2's turn")
-                game.player = 1
-        else:
-            print(f"Player {game.player}'s turn")
+        print(f"Player {game.player+1}'s turn")
 
-        game.getInput()
-        
+        move = game.getInput()
+        while(not game.apply_action(move)):
+            print('Invalid Move')
+            move = game.getInput()
         # if move is None:
         #     break
 
-        # game.display()
-        firstPlayer = not firstPlayer
+        game.next_turn()
 
         # if game.isGoal():
         #     print(f"Player {game.player} wins!")

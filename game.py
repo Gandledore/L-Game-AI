@@ -1,5 +1,7 @@
-from base_structs.gamestate import gamestate # imports as class 
 import numpy as np
+
+from base_structs.gamestate import gamestate # imports as class 
+from base_structs.action import action
 
 # Class Game
 class Game:
@@ -7,70 +9,113 @@ class Game:
     def __init__(self):
         self.state = gamestate(); 
         self.gamemode = 0 #0 = human vs human, 1 = human vs agent, 2 = agent vs agent
-        self.player = 0 # 0 and 1
+        self.player = 0 # {0,1} who's turn
     
     def getLegalMoves(state):
         # get array save ingame as a set set(l1.coords) smae ofr l2
         return None
-    
+     
     def getInput(self):
         if self.gamemode == 0:
             wholeMoves = input(f"Player {self.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         try:
             move_parts = wholeMoves.split()
-
-            Lx, Ly = int(move_parts[0]), int(move_parts[1])
-            Ld = move_parts[2]
-
-            Tx, Ty, newTx, newTy = int(move_parts[3]), int(move_parts[4]), int(move_parts[5]), int(move_parts[6])
-        
             
-            if self.gamemode == 0 and self.player == 0:
-                # self.state.L1.newPos(Lx, Ly, Ld)
-                self.state.L1.x = Lx
-                self.state.L1.y = Ly
-                self.state.L1.short_leg_direction = Ld
-                self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3= self.state.L1.compute_L_coords()
-                self.player = 1
-            else:
-                self.state.L2.x = Lx
-                self.state.L2.y = Ly
-                self.state.L2.short_leg_direction = Ld
-                self.state.L2.p0, self.state.L2.p1, self.state.L2.p2, self.state.L2.p3= self.state.L2.compute_L_coords()
-                self.player = 0
+            new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
+            # print('new l pos:',new_l_pos)
 
-            if (Tx !=0 or Ty!=0 or newTx!=0 or newTy!=0):
-                    if (self.state.T1.x == Tx and self.state.T1.y == Ty):
-                        self.state.T1.x = newTx
-                        self.state.T1.y = newTy
-                    elif (self.state.T2.x == Tx and self.state.T2.y == Ty):
-                        self.state.T2.x = newTx
-                        self.state.T2.y = newTy
-                    else:
-                        print("No coin at (",Tx,", ", Ty, ")")
+            if len(move_parts)==7:
+                current_token_pos = (int(move_parts[3]), int(move_parts[4]))
+                new_token_pos = (int(move_parts[5]), int(move_parts[6]))
+                token_id = next((i for i, token in enumerate(self.state.token_pieces) if current_token_pos == token.get_position()), -1)
+            elif len(move_parts)==3:
+                current_token_pos = None
+                new_token_pos = None
+                token_id=None
+            
+            # print('current token pos:',current_token_pos)
+            # print('new token pos:',new_token_pos)
+            # print('token_id:',token_id)
+            
+            move = action(l_piece_id=self.player,new_l_pos=new_l_pos,token_id=token_id,new_token_pos=new_token_pos)
+            return move
 
-            self.display()
-
-   
-                    
         except ValueError as e:
             print(f"Invalid input: {e}.")
-            return self.getInput()  
+            return self.getInput()
 
+    def valid_move(self,move:action)->bool:#return True if valid move, False if invalid
+        if move.token_id==-1:#check a token is at provided coords
+            print('Invalid Token Position')
+            return False
+        
+        new_l_set = set(map(tuple,move.new_l.get_coords()))
+        current_L_other_set = set(map(tuple,self.state.L_pieces[not move.l_piece_id].get_coords()))
+        
+        if move.token_id!=None:
+            other_token = self.state.token_pieces[not move.token_id]
+            #check moved token isn't other token
+            if move.new_token==other_token:
+                print("Token moved onto other token")
+                return False
+            
+            #check if moved token collides with either l piece
+            if move.new_token.get_position() in new_l_set or move.new_token.get_position() in current_L_other_set:
+                print("moved token collides with l piece")
+                return False
+            
+            #check moved token is inside game board
+            if move.new_token>4 or move.new_token<1:
+                print("token not in game board")
+                return False
+            
+            #check other token doesn't collide with moved l piece
+            #already know other token doesn't collide with other l
+            if other_token.get_position() in new_l_set:
+                print("other token collides with moved l piece")
+                return False
+        else:
+            #check moved l piece doesn't intersect with either token
+            for i,token in enumerate(self.state.token_pieces):
+                if token.get_position() in new_l_set:
+                    print(f'moved l piece collides with token {i}')
+                    return False
+        
+        #check l pieces don't collide
+        if new_l_set.intersection(current_L_other_set)!=set():
+            print("l pieces intersect")
+            return False
+        
+        #check moved l piece was actually moved
+        if move.new_l==self.state.L_pieces[move.l_piece_id]:
+            print('l piece not moved')
+            return False
+        
+        #check moved l piece is inside game board
+        if move.new_l>4 or move.new_l<1 :
+            print("l piece not in game board")
+            return False
+        
+        return True
+       
+    def apply_action(self,move:action)->bool: #true if action applied successfuly, false if failed
+        if not self.valid_move(move):
+            return False
+        self.state.L_pieces[move.l_piece_id] = move.new_l
+        if move.token_id!=None:
+            self.state.token_pieces[move.token_id] = move.new_token
+        return True
+    
     def display(self):
         board = np.full((4, 4), "  ") # 4 by 4 of empty string
         
-        # print(self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3)
-        for px, py in [self.state.L1.p0, self.state.L1.p1, self.state.L1.p2, self.state.L1.p3]:
-            board[py-1, px-1] = "L1"
-        for px, py in [self.state.L2.p0, self.state.L2.p1, self.state.L2.p2, self.state.L2.p3]:
-            board[py-1, px-1] = "L2" 
-      
-        T1x, T1y = self.state.T1.get_position()
-        board[T1y - 1, T1x - 1] = "T1"
+        for i,l in enumerate(self.state.L_pieces):
+            for px, py in l.get_coords():
+                board[py-1, px-1] = "L"+str(i+1)
 
-        T2x, T2y = self.state.T2.get_position()
-        board[T2y - 1, T2x - 1] = "T2"
+        for i,t in enumerate(self.state.token_pieces):
+            tx, ty = t.get_position()
+            board[ty - 1, tx - 1] = "T"+str(i+1)
 
 
         rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
@@ -92,9 +137,11 @@ class Game:
         modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
         self.gamemode = modeInput
     
-    def applyAction(action):
+    def applyAction(self,action):
         return None
-
+    
+    def next_turn(self):
+        self.player = not self.player
 
 if __name__ == "__main__":
     test = Game()
