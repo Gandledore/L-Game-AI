@@ -139,13 +139,13 @@ class Game:
         return True
     
     def isGoal(self):
-        return len(self.getLegalMoves())>0
+        return len(self.getLegalMoves())==0
     
     def whoWins(self):
         if self.isGoal():
             #winner is previous player
             #current player is stuck
-            return not self.player 
+            return int(not self.player)+1 
         return None
     
     def setGamemode(self):

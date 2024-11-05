@@ -12,7 +12,7 @@ def play():
 
     game.setGamemode()
 
-    while game.whoWins()!=None:
+    while game.whoWins()==None:
         game.display()
         print(f"Player {game.player+1}'s turn")
 
@@ -28,7 +28,8 @@ def play():
         # if game.isGoal():
         #     print(f"Player {game.player} wins!")
         #     break
-
+    game.display()
+    print('Player',game.whoWins(),'wins')
 
 if __name__ == "__main__":
     play()
