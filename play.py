@@ -12,7 +12,7 @@ def play():
 
     game.setGamemode()
 
-    while True:
+    while game.whoWins()!=None:
         game.display()
         print(f"Player {game.player+1}'s turn")
 

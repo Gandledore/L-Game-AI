@@ -13,7 +13,15 @@ class Game:
     
     def getLegalMoves(state):
         # get array save ingame as a set set(l1.coords) smae ofr l2
-        return None
+        
+        #currently dummy response to test whoWins()
+        ans = input("Are you stuck: ")
+        if(ans=='y'):
+            print('game over')
+            return []
+        else:
+            print('game not over')
+            return [1]
      
     def getInput(self):
         if self.gamemode == 0:
@@ -131,7 +139,14 @@ class Game:
         return True
     
     def isGoal(self):
-        return True
+        return len(self.getLegalMoves())>0
+    
+    def whoWins(self):
+        if self.isGoal():
+            #winner is previous player
+            #current player is stuck
+            return not self.player 
+        return None
     
     def setGamemode(self):
         modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
