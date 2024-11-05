@@ -28,6 +28,9 @@ class L_piece():
         p3 = p1 + self.direction_mapping[self.long_leg_direction]*2
         return p0,p1,p2,p3
     
+    def update_coords(self):
+        self.coords = np.array(self.compute_L_coords())
+    
     def __init__(self,x:int,y:int,d:str):
         self.x = x
         self.y = y
@@ -51,17 +54,19 @@ class L_piece():
         elif self.short_leg_direction in ['E','W']:
             self.long_leg_direction = self.orientation_map[self.short_leg_direction][y>2]
         
-        self.p0,self.p1,self.p2,self.p3 = self.compute_L_coords()
-    
-    
-    # def newPos(self,x:int,y:int,d:str):
-    #     self.x = x
-    #     self.y = y
-    #     self.short_leg_direction = d
+        self.update_coords()
         
-    #     if self.short_leg_direction in ['N','S']:
-    #         self.long_leg_direction = self.orientation_map[self.short_leg_direction][x>2]
-    #     elif self.short_leg_direction in ['E','W']:
-    #         self.long_leg_direction = self.orientation_map[self.short_leg_direction][y>2]
-        
-    #     self.p0,self.p1,self.p2,self.p3 = self.compute_L_coords()
+    def get_coords(self)->np.ndarray:
+        return self.coords
+    
+    def get_position(self)->Tuple[int,int]:
+        return self.x,self.y
+    
+    def __eq__(self, other:'L_piece')->bool:
+        return self.x==other.x and self.y==other.y and self.short_leg_direction==other.short_leg_direction
+    
+    def __lt__(self,value:int)->bool: #true if any are less than value
+        return bool(np.sum(self.coords.flatten()<value))
+
+    def __gt__(self,value:int)->bool: #true if any are greater than value
+        return bool(np.sum(self.coords.flatten()>value))
