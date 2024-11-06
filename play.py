@@ -1,5 +1,5 @@
-from base_structs import *
-from game import Game
+# from classes import *
+from classes.game import Game
 
 def play():
     game = Game()

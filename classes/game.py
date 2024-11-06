@@ -1,65 +1,51 @@
 import numpy as np
 
-from base_structs.gamestate import gamestate # imports as class 
-from base_structs.action import action
+from classes.base_structs.gamestate import gamestate # imports as class 
+from classes.base_structs.action import action
+from classes.base_structs.token_piece import token_piece
+from classes.base_structs.L_piece import L_piece
 
-# Class Game
+
+from typing import Union
+
 class Game:
-# Saved
     def __init__(self):
         self.state = gamestate(); 
         self.gamemode = 0 #0 = human vs human, 1 = human vs agent, 2 = agent vs agent
         self.player = 0 # {0,1} who's turn
-    
-    def getLegalMoves(self):
-        # get array save ingame as a set set(l1.coords) smae ofr l2
         
-        # 1 1 E  # 3 1 S
-        # 2 1 E  # 3 2 S
-        # 3 1 E  # 3 3 S
-        # 1 2 E  # 4 1 S
-        # 2 2 E  # 4 2 S
-        # 3 2 E  # 4 3 S
-
-        # 2 1 W  # 3 1 N
-        # 3 1 W  # 3 2 N
-        # 4 1 W  # 3 3 N
-        # 2 2 W  # 4 1 N
-        # 3 2 W  # 4 2 N
-        # 4 2 W  # 4 3 N
-        LSet = set()
-        TSet = set()
-        with open("Lgame/L-Game-AI/bruteforce/Lpos.txt", 'r') as file:
-            for line in file:
-                line = line.strip()
-                move = eval(line)
-                LSet.add(move)
-        with open("Lgame/L-Game-AI/bruteforce/Tpos.txt", 'r') as file:
-            for line in file:
-                line = line.strip()
-                move = eval(line)
-                TSet.add(move)
-
+        #precompute L positions that are generally possible, assuming no other pieces on the board (ie within board)
+        self.general_L_pos = []
+        for x in L_piece.POSSIBLE_SETS['x']:
+            for y in L_piece.POSSIBLE_SETS['y']:
+                for d in L_piece.POSSIBLE_SETS['short_leg_direction']:
+                    l = L_piece(x=x,y=y,d=d)
+                    if self.withinBoard(l):
+                        self.general_L_pos.append((x,y,d))
+        
+        #precompute T positions that are generally possible, assuming no other pieces on board (ie within board)
+        self.general_T_pos = []
+        for x in token_piece.POSSIBLE_SETS['x']:
+            for y in token_piece.POSSIBLE_SETS['y']:
+                self.general_T_pos.append((x,y))#don't need to check within board, cause they are size 1x1
+        
+    def getLegalMoves(self):
         #create list of possible actions
         validActions = []
-        for Lpos in LSet: #where can move L piece generally possible
+        for Lpos in self.general_L_pos: #where can move L piece generally possible
             for T in range(len(self.state.token_pieces)):
-                for Tpos in TSet:
-                    if (Tpos != self.state.token_pieces[T].get_position()): #only consider when you move tokens.       
+                for Tpos in self.general_T_pos:
+                    if (Tpos != self.state.token_pieces[T].get_position()): #only consider you moving the token.
                         move = action(self.player, Lpos, T, Tpos)
                         if (self.valid_move(move)):
                             validActions.append(move)
-                    
+            
+            #consider not moving tokens only once per possible l move                    
             move = action(self.player, Lpos, None, None)
             if (self.valid_move(move)):
                 validActions.append(move)
-        #check if actions are valid
-
-            #if invalid remove from list 
         
         #return list of valid actions
-        
-
         return validActions
      
     def getInput(self):
@@ -69,7 +55,6 @@ class Game:
             move_parts = wholeMoves.split()
             
             new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
-            # print('new l pos:',new_l_pos)
 
             if len(move_parts)==7:
                 current_token_pos = (int(move_parts[3]), int(move_parts[4]))
@@ -80,10 +65,6 @@ class Game:
                 new_token_pos = None
                 token_id=None
             
-            # print('current token pos:',current_token_pos)
-            # print('new token pos:',new_token_pos)
-            # print('token_id:',token_id)
-            
             move = action(l_piece_id=self.player,new_l_pos=new_l_pos,token_id=token_id,new_token_pos=new_token_pos)
             return move
 
@@ -91,9 +72,15 @@ class Game:
             print(f"Invalid input: {e}.")
             return self.getInput()
 
-    def valid_move(self,move:action)->bool:#return True if valid move, False if invalid
+    def withinBoard(self,piece:Union[L_piece, token_piece]):
+        if piece>4 or piece<1 :
+            return False
+        return True
+
+    def valid_move(self,move:action,feedback:bool=False)->bool:#return True if valid move, False if invalid
         if move.token_id==-1:#check a token is at provided coords
-            print('Invalid Token Position')
+            if feedback:
+                print('Invalid Token Position')
             return False
         
         new_l_set = set(map(tuple,move.new_l.get_coords()))
@@ -103,50 +90,58 @@ class Game:
             other_token = self.state.token_pieces[not move.token_id]
             #check moved token isn't other token
             if move.new_token==other_token:
-                print("Token moved onto other token")
+                if feedback:
+                    print("Token moved onto other token")
                 return False
             
             #check if moved token collides with either l piece
             if move.new_token.get_position() in new_l_set or move.new_token.get_position() in current_L_other_set:
-                print("moved token collides with l piece")
+                if feedback:
+                    print("moved token collides with l piece")
                 return False
             
             #check moved token is inside game board
-            if move.new_token>4 or move.new_token<1:
-                print("token not in game board")
+            if not self.withinBoard(move.new_token):
+                if feedback:
+                    print("token not in game board")
                 return False
             
             #check other token doesn't collide with moved l piece
             #already know other token doesn't collide with other l
             if other_token.get_position() in new_l_set:
-                print("other token collides with moved l piece")
+                if feedback:
+                    print("other token collides with moved l piece")
                 return False
-        else:
-            #check moved l piece doesn't intersect with either token
-            for i,token in enumerate(self.state.token_pieces):
-                if token.get_position() in new_l_set:
-                    print(f'moved l piece collides with token {i}')
-                    return False
         
+        #check moved l piece doesn't intersect with neither current token (because L piece moves first)
+        for i,token in enumerate(self.state.token_pieces):
+            if token.get_position() in new_l_set:
+                if feedback:
+                    print(f'moved l piece collides with token {i}')
+                return False
+    
         #check l pieces don't collide
         if new_l_set.intersection(current_L_other_set)!=set():
-            print("l pieces intersect")
+            if feedback:
+                print("l pieces intersect")
             return False
         
         #check moved l piece was actually moved
         if move.new_l==self.state.L_pieces[move.l_piece_id]:
-            print('l piece not moved')
+            if feedback:
+                print('l piece not moved')
             return False
         
         #check moved l piece is inside game board
-        if move.new_l>4 or move.new_l<1 :
-            print("l piece not in game board")
+        if not self.withinBoard(move.new_l):
+            if feedback:
+                print("l piece not in game board")
             return False
         
         return True
        
-    def apply_action(self,move:action)->bool: #true if action applied successfuly, false if failed
-        if not self.valid_move(move):
+    def apply_action(self,move:action,feedback:bool=True)->bool: #true if action applied successfuly, false if failed
+        if not self.valid_move(move,feedback):
             return False
         self.state.L_pieces[move.l_piece_id] = move.new_l
         if move.token_id!=None:
@@ -192,7 +187,7 @@ class Game:
         self.gamemode = modeInput
     
     def next_turn(self):
-        self.player = not self.player
+        self.player = int(not self.player)
 
 if __name__ == "__main__":
     test = Game()

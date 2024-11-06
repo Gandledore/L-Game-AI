@@ -1,7 +1,11 @@
 import numpy as np
 from typing import Tuple
+import sys
 
 class L_piece():
+    #dictionary with keys being initialization params, values being their respective possible assignments
+    POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4},'short_leg_direction':{'N','E','S','W'}}
+    
     def compute_L_coords(self)->Tuple[np.ndarray[int,int],
                                       np.ndarray[int,int],
                                       np.ndarray[int,int],
@@ -32,6 +36,10 @@ class L_piece():
         self.coords = np.array(self.compute_L_coords())
     
     def __init__(self,x:int,y:int,d:str):
+        assert x in self.POSSIBLE_SETS['x'], f"L piece initialization failed. {x} is not in {self.POSSIBLE_SETS['x']}"
+        assert y in self.POSSIBLE_SETS['y'], f"L piece initialization failed. {y} is not in {self.POSSIBLE_SETS['y']}"
+        assert d in self.POSSIBLE_SETS['short_leg_direction'], f"L piece initialization failed. {d} is not in {self.POSSIBLE_SETS['short_leg_direction']}"
+            
         self.x = x
         self.y = y
         self.short_leg_direction = d
@@ -55,7 +63,7 @@ class L_piece():
             self.long_leg_direction = self.orientation_map[self.short_leg_direction][y>2]
         
         self.update_coords()
-        
+    
     def get_coords(self)->np.ndarray:
         return self.coords
     
@@ -70,3 +78,6 @@ class L_piece():
 
     def __gt__(self,value:int)->bool: #true if any are greater than value
         return bool(np.sum(self.coords.flatten()>value))
+    
+    def __repr__(self):
+        return f'({self.x} | {self.y} | {self.short_leg_direction})'
