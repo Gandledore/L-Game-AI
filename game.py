@@ -191,9 +191,6 @@ class Game:
         modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
         self.gamemode = modeInput
     
-    def applyAction(self,action):
-        return None
-    
     def next_turn(self):
         self.player = not self.player
 
