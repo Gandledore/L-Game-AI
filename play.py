@@ -11,13 +11,13 @@ def play():
     # player_2 = game.state.L2
 
     game.setGamemode()
-
-    while game.whoWins()==None:
+    
+    while game.whoWins(game.state)==None:
         game.display()
         print(f"Player {game.player+1}'s turn")
 
         move = game.getInput()
-        while(not game.apply_action(move)):
+        while(not game.apply_action(game.state,move)):
             print('Invalid Move')
             move = game.getInput()
         # if move is None:
@@ -29,7 +29,7 @@ def play():
         #     print(f"Player {game.player} wins!")
         #     break
     game.display()
-    print('Player',game.whoWins(),'wins')
+    print('Player',game.whoWins(game.state),'wins')
 
 if __name__ == "__main__":
     play()
