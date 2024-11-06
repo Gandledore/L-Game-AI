@@ -11,9 +11,56 @@ class Game:
         self.gamemode = 0 #0 = human vs human, 1 = human vs agent, 2 = agent vs agent
         self.player = 0 # {0,1} who's turn
     
-    def getLegalMoves(state):
+    def getLegalMoves(self):
         # get array save ingame as a set set(l1.coords) smae ofr l2
-        return None
+        
+        # 1 1 E  # 3 1 S
+        # 2 1 E  # 3 2 S
+        # 3 1 E  # 3 3 S
+        # 1 2 E  # 4 1 S
+        # 2 2 E  # 4 2 S
+        # 3 2 E  # 4 3 S
+
+        # 2 1 W  # 3 1 N
+        # 3 1 W  # 3 2 N
+        # 4 1 W  # 3 3 N
+        # 2 2 W  # 4 1 N
+        # 3 2 W  # 4 2 N
+        # 4 2 W  # 4 3 N
+        LSet = set()
+        TSet = set()
+        with open("Lgame/L-Game-AI/bruteforce/Lpos.txt", 'r') as file:
+            for line in file:
+                line = line.strip()
+                move = eval(line)
+                LSet.add(move)
+        with open("Lgame/L-Game-AI/bruteforce/Tpos.txt", 'r') as file:
+            for line in file:
+                line = line.strip()
+                move = eval(line)
+                TSet.add(move)
+
+        #create list of possible actions
+        validActions = []
+        for Lpos in LSet: #where can move L piece generally possible
+            for T in range(len(self.state.token_pieces)):
+                for Tpos in TSet:
+                    if (Tpos != self.state.token_pieces[T].get_position()): #only consider when you move tokens.       
+                        move = action(self.player, Lpos, T, Tpos)
+                        if (self.valid_move(move)):
+                            validActions.append(move)
+                    
+            move = action(self.player, Lpos, None, None)
+            if (self.valid_move(move)):
+                validActions.append(move)
+        #check if actions are valid
+
+            #if invalid remove from list 
+        
+        #return list of valid actions
+        
+
+        return validActions
      
     def getInput(self):
         if self.gamemode == 0:
