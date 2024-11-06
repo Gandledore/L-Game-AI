@@ -48,13 +48,18 @@ class Game:
         #return list of valid actions
         return validActions
      
+    
     #interface for a play code to get human input
     def getInput(self)->action:#needs cleanup
         if self.gamemode == 0:
             wholeMoves = input(f"Player {self.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         try:
             move_parts = wholeMoves.split()
+            print(len(move_parts))
+            if ( (len(move_parts) != 7) and (len(move_parts) != 3) ):
+                raise ValueError("Enter commands in specified format")
             
+
             new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
 
             if len(move_parts)==7:
@@ -202,6 +207,7 @@ class Game:
         self.player = int(not self.player)
 
 if __name__ == "__main__":
+    print("run python3 play.py instead")
     test = Game()
     test.setGamemode()
     test.display()
