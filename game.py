@@ -178,7 +178,14 @@ class Game:
         return True
     
     def isGoal(self):
-        return True
+        return len(self.getLegalMoves())==0
+    
+    def whoWins(self):
+        if self.isGoal():
+            #winner is previous player
+            #current player is stuck
+            return int(not self.player)+1 
+        return None
     
     def setGamemode(self):
         modeInput = int(input("0 = human vs human, 1 = human vs agent, 2 = agent vs agent, Enter your mode: "))
