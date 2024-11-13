@@ -1,11 +1,11 @@
 
 import random
 
-from base_structs.player import Player
-from base_structs.action import action
-from game import Game
+from classes.players.player import Player
+from classes.base_structs.action import action
+from classes.game import Game
 
-class Agent(Player):
+class RandomAgent(Player):
     def getMove(self, game: Game) -> action:
         legal_moves = game.getLegalMoves(game.state)
         return random.choice(legal_moves) if legal_moves else None

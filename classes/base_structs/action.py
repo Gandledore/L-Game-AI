@@ -1,5 +1,5 @@
-from base_structs.L_piece import L_piece
-from base_structs.token_piece import token_piece
+from classes.base_structs.L_piece import L_piece
+from classes.base_structs.token_piece import token_piece
 
 from typing import Tuple
 from typing import Optional

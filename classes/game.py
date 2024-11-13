@@ -1,7 +1,7 @@
 import numpy as np
 
-from base_structs.gamestate import gamestate # imports as class 
-from base_structs.action import action
+from classes.base_structs.gamestate import gamestate # imports as class 
+from classes.base_structs.action import action
 
 # Class Game
 class Game:
@@ -142,6 +142,7 @@ class Game:
     
     def next_turn(self):
         self.player = not self.player
+        print(len(self.getLegalMoves(self.state)))
 
 if __name__ == "__main__":
     test = Game()

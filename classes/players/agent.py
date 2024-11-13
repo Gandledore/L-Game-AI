@@ -1,6 +1,6 @@
-from base_structs.player import Player
-from base_structs.action import action
-from game import Game
+from classes.players.player import Player
+from classes.base_structs.action import action
+from classes.game import Game
 
 class Agent(Player):
     def getMove(self, game: Game) -> action:

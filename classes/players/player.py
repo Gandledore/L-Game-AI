@@ -1,9 +1,6 @@
 from abc import ABC, abstractmethod
-from base_structs.action import action
-from game import Game
-from players.agent import Agent
-from players.human import Human
-from players.randomAgent import RandomAgent
+from classes.base_structs.action import action
+from classes.game import Game
 
 class Player:
 
