@@ -7,11 +7,15 @@ def setGameMode(self)->None:
     while True:
         try:
             modeInput = int(input("0 = human vs human\n1 = human vs agent\n2 = agent vs agent\nEnter your mode: "))
-            self.gamemode = modeInput
+            
+            if modeInput not in [0,1,2]:
+                raise ValueError("Invalid input")
             break
-        except modeInput not in [0,1,2]:
-            print(f"Invalid input.")
-            continue
+
+        except ValueError:
+            print(f"Invalid input")
+        
+    self.gamemode = modeInput
 
     # instantiating players
 
@@ -49,7 +53,7 @@ def play():
         #     print(f"Player {game.player} wins!")
         #     break
     game.display()
-    print('Player',game.whoWins(game.state),'wins!')
+    print('Player',game.whoWins(game.state)+1,'wins!')
 
 if __name__ == "__main__":
     play()
