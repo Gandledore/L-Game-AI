@@ -1,16 +1,34 @@
 import Players
 from classes.game import Game
 
+def setGameMode(self)->None:
+
+    # gamemode input, exception handling
+    while True:
+        try:
+            modeInput = int(input("0 = human vs human\n1 = human vs agent\n2 = agent vs agent\nEnter your mode: "))
+            self.gamemode = modeInput
+            break
+        except modeInput not in [0,1,2]:
+            print(f"Invalid input.")
+            continue
+
+    # instantiating players
+
+    if self.gamemode == 0:
+        players = [Players.Human(),Players.Human()]
+    elif self.gamemode == 1:
+        players = [Players.Human(),Players.RandomAgent()]
+    elif self.gamemode == 2:
+        players = [Players.RandomAgent(),Players.RandomAgent()]
+
+    return players
+
 def play():
     game = Game()
 
-    # for now: all human
-    # later: assigning players 1 and 2 based on gamemode?
-    # handle swapping in the middle?
-    # players = [Players.Human(),Players.RandomAgent()]
-    players = [Players.RandomAgent(),Players.RandomAgent()]
-
-    game.setGamemode()
+    # Enter gamemode 0, 1, or 2
+    players = setGameMode(game)
     
     while game.whoWins(game.state)==None:
         game.display()
@@ -31,28 +49,7 @@ def play():
         #     print(f"Player {game.player} wins!")
         #     break
     game.display()
-    print('Player',game.whoWins(game.state),'wins')
+    print('Player',game.whoWins(game.state),'wins!')
 
 if __name__ == "__main__":
     play()
-
-# Agent()
-#     player_2 = Agent()
-
-#     while not game.isGoal():
-#         if firstPlayer:
-#             action = player_1.getInput()
-#             game = game.applyAction(action)
-
-#         else:
-#             action = player_2.getInput()
-#             game = game.applyAction(action)
-
-#         firstPlayer = not firstPlayer
-#         game.display()
-
-
-        # if game.player == 0:
-        #     player_1.newPos(move)
-        # else:
-        #     player_2.newPos(move)
