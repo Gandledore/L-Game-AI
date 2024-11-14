@@ -10,7 +10,7 @@ def setGameMode()->Tuple[int,List[Players.Player]]:
         try:
             modeInput = int(input("0 = human vs human\n1 = human vs agent\n2 = agent vs agent\nEnter your mode: "))
             
-            if modeInput not in [0,1,2]:
+            if modeInput not in [0,1,2, 3]:
                 raise ValueError("Invalid input")
             break
 
@@ -24,6 +24,9 @@ def setGameMode()->Tuple[int,List[Players.Player]]:
         players = [Players.Human(),Players.RandomAgent()]
     elif modeInput == 2:
         players = [Players.RandomAgent(),Players.RandomAgent()]
+    
+    elif modeInput == 3:
+        players = [Players.Agent(),Players.RandomAgent()]
 
     return modeInput,players
 
