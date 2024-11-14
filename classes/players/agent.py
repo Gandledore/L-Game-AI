@@ -86,10 +86,11 @@ class Agent(Player):
     #     v <- -inf
         v = float('-inf')
     #     for each a in game.ACTIONS(state) do
-        for action in game.getLegalMoves(state):
+        legalMoves = game.getLegalMoves(state);
+        for action in legalMoves:
             print(f"Evaluating move {action} at depth {depth}")
     #         v2, a2 <- MIN-VALUE(game, game.RESULT(state, a), alpha, beta)
-            v2, a2 = self.MinValueAB(game, game.getSuccessor(state, action), alpha, beta, depth)
+            v2, a2 = self.MinValueAB(game, game.getSuccessor(state, action), alpha, beta, depth-1)
     #         if v2 > v then
             if v2 > v:
     #             v, move <- v2, a
@@ -112,9 +113,10 @@ class Agent(Player):
     #     v <- +inf
         v = float('inf')
     #     for each a in game.ACTIONS(state) do
-        for action in game.getLegalMoves(state):
+        legalMoves = game.getLegalMoves(state);
+        for action in legalMoves:
     #         v2, a2 <- MAX-VALUE(game, game.RESULT(state, a), alpha, beta)
-            v2, a2 = self.MaxValueAB(game, game.getSuccessor(state, action), alpha, beta, depth)
+            v2, a2 = self.MaxValueAB(game, game.getSuccessor(state, action), alpha, beta, depth-1)
     #         if v2 < v then
             if v2 < v:
     #             v, move <- v2, a
