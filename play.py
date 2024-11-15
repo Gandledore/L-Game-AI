@@ -20,7 +20,7 @@ def setGameMode()->Tuple[int,List[Players.Player]]:
         
     # instantiating players
     if modeInput == 0:
-        players = [Players.Human(0),Players.Agent(1)]
+        players = [Players.Human(0),Players.Human(1)]
     elif modeInput == 1:
         players = [Players.Human(0),Players.RandomAgent(1)]
     elif modeInput == 2:

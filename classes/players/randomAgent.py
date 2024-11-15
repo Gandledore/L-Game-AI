@@ -10,6 +10,6 @@ class RandomAgent(Player):
         super().__init__(id)
     
     def getMove(self, state: gamestate) -> action:
-        legal_moves = state.getLegalMoves(state.state)
+        legal_moves = state.getLegalMoves()
         return random.choice(legal_moves) if legal_moves else None
 
