@@ -2,6 +2,7 @@ import Players
 from classes.game import Game
 
 from typing import Tuple,List
+import copy
 
 def setGameMode()->Tuple[int,List[Players.Player]]:
 
@@ -19,14 +20,14 @@ def setGameMode()->Tuple[int,List[Players.Player]]:
         
     # instantiating players
     if modeInput == 0:
-        players = [Players.Human(),Players.Human()]
+        players = [Players.Human(0),Players.Agent(1)]
     elif modeInput == 1:
-        players = [Players.Human(),Players.RandomAgent()]
+        players = [Players.Human(0),Players.RandomAgent(1)]
     elif modeInput == 2:
-        players = [Players.RandomAgent(),Players.RandomAgent()]
+        players = [Players.RandomAgent(0),Players.RandomAgent(1)]
     
     elif modeInput == 3:
-        players = [Players.Agent(),Players.RandomAgent()]
+        players = [Players.Agent(0),Players.RandomAgent(1)]
 
     return modeInput,players
 
@@ -40,14 +41,15 @@ def play():
     winner = None
     while winner==None:
         game.display()
-        print(f"Player {game.player+1}'s turn")
+        turn = game.getTurn()
+        print(f"Player {turn+1}'s turn")
         
-        current_player = players[game.player]
+        current_player = players[turn]
         success=False
         for i in range(K):#while True
             try:
-                move = current_player.getMove(game) #value error if invalid input format
-                game.apply_action(game.state,move)  #assertion error if invalid move
+                move = current_player.getMove(copy.deepcopy(game.state)) #value error if invalid input format
+                game.apply_action(move)  #assertion error if invalid move
                 success=True
                 break
             except ValueError as e:
@@ -57,11 +59,10 @@ def play():
         if not success: #if no valid move provided after K attempts, kill game
             print(f'\n\nNo valid play after {K} moves. Game over.')
             break
-        game.next_turn()
-        winner = game.whoWins(game.state)
+        winner = game.whoWins()
 
     game.display()
-    print('Player',winner+1 if winner!=None else int(not game.player)+1,'wins!')
+    print('Player',bool(winner)+1,'wins!')
 
 if __name__ == "__main__":
     play()

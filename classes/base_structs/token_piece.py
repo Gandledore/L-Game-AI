@@ -19,3 +19,5 @@ class token_piece():
         return self.x>value and self.y>value
     def __repr__(self):
         return f'({self.x} | {self.y})'
+    def __hash__(self):
+        return hash((self.x,self.y))

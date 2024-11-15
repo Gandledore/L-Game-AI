@@ -81,3 +81,6 @@ class L_piece():
     
     def __repr__(self):
         return f'({self.x} | {self.y} | {self.short_leg_direction})'
+    
+    def __hash__(self):
+        return hash((self.x,self.y,self.short_leg_direction))
