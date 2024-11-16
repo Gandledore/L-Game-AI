@@ -29,9 +29,9 @@ class gamestate():
     def __repr__(self):
         return f"L pieces: {[l for l in self.L_pieces]}\nT pieces {[t for t in self.token_pieces]}"
     def __hash__(self):
-        return hash((tuple(self.L_pieces),tuple(self.token_pieces)))
+        return hash((self.player,tuple(self.L_pieces),tuple(self.token_pieces)))
     def __eq__(self,other:"gamestate"):
-        return self.L_pieces==other.L_pieces and self.token_pieces==other.token_pieces
+        return self.player==other.player and self.L_pieces==other.L_pieces and self.token_pieces==other.token_pieces
     
     #returns list of legal actions for current player
     def getLegalMoves(self)->List[action]:
