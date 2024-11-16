@@ -1,14 +1,14 @@
-from abc import ABC, abstractmethod
+from abc import ABC,abstractmethod
 from classes.base_structs.action import action
-from classes.game import Game
+from classes.base_structs.gamestate import gamestate
 
-class Player:
+class Player(ABC):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self,id:int):
+        self.id = id
     
     @abstractmethod
-    def getMove(self, game: Game) -> action:
+    def getMove(self, game: gamestate) -> action:
         pass
 
 
