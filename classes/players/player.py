@@ -10,5 +10,5 @@ class Player(ABC):
     @abstractmethod
     def getMove(self, game: gamestate) -> action:
         pass
-
+    
 
