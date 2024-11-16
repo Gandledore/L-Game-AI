@@ -56,7 +56,7 @@ class Agent(Player):
         for i,action in enumerate(state.getLegalMoves()):
             # print(f"Max: Evaluating move {i} at depth {depth}")
     #         v2, a2 <- MIN-VALUE(game, game.RESULT(state, a))
-            v2, _ = self.MinValue(state.getSuccessor(action), depth-1, 1)
+            v2, _ = self.MinValue(state.getSuccessor(action), depth-1, player+1)
     #         if v2 > v then
             if v2 > v:
     #             v, move <- v2, a
@@ -83,7 +83,7 @@ class Agent(Player):
         for i,action in enumerate(state.getLegalMoves()):
     #         v2, a2 <- MAX-VALUE(game, game.RESULT(state, a))
             # print(f"Min: Evaluating move {i} at depth {depth}")
-            v2, _ = self.MaxValue(state.getSuccessor(action), depth-1, 0)
+            v2, _ = self.MaxValue(state.getSuccessor(action), depth-1, player-1)
     #         if v2 < v then
             if v2 < v:
     #         v, move <- v2, a

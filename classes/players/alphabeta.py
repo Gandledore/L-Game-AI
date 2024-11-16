@@ -51,7 +51,7 @@ class AlphaBeta(Player):
         for i,action in enumerate(state.getLegalMoves()):
             # print(f"Max: Evaluating move {i} at depth {depth}")
     #         v2, a2 <- MIN-VALUE(game, game.RESULT(state, a), alpha, beta)
-            v2, _ = self.MinValueAB(state.getSuccessor(action), alpha, beta, depth-1, 1)
+            v2, _ = self.MinValueAB(state.getSuccessor(action), alpha, beta, depth-1, player+1)
     #         if v2 > v then
             if v2 > v:
     #             v, move <- v2, a
@@ -78,7 +78,7 @@ class AlphaBeta(Player):
         
         for i,action in enumerate(state.getLegalMoves()):
     #         v2, a2 <- MAX-VALUE(game, game.RESULT(state, a), alpha, beta)
-            v2, _ = self.MaxValueAB(state.getSuccessor(action), alpha, beta, depth-1, 0)
+            v2, _ = self.MaxValueAB(state.getSuccessor(action), alpha, beta, depth-1, player-1)
     #         if v2 < v then
             if v2 < v:
     #             v, move <- v2, a
