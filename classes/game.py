@@ -44,6 +44,7 @@ class Game:
         #checks who wins. Either None, 0 or 1
     
     #determines who wins, returns None, 0 or 1
+    # made a copy of this in gamestate
     def whoWins(self)->Optional[int]:
         if self.state.isGoal():
             #winner is previous player

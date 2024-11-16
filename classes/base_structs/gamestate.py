@@ -128,5 +128,13 @@ class gamestate():
         #game over when no legal moves available
         return len(self.getLegalMoves())==0
     
+    def whoWins(self)->Optional[int]:
+        if self.isGoal():
+            #winner is previous player
+            #current player is stuck
+            return int(not self.state.player)
+        #game is not over
+        return None
+    
 
     
