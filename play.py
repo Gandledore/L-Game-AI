@@ -24,14 +24,10 @@ def setGameMode()->Tuple[int,List[Players.Player]]:
     elif modeInput == 1:
         players = [Players.Human(0),Players.Agent(1)]
     elif modeInput == 2:
-        players = [Players.RandomAgent(0),Players.RandomAgent(1)]
+        players = [Players.Agent(0),Players.Agent(1)]
     
     elif modeInput == 3:
         players = [Players.Agent(0),Players.RandomAgent(1)]
-    elif modeInput == 4:
-        players = [Players.Agent(0),Players.Agent(1)]
-    elif modeInput == 5:
-        players = [Players.AlphaBeta(0), Players.AlphaBeta(1)]
 
     return modeInput,players
 

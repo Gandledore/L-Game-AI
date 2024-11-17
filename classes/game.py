@@ -46,12 +46,7 @@ class Game:
     #determines who wins, returns None, 0 or 1
     # made a copy of this in gamestate
     def whoWins(self)->Optional[int]:
-        if self.state.isGoal():
-            #winner is previous player
-            #current player is stuck
-            return int(not self.state.player)
-        #game is not over
-        return None
+        return self.state.whoWins()
     
 if __name__ == "__main__":
     print("run python3 play.py instead")

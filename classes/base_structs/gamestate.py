@@ -4,6 +4,7 @@ from classes.base_structs.action import action
 
 from typing import Union,List,Optional,Tuple
 import copy
+
 class gamestate():
     def __init__(self):
         self.player = 0
@@ -132,7 +133,7 @@ class gamestate():
         if self.isGoal():
             #winner is previous player
             #current player is stuck
-            return int(not self.state.player)
+            return int(not self.player)
         #game is not over
         return None
     
