@@ -3,9 +3,9 @@ from classes.game import Game
 
 from typing import Tuple,List
 import copy
+import numpy as np
 
-def setGameMode()->Tuple[int,List[Players.Player]]:
-
+def getGameMode()->int:
     # gamemode input, exception handling
     while True:
         try:
@@ -17,32 +17,38 @@ def setGameMode()->Tuple[int,List[Players.Player]]:
 
         except ValueError:
             print(f"Invalid input")
-        
+    return modeInput
+
+def setGameMode(mode)->Tuple[int,List[Players.Player]]:
     # instantiating players
-    if modeInput == 0:
+    if mode == 0:
         players = [Players.Human(0),Players.Human(1)]
-    elif modeInput == 1:
+    elif mode == 1:
         players = [Players.Human(0),Players.Agent(1)]
-    elif modeInput == 2:
+    elif mode == 2:
         players = [Players.Agent(0),Players.Agent(1)]
     
-    elif modeInput == 3:
+    elif mode == 3:
         players = [Players.Agent(0),Players.RandomAgent(1)]
-
-    return modeInput,players
+    elif mode == 4:
+        players = [Players.RandomAgent(0),Players.RandomAgent(1)]
+    return mode,players
 
 def play():
     game = Game()
     
     # Enter gamemode 0, 1, or 2
-    gamemode,players = setGameMode()
+    gamemode,players = setGameMode(getGameMode())
 
     K = 3
     winner = None
+    turns = 0
     while winner==None:
+        # print('Gamestates Generated:',gamestate._count)
         game.display()
         turn = game.getTurn()
-        print(f"Player {turn+1}'s turn")
+        turns+=1
+        print(f"Player {turn+1}'s turn ({turns})")
         
         current_player = players[turn]
         success=False
@@ -63,6 +69,11 @@ def play():
 
     game.display()
     print('Player',bool(winner)+1,'wins!')
-
+    print('Total Turns',turns)
+    gs = type(game.state)
+    print(f'{gs._count} gamestates generated')
+    num_legal_moves_per_state = [len(moves) for state,moves in gs._legalMoves.items()]
+    print(f'Branching factor | Max:{np.max(num_legal_moves_per_state)} | Mean: {np.mean(num_legal_moves_per_state):.2f}')
+    print(f'CH: {gs._cache_hits} | CM:{gs._cache_misses} | Cache Hit Rate: {100*gs._cache_hits/(gs._cache_misses+gs._cache_hits):.1f}%')
 if __name__ == "__main__":
     play()

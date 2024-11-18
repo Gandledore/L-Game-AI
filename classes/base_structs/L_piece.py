@@ -5,6 +5,7 @@ import sys
 class L_piece():
     #dictionary with keys being initialization params, values being their respective possible assignments
     POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4},'short_leg_direction':{'N','E','S','W'}}
+    POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4],'short_leg_direction':['N','E','S','W']}
     
     def compute_L_coords(self)->Tuple[np.ndarray[int,int],
                                       np.ndarray[int,int],
@@ -36,10 +37,10 @@ class L_piece():
         self.coords = np.array(self.compute_L_coords())
     
     def __init__(self,x:int,y:int,d:str):
-        assert x in self.POSSIBLE_SETS['x'], f"L piece initialization failed. {x} is not in {self.POSSIBLE_SETS['x']}"
-        assert y in self.POSSIBLE_SETS['y'], f"L piece initialization failed. {y} is not in {self.POSSIBLE_SETS['y']}"
-        assert d in self.POSSIBLE_SETS['short_leg_direction'], f"L piece initialization failed. {d} is not in {self.POSSIBLE_SETS['short_leg_direction']}"
-            
+        assert x in L_piece.POSSIBLE_SETS['x'], f"L piece x={x} is not in {L_piece.POSSIBLE_SETS['x']}"
+        assert y in L_piece.POSSIBLE_SETS['y'], f"L piece y={y} is not in {L_piece.POSSIBLE_SETS['y']}"
+        assert d in L_piece.POSSIBLE_SETS['short_leg_direction'], f"L piece short_leg_direciton={d} is not in {L_piece.POSSIBLE_SETS['short_leg_direction']}"
+        
         self.x = x
         self.y = y
         self.short_leg_direction = d
@@ -67,6 +68,9 @@ class L_piece():
     def get_coords(self)->np.ndarray:
         return self.coords
     
+    def get_tuple(self)->Tuple[int,int,str]:
+        return self.x,self.y,self.short_leg_direction
+    
     def get_position(self)->Tuple[int,int]:
         return self.x,self.y
     
@@ -80,7 +84,7 @@ class L_piece():
         return bool(np.sum(self.coords.flatten()>value))
     
     def __repr__(self):
-        return f'({self.x} | {self.y} | {self.short_leg_direction})'
+        return f'({self.x}, {self.y}, {self.short_leg_direction})'
     
     def __hash__(self):
         return hash((self.x,self.y,self.short_leg_direction))
