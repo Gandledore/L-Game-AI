@@ -5,6 +5,9 @@ from typing import Tuple,List
 import copy
 import numpy as np
 
+import cProfile
+import pstats
+
 def getGameMode()->int:
     # gamemode input, exception handling
     while True:
@@ -24,7 +27,7 @@ def setGameMode(mode)->Tuple[int,List[Players.Player]]:
     if mode == 0:
         players = [Players.Human(0),Players.Human(1)]
     elif mode == 1:
-        players = [Players.Human(0),Players.Agent(1)]
+        players = [Players.Agent(0),Players.Human(1)]
     elif mode == 2:
         players = [Players.Agent(0),Players.Agent(1)]
     
@@ -38,7 +41,8 @@ def play():
     game = Game()
     
     # Enter gamemode 0, 1, or 2
-    gamemode,players = setGameMode(getGameMode())
+    # gamemode,players = setGameMode(getGameMode())
+    gamemode,players = setGameMode(3)
 
     K = 3
     winner = None
@@ -76,4 +80,18 @@ def play():
     print(f'Branching factor | Max:{np.max(num_legal_moves_per_state)} | Mean: {np.mean(num_legal_moves_per_state):.2f}')
     print(f'CH: {gs._cache_hits} | CM:{gs._cache_misses} | Cache Hit Rate: {100*gs._cache_hits/(gs._cache_misses+gs._cache_hits):.1f}%')
 if __name__ == "__main__":
+    profiler = cProfile.Profile()
+    profiler.enable()
+    
+    # Your main function or script
     play()
+    
+    profiler.disable()
+    
+    # Create a stats object
+    stats = pstats.Stats(profiler)
+    
+    # Sort by 'time' (total time in each function) and print the top 10 functions
+    stats.strip_dirs()  # Optional: remove long file paths for readability
+    stats.sort_stats("time").print_stats(10)
+    # stats.sort_stats("cumulative").print_stats(10)

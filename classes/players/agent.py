@@ -12,18 +12,19 @@ class Agent(Player):
     _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
     _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}
     
-    def __init__(self, id:int, depth=2, prune:bool=True):
+    def __init__(self, id:int, depth=3, prune:bool=True):
         super().__init__(id)
-        self.depth = 2*depth-1
+        self.depth = depth
         self.prune = prune
-        visited = {} # compute heuristic once and never again, memory outside of local turn save searched states ( may be too memory intensive except for d = inf)
+        # visited = {} # compute heuristic once and never again, memory outside of local turn save searched states ( may be too memory intensive except for d = inf)
 
     def getMove(self, state: gamestate) -> action:
         print('Thinking...')
         start = time.time()
         value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
-        print(f'Move: {bestAction} | Value: {value} | Time: {end-start:.1f} | Pruned: {self.num_prune}/{self.max_prune}')
+        print(f'Move: {bestAction} | Value: {value}')
+        print(f'Time: {end-start:.1f} | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
         print(f'CH: {gamestate._cache_hits} | CM:{gamestate._cache_misses} | Cache Hit Rate: {100*gamestate._cache_hits/(gamestate._cache_misses+gamestate._cache_hits):.1f}%')
         return bestAction
     
@@ -34,8 +35,8 @@ class Agent(Player):
         
         l_set = set(map(tuple,move.new_l.get_coords()))
         
-        control_core = core_weight * len(l_set.intersection(Agent._CORE))           #reward controlling core
-        avoid_corner = -1*corner_weight * len(l_set.intersection(Agent._CORNERS))   #penalize touching corner
+        control_core = core_weight * len(l_set & Agent._CORE)           #reward controlling core
+        avoid_corner = -1*corner_weight * len(l_set & Agent._CORNERS)   #penalize touching corner
         killer_token = killer_token_weight * int(move.new_token.get_position() in Agent._KILLER_TOKENS if move.new_token else 0) #reward placing tokens in killer positions
         
         # +1 if heuristic from own perspective, 
@@ -58,13 +59,13 @@ class Agent(Player):
         player_l_set = set(map(tuple,state.L_pieces[player].get_coords()))
         opponent_l_set = set(map(tuple,state.L_pieces[opponent].get_coords()))
         
-        control_core = core_weight * len(player_l_set.intersection(Agent._CORE))           #reward controlling core
-        expel_core = -1*core_weight * len(opponent_l_set.intersection(Agent._CORE))        #penalize oponent in core
-        avoid_corner = -1*corner_weight * len(player_l_set.intersection(Agent._CORNERS))   #penalize touching corner
-        force_corner = corner_weight * len(opponent_l_set.intersection(Agent._CORNERS))    #reward oponent being in corner
+        control_core = core_weight * len(player_l_set & Agent._CORE)           #reward controlling core
+        expel_core = -1*core_weight * len(opponent_l_set & Agent._CORE)        #penalize oponent in core
+        avoid_corner = -1*corner_weight * len(player_l_set & Agent._CORNERS)   #penalize touching corner
+        force_corner = corner_weight * len(opponent_l_set & Agent._CORNERS)    #reward oponent being in corner
 
         #reward true if they lose
-        winning = win_weight * (state.isGoal()) #colinear with legalmovesofother
+        winning = win_weight * state.isGoal() #colinear with legalmovesofother
 
         score = legalmovesofother + control_core + expel_core + avoid_corner + force_corner + winning
         # print ("score: ", score)
@@ -97,7 +98,7 @@ class Agent(Player):
         # print('Continuing Search')
         numMoves = len(moves)
         for i,next_state in enumerate(next_states):
-            v2, a = self.MinValueAB(next_state, depth-1, alpha, beta)
+            v2, _ = self.MinValueAB(next_state, depth-1, alpha, beta)
             if v2 > v:
                 v, move = v2, moves[i]
                 alpha = max(alpha, v)

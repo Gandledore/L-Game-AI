@@ -16,22 +16,22 @@ class gamestate():
     _cache_misses = 0
     _preprocessing_done = False
     
-    def __init__(self):
-        self.player = 0
-        self.L_pieces = [L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')]
-        self.token_pieces = [token_piece(x=1,y=1),token_piece(x=4,y=4)]
+    def __init__(self, player=None, L_pieces=None, token_pieces=None):
+        self.player = player if player is not None else 0
+        self.L_pieces = L_pieces if L_pieces is not None else [L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')]
+        self.token_pieces = token_pieces if token_pieces is not None else [token_piece(x=1,y=1),token_piece(x=4,y=4)]
         gamestate._count+=1
         if not gamestate._preprocessing_done:
             gamestate._precompute_gen_L_pos()
             gamestate._precompute_gen_T_pos()
             gamestate._preprocessing_done = True
-            
+
     #precompute L positions that are generally possible, assuming no other pieces on the board (ie within board)
     @classmethod
     def _precompute_gen_L_pos(cls):
-        for x in L_piece.POSSIBLE_LISTS['x']:
-            for y in L_piece.POSSIBLE_LISTS['y']:
-                for d in L_piece.POSSIBLE_LISTS['short_leg_direction']:
+        for x in L_piece._POSSIBLE_LISTS['x']:
+            for y in L_piece._POSSIBLE_LISTS['y']:
+                for d in L_piece._POSSIBLE_LISTS['short_leg_direction']:
                     l = L_piece(x=x,y=y,d=d)
                     if cls._withinBoard(l):
                         cls._general_L_pos.append((x,y,d))
@@ -40,8 +40,8 @@ class gamestate():
     #precompute T positions that are generally possible, assuming no other pieces on board (ie within board)
     @classmethod
     def _precompute_gen_T_pos(cls):
-        for x in token_piece.POSSIBLE_LISTS['x']:
-            for y in token_piece.POSSIBLE_LISTS['y']:
+        for x in token_piece._POSSIBLE_LISTS['x']:
+            for y in token_piece._POSSIBLE_LISTS['y']:
                 cls._general_T_pos.append((x,y))#don't need to check within board, cause they are size 1x1
                 cls._general_pos_set.add((x,y))
                 
@@ -76,7 +76,7 @@ class gamestate():
         cls._legalMoves[state] = validActions
         
     def __repr__(self):
-        return f"L pieces: {[l for l in self.L_pieces]}\nT pieces {[t for t in self.token_pieces]}"
+        return f" Player: {self.player}\nL pieces: {[l for l in self.L_pieces]}\nT pieces: {[t for t in self.token_pieces]}"
     def __hash__(self):
         return hash((self.player,tuple(self.L_pieces),tuple(self.token_pieces)))
     def __eq__(self,other:"gamestate"):
@@ -118,14 +118,14 @@ class gamestate():
         current_L_other_set = set(map(tuple,self.L_pieces[not move.l_piece_id].get_coords()))
         
         #check l pieces don't collide
-        if len(new_l_set.intersection(current_L_other_set))!=0:
+        if new_l_set & current_L_other_set:
             return False, "L pieces overlap."
         
         #check that moved l piece intersects with neither current token (because L piece moves first)
         #already know other token doesn't collide with other l
-        for i,token in enumerate(self.token_pieces):
-            if token.get_position() in new_l_set:
-                return False, f'Moved l piece collides with token {i+1}'
+        current_token_pos = {token.get_position() for token in self.token_pieces}
+        if current_token_pos & new_l_set:
+            return False, f'Moved l piece collides with token(s)'
         
         #check moved l piece is inside game board
         if not cls._withinBoard(move.new_l):
@@ -151,15 +151,14 @@ class gamestate():
         return True, "valid move"
     
     #take state and move, return new gamestate where move is applied
-    def getSuccessor(self, move:action)->"gamestate":
+    def getSuccessor(self, move: action) -> "gamestate":
         valid, feedback = self.valid_move(move)
         assert valid, feedback
-        state = copy.deepcopy(self)
-        state.player = int(not self.player)
-        state.L_pieces[move.l_piece_id] = move.new_l
-        if move.token_id!=None:
-            state.token_pieces[move.token_id] = move.new_token
-        return state
+        assert move.l_piece_id==self.player,'not your turn'
+        
+        return gamestate(int(not self.player),
+                          [move.new_l if self.player==i else self.L_pieces[i] for i in range(2)],
+                          [move.new_token if move.token_id==i else self.token_pieces[i] for i in range(2)])
     
     #checks state is goal
     def isGoal(self)->bool:

@@ -5,7 +5,7 @@ from classes.players.player import Player
 from classes.base_structs.action import action
 from classes.base_structs.gamestate import gamestate
 
-# random.seed(0)
+random.seed(0)
 
 class RandomAgent(Player):
     def __init__(self, id):

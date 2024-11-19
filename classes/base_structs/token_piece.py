@@ -2,12 +2,12 @@ from typing import Tuple
 
 class token_piece():
     #dictionary with keys being initialization params, values being their respective possible assignments
-    POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4]}
-    POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4}}
+    _POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4]}
+    _POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4}}
     
     def __init__(self,x:int,y:int)->None:
-        assert x in token_piece.POSSIBLE_SETS['x'], f"Token x={x} not in {token_piece.POSSIBLE_SETS['x']}"
-        assert y in token_piece.POSSIBLE_SETS['y'], f"Token y={y} not in {token_piece.POSSIBLE_SETS['y']}"
+        assert x in token_piece._POSSIBLE_SETS['x'], f"Token x={x} not in {token_piece._POSSIBLE_SETS['x']}"
+        assert y in token_piece._POSSIBLE_SETS['y'], f"Token y={y} not in {token_piece._POSSIBLE_SETS['y']}"
         
         self.x=x
         self.y=y
