@@ -41,8 +41,8 @@ def play():
     game = Game()
     
     # Enter gamemode 0, 1, or 2
-    # gamemode,players = setGameMode(getGameMode())
-    gamemode,players = setGameMode(3)
+    gamemode,players = setGameMode(getGameMode())
+    # gamemode,players = setGameMode(3)
 
     K = 3
     winner = None
@@ -53,7 +53,7 @@ def play():
         turn = game.getTurn()
         turns+=1
         print(f"Player {turn+1}'s turn ({turns})")
-        
+
         current_player = players[turn]
         success=False
         for i in range(K):#while True

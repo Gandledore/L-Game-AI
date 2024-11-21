@@ -2,13 +2,19 @@ from classes.players.player import Player
 from classes.base_structs.action import action
 from classes.base_structs.gamestate import gamestate
 
+import Players
+import copy
+
 class Human(Player):
     def __init__(self,id:int):
         super().__init__(id)
     
     #interface for a play code to get human input
     def getMove(self, state: gamestate) -> action:
+
         print('Valid Moves:',len(state.getLegalMoves()))
+        suggestedmove = Players.Agent(0, 2).getMove(copy.deepcopy(state)) # get move from a alphabeta heuristic depth 1 search
+        print("Suggested Move: ", suggestedmove.format_move())
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         move_parts = wholeMoves.split()
     
@@ -32,3 +38,4 @@ class Human(Player):
         
         move = action(l_piece_id=state.player,new_l_pos=new_l_pos,token_id=token_id,new_token_pos=new_token_pos)
         return move
+    

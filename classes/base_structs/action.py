@@ -19,3 +19,11 @@ class action():
             
     def __repr__(self):
         return f'L_id: {self.l_piece_id} | new_L_pos: {self.new_l} | T_id: {self.token_id} | new_T_pos: {self.new_token}'
+
+    def format_move(self) -> str:
+        l_str = f"{self.new_l.x} {self.new_l.y} {self.new_l.short_leg_direction}"
+        if self.new_token is not None:
+            t_str = f"{self.new_token.x} {self.new_token.y}"
+            return f"L{self.l_piece_id+1}: {l_str} | T{self.token_id+1}: {t_str}"
+        else:
+            return l_str
