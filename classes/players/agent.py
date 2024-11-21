@@ -26,7 +26,7 @@ class Agent(Player):
         end = time.time()
         print(f'Move: {bestAction} | Value: {value}')
         print(f'Time: {end-start:.1f} | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
-        print(f'CH: {gamestate._cache_hits} | CM:{gamestate._cache_misses} | Cache Hit Rate: {100*gamestate._cache_hits/(gamestate._cache_misses+gamestate._cache_hits):.1f}%')
+        # print(f'CH: {gamestate._cache_hits} | CM:{gamestate._cache_misses} | Cache Hit Rate: {100*gamestate._cache_hits/(gamestate._cache_misses+gamestate._cache_hits):.1f}%')
         return bestAction
     
     def action_heuristic(self,move:packed_action)->int:
@@ -44,9 +44,6 @@ class Agent(Player):
         avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))   #penalize touching corner
         killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if token_id!=255 else 0) #reward placing tokens in killer positions
         
-        # +1 if heuristic from own perspective, 
-        # -1 if from oponent's perspective
-        # flip = 2*int(l_piece_id==self.id)-1
         return control_core + avoid_corner + killer_token
     
     def heuristic(self, state:gamestate) -> int:
@@ -87,30 +84,22 @@ class Agent(Player):
       
         v = float('-inf')
         move = None
-        t1 = time.time()
-        moves = np.array(state.getLegalMoves())
-        t2 = time.time()
-        next_states = np.array([state.getSuccessor(move) for move in moves])
-        t3 = time.time()
-        # heuristics = np.array([self.heuristic(next_state) for next_state in next_states])
+        
+        moves = state.getLegalMoves()
         heuristics = np.array([self.action_heuristic(move) for move in moves])
-        t4 = time.time()
-        sort_indexes = np.argsort(heuristics)
-        next_states = next_states[sort_indexes]
+        sort_indexes = np.argsort(heuristics)[::-1]
         moves = moves[sort_indexes]
-        t5 = time.time()
-        # print(f'Times | Getting Moves: {t2-t1:.2f} | Getting Successors: {t3-t2:.2f} | Computing Heuristics: {t4-t3:.2f} | Sorting: {t5-t4:.2f}')
-        # print('Continuing Search')
+        
         numMoves = len(moves)
-        for i,next_state in enumerate(next_states):
-            v2, _ = self.MinValueAB(next_state, depth-1, alpha, beta)
+        self.max_prune+= numMoves
+        for i,m in enumerate(moves):
+            v2, _ = self.MinValueAB(state.getSuccessor(m), depth-1, alpha, beta)
             if v2 > v:
-                v, move = v2, moves[i]
+                v, move = v2, m
                 alpha = max(alpha, v)
             if self.prune and v >= beta:
                 # print(f'Pruned {numMoves-i}/{numMoves} actions')
                 self.num_prune+= numMoves-i
-                self.max_prune+= numMoves
                 break
         return v, move
     
@@ -118,24 +107,24 @@ class Agent(Player):
     def MinValueAB(self, state: gamestate, depth:int, alpha:float, beta:float) -> Tuple[int, packed_action]:
         if depth == 0 or state.isGoal():
             return self.heuristic(state), None
-        v = float('inf')
         
+        v = float('inf')
         move = None
         
-        moves = np.array(state.getLegalMoves())
+        moves = state.getLegalMoves()
         heuristics = np.array([self.action_heuristic(move) for move in moves])
         sort_indexes = np.argsort(heuristics)[::-1]
         moves = moves[sort_indexes]
         
+        numMoves = len(moves)
+        self.max_prune+=numMoves
         for i,m in enumerate(moves):
             v2, _ = self.MaxValueAB(state.getSuccessor(m), depth-1, alpha, beta)
             if v2 < v:
                 v, move = v2, m
                 beta = min(beta, v)
             if self.prune and v <= alpha:
-                numMoves = len(moves)
                 # print(f'Pruned {numMoves-i}/{numMoves} actions')
                 self.num_prune+=numMoves-i
-                self.max_prune+=numMoves
                 break
         return v, move

@@ -1,12 +1,13 @@
 import pickle
 import time
 import os
+import numpy as np
 
 from classes.base_structs.L_piece import L_piece
 from classes.base_structs.token_piece import token_piece
 from classes.base_structs.action import packed_action
 
-from typing import Union,List,Optional,Tuple
+from typing import Union,List,Optional,Tuple,Callable
 
 class gamestate():
     #precompute with static stuff
@@ -19,12 +20,7 @@ class gamestate():
     _preprocessing_done = False
     
     _board = {(x,y) for x in range(1,5) for y in range(1,5)}
-    
-    # _CORE = {(2,2), (2,3), (3,2), (3,3)}
-    # _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
-    # _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}
-    
-    
+
     def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')], token_pieces:List[token_piece]=[token_piece(x=1,y=1),token_piece(x=4,y=4)]):
         self.player = player
         self.L_pieces = L_pieces
@@ -62,26 +58,6 @@ class gamestate():
     def _withinBoard(cls,piece:Union[L_piece, token_piece])->bool:
         return piece.get_coords() <= cls._board
     
-    # def action_heuristic(self,move:packed_action)->int:
-    #     core_weight = 20
-    #     corner_weight = 40
-    #     killer_token_weight = 10
-        
-    #     l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, token_id, new_token_pos_x,new_token_pos_y = move.get_rep()
-    #     new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
-    #     new_t_pos = (new_token_pos_x,new_token_pos_y)
-        
-    #     l_set = L_piece._compute_L_coords(*new_l_pos)
-
-    #     control_core = core_weight * len(l_set & gamestate._CORE)           #reward controlling core
-    #     avoid_corner = -1*corner_weight * len(l_set & gamestate._CORNERS)   #penalize touching corner
-    #     killer_token = killer_token_weight * int(new_t_pos in gamestate._KILLER_TOKENS if token_id!=255 else 0) #reward placing tokens in killer positions
-        
-    #     # +1 if heuristic from own perspective, 
-    #     # -1 if from oponent's perspective
-    #     flip = 2*int(l_piece_id==self.player)-1
-    #     return flip*(control_core + avoid_corner + killer_token)
-    
     @classmethod 
     def _compute_legalMoves(cls,state:"gamestate"):
         #create list of possible actions
@@ -93,15 +69,15 @@ class gamestate():
             if state.valid_move(move)[0]:
                 validActions.append(move)
                 
-                #skip trying to move any tokens, cause L piece moves first
+                #if L piece fails, no point trying tokens
                 for T in range(len(state.token_pieces)):
                     for Tpos in cls._general_T_pos:
                         if (Tpos != state.token_pieces[T].get_position()):                   #only consider you moving the token.
                             move = packed_action(state.player, Lpos, T, Tpos)
                             if (state.valid_move(move)[0]):                                  #only add it if its valid
                                 validActions.append(move)
-
-        cls._legalMoves[state] = validActions
+        
+        cls._legalMoves[state] = np.array(validActions)
     
     @classmethod 
     def _preprocess_all_legalMoves(cls):
