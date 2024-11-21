@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple,Set
 
 class token_piece():
     #dictionary with keys being initialization params, values being their respective possible assignments
@@ -11,6 +11,10 @@ class token_piece():
         
         self.x=x
         self.y=y
+        
+    def get_coords(self)->Set[Tuple[int,int]]:
+        return set([(self.x,self.y)])
+    
     def get_position(self)->Tuple[int,int]:
         return self.x,self.y
     

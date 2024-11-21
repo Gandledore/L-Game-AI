@@ -1,11 +1,11 @@
 import numpy as np
-from typing import Tuple
+from typing import Tuple,Set
 import sys
 
 class L_piece():
     #dictionary with keys being initialization params, values being their respective possible assignments
-    _POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4},'short_leg_direction':{'N','E','S','W'}}
-    _POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4],'short_leg_direction':['N','E','S','W']}
+    _POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4},'d':{'N','E','S','W'}}
+    _POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4],'d':['N','E','S','W']}
     _direction_mapping = {
         'N':np.array([0,-1]),
         'E':np.array([1,0]),
@@ -18,11 +18,9 @@ class L_piece():
         'S': ('E', 'W'),
         'W': ('S', 'N')
     }
-    
-    def compute_L_coords(self)->Tuple[np.ndarray[int,int],
-                                      np.ndarray[int,int],
-                                      np.ndarray[int,int],
-                                      np.ndarray[int,int]]:
+    _l_coords = {}
+    @classmethod
+    def _compute_L_coords(cls,x,y,d)->Set[Tuple[int,int]]:
         """computes matrix coords of L piece
             matrix coords:
                 upper left  : [1,1]
@@ -37,53 +35,53 @@ class L_piece():
         Returns:
             Tuple of 4 ndarrays each containing 2 integers
         """
+        if (x,y,d) not in cls._l_coords:
         
-        p1 = np.array([self.x,self.y])
-        p0 = p1 + L_piece._direction_mapping[self.short_leg_direction]
+            p1 = np.array([x,y])
+            p0 = p1 + cls._direction_mapping[d]
+            
+            if d in ['N','S']:
+                ld = cls._orientation_map[d][x>2]
+            elif d in ['E','W']:
+                ld = cls._orientation_map[d][y>2]
+
+            p2 = p1 + cls._direction_mapping[ld]
+            p3 = p1 + cls._direction_mapping[ld]*2
+            cls._l_coords[(x,y,d)] = set((tuple(p0),tuple(p1),tuple(p2),tuple(p3)))
         
-        p2 = p1 + L_piece._direction_mapping[self.long_leg_direction]
-        p3 = p1 + L_piece._direction_mapping[self.long_leg_direction]*2
-        return p0,p1,p2,p3
+        return cls._l_coords[(x,y,d)]
     
-    def update_coords(self):
-        self.coords = np.array(self.compute_L_coords())
-    
-    def __init__(self,x:int,y:int,d:str):
+    def __init__(self,x:int=1,y:int=1,d:str='E'):
         assert x in L_piece._POSSIBLE_SETS['x'], f"L piece x={x} is not in {L_piece._POSSIBLE_SETS['x']}"
         assert y in L_piece._POSSIBLE_SETS['y'], f"L piece y={y} is not in {L_piece._POSSIBLE_SETS['y']}"
-        assert d in L_piece._POSSIBLE_SETS['short_leg_direction'], f"L piece short_leg_direciton={d} is not in {L_piece._POSSIBLE_SETS['short_leg_direction']}"
+        assert d in L_piece._POSSIBLE_SETS['d'], f"L piece d={d} is not in {L_piece._POSSIBLE_SETS['d']}"
         
         self.x = x
         self.y = y
-        self.short_leg_direction = d
+        self.d = d
         
-        if self.short_leg_direction in ['N','S']:
-            self.long_leg_direction = L_piece._orientation_map[self.short_leg_direction][x>2]
-        elif self.short_leg_direction in ['E','W']:
-            self.long_leg_direction = L_piece._orientation_map[self.short_leg_direction][y>2]
-        
-        self.update_coords()
+        self.coords = L_piece._compute_L_coords(x,y,d)
     
-    def get_coords(self)->np.ndarray:
+    def get_coords(self)->Set[Tuple[int,int]]:
         return self.coords
     
     def get_tuple(self)->Tuple[int,int,str]:
-        return self.x,self.y,self.short_leg_direction
+        return self.x,self.y,self.d
     
     def get_position(self)->Tuple[int,int]:
         return self.x,self.y
     
     def __eq__(self, other:'L_piece')->bool:
-        return self.x==other.x and self.y==other.y and self.short_leg_direction==other.short_leg_direction
+        return self.x==other.x and self.y==other.y and self.d==other.d
     
     def __lt__(self,value:int)->bool: #true if any are less than value
-        return bool(np.sum(self.coords.flatten()<value))
+        return any(x < value for tpl in self.coords for x in tpl)
 
     def __gt__(self,value:int)->bool: #true if any are greater than value
-        return bool(np.sum(self.coords.flatten()>value))
+        return any(x > value for tpl in self.coords for x in tpl)
     
     def __repr__(self):
-        return f'({self.x}, {self.y}, {self.short_leg_direction})'
+        return f'({self.x}, {self.y}, {self.d})'
     
     def __hash__(self):
-        return hash((self.x,self.y,self.short_leg_direction))
+        return hash((self.x,self.y,self.d))

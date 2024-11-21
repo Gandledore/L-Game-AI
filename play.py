@@ -2,9 +2,7 @@ import Players
 from classes.game import Game
 
 from typing import Tuple,List
-import copy
 import numpy as np
-
 import cProfile
 import pstats
 
@@ -58,7 +56,7 @@ def play():
         success=False
         for i in range(K):#while True
             try:
-                move = current_player.getMove(copy.deepcopy(game.state)) #value error if invalid input format
+                move = current_player.getMove(game.getState()) #value error if invalid input format
                 game.apply_action(move)  #assertion error if invalid move
                 success=True
                 break
@@ -75,7 +73,6 @@ def play():
     print('Player',bool(winner)+1,'wins!')
     print('Total Turns',turns)
     gs = type(game.state)
-    print(f'{gs._count} gamestates generated')
     num_legal_moves_per_state = [len(moves) for state,moves in gs._legalMoves.items()]
     print(f'Branching factor | Max:{np.max(num_legal_moves_per_state)} | Mean: {np.mean(num_legal_moves_per_state):.2f}')
     print(f'CH: {gs._cache_hits} | CM:{gs._cache_misses} | Cache Hit Rate: {100*gs._cache_hits/(gs._cache_misses+gs._cache_hits):.1f}%')

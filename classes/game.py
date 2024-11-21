@@ -2,9 +2,9 @@ import numpy as np
 import copy
 
 from classes.base_structs.gamestate import gamestate # imports as class 
-from classes.base_structs.action import action
+from classes.base_structs.action import packed_action
 
-from typing import Union,List,Optional,Tuple
+from typing import Optional
 class Game:
     def __init__(self):
         self.state = gamestate()
@@ -13,11 +13,11 @@ class Game:
         return self.state.player
     
     def getState(self)->gamestate:
-        return copy.deepcopy(self.state)
+        return gamestate(self.state.player,self.state.L_pieces[:],self.state.token_pieces[:])
     
     #updates game state with action if it is valid, returns true iff successfuly
     #feedback passed through to valid moves
-    def apply_action(self,move:action)->None:
+    def apply_action(self,move:packed_action)->None:
         self.state = self.state.getSuccessor(move)
     
     #interface to display game board and pieces
