@@ -33,62 +33,68 @@ def setGameMode(mode)->Tuple[int,List[Players.Player]]:
         players = [Players.Agent(0),Players.RandomAgent(1)]
     elif mode == 4:
         players = [Players.RandomAgent(0),Players.RandomAgent(1)]
+    else:
+        print(f'Gamemode {mode} not defined')
     return mode,players
 
-def play():
+def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray]:
     game = Game()
     
     # Enter gamemode 0, 1, or 2
-    # gamemode,players = setGameMode(getGameMode())
-    gamemode,players = setGameMode(3)
-
-    K = 3
-    winner = None
-    turns = 0
-    while winner==None:
-        # print('Gamestates Generated:',gamestate._count)
-        game.display()
-        turn = game.getTurn()
-        turns+=1
-        print(f"Player {turn+1}'s turn ({turns})")
-        
-        current_player = players[turn]
-        success=False
-        for i in range(K):#while True
-            try:
-                move = current_player.getMove(game.getState()) #value error if invalid input format
-                game.apply_action(move)  #assertion error if invalid move
-                success=True
+    if gm==-1:
+        gamemode,players = setGameMode(getGameMode())
+    else:
+        gamemode,players = setGameMode(gm)    
+    winners  = np.empty(shape=(N),dtype=int)
+    turns = np.empty(shape=(N),dtype=int)
+    for n in range(N):
+        while game.whoWins()==None:
+            # print('Gamestates Generated:',gamestate._count)
+            if display: game.display()
+            turn = game.getTurn()
+            if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
+            
+            current_player = players[turn]
+            success=False
+            K = 5
+            for k in range(K):#while True
+                try:
+                    move = current_player.getMove(game.getState()) #value error if invalid input format
+                    if display: print("Move:",move)
+                    game.apply_action(move)  #assertion error if invalid move
+                    success=True
+                    break
+                except ValueError as e:
+                    print(f'Invalid Input. {e}\n')
+                except AssertionError as e:
+                    print(f'Invalid Move. {e}\n')
+            if not success: #if no valid move provided after K attempts, kill game
+                print(f'\n\nNo valid play after {K} moves. Game over.')
                 break
-            except ValueError as e:
-                print(f'Invalid Input. {e}\n')
-            except AssertionError as e:
-                print(f'Invalid Move. {e}\n')
-        if not success: #if no valid move provided after K attempts, kill game
-            print(f'\n\nNo valid play after {K} moves. Game over.')
-            break
-        winner = game.whoWins()
 
-    game.display()
-    print('Player',bool(winner)+1,'wins!')
-    print('Total Turns',turns)
-    gs = type(game.state)
-    num_legal_moves_per_state = [len(moves) for state,moves in gs._legalMoves.items()]
-    print(f'Branching factor | Max:{np.max(num_legal_moves_per_state)} | Mean: {np.mean(num_legal_moves_per_state):.2f}')
-    print(f'CH: {gs._cache_hits} | CM:{gs._cache_misses} | Cache Hit Rate: {100*gs._cache_hits/(gs._cache_misses+gs._cache_hits):.1f}%')
+        winner = game.whoWins()
+        winner = int(not turn)+1 if winner==None else winner+1
+        winners[n] = winner
+        turns[n] = game.totalTurns()
+
+        if display: 
+            game.display()
+            print('Player',winner,'wins!')
+            print('Total Turns',game.totalTurns())
+            
+        game.reset()
+    return winners, turns
+
 if __name__ == "__main__":
-    profiler = cProfile.Profile()
-    profiler.enable()
+    # profiler = cProfile.Profile()
+    # profiler.enable()
     
-    # Your main function or script
-    play()
+    _,_ = play()
     
-    profiler.disable()
+    # profiler.disable()
     
-    # Create a stats object
-    stats = pstats.Stats(profiler)
+    # stats = pstats.Stats(profiler)
     
-    # Sort by 'time' (total time in each function) and print the top 10 functions
-    stats.strip_dirs()  # Optional: remove long file paths for readability
-    stats.sort_stats("time").print_stats(10)
-    # stats.sort_stats("cumulative").print_stats(10)
+    # # Sort by 'time' (total time in each function) and print the top 10 functions
+    # stats.strip_dirs()  # Optional: remove long file paths for readability
+    # stats.sort_stats("time").print_stats(10)

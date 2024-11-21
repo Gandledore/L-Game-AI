@@ -20,12 +20,12 @@ class Agent(Player):
         # visited = {} # compute heuristic once and never again, memory outside of local turn save searched states ( may be too memory intensive except for d = inf)
 
     def getMove(self, state: gamestate) -> packed_action:
-        print('Thinking...')
+        # print('Thinking...')
         start = time.time()
         value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
-        print(f'Move: {bestAction} | Value: {value}')
-        print(f'Time: {end-start:.1f} | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
+        # print(f'Move: {bestAction} | Value: {value}')
+        # print(f'Time: {end-start:.1f} | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
         # print(f'CH: {gamestate._cache_hits} | CM:{gamestate._cache_misses} | Cache Hit Rate: {100*gamestate._cache_hits/(gamestate._cache_misses+gamestate._cache_hits):.1f}%')
         return bestAction
     

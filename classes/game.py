@@ -8,6 +8,7 @@ from typing import Optional
 class Game:
     def __init__(self):
         self.state = gamestate()
+        self.turns = 0
         
     def getTurn(self)->int:
         return self.state.player
@@ -19,7 +20,8 @@ class Game:
     #feedback passed through to valid moves
     def apply_action(self,move:packed_action)->None:
         self.state = self.state.getSuccessor(move)
-    
+        self.turns+=1
+        
     #interface to display game board and pieces
     def display(self)->None:
         board = np.full((4, 4), "  ") # 4 by 4 of empty string
@@ -47,6 +49,13 @@ class Game:
     # made a copy of this in gamestate
     def whoWins(self)->Optional[int]:
         return self.state.whoWins()
+    
+    def totalTurns(self)->int:
+        return self.turns
+    
+    def reset(self)->None:
+        self.state = gamestate()
+        self.turns = 0
     
 if __name__ == "__main__":
     print("run python3 play.py instead")
