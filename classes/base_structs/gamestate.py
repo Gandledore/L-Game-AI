@@ -8,6 +8,7 @@ from classes.base_structs.token_piece import token_piece
 from classes.base_structs.action import packed_action
 
 from typing import Union,List,Optional,Tuple,Callable
+from tqdm import tqdm
 
 class gamestate():
     #precompute with static stuff
@@ -99,7 +100,7 @@ class gamestate():
             print('Legal Moves not Preprocessed. Processing them now...')
             start = time.time()
             count=0
-            for l0_pos in cls._general_L_pos:
+            for l0_pos in tqdm(cls._general_L_pos):
                 l0_set = L_piece._compute_L_coords(*l0_pos)
                 l0 = L_piece(*l0_pos)
                 for l1_pos in cls._general_L_pos:
@@ -117,8 +118,8 @@ class gamestate():
                                                 count+=1
                                                 state = gamestate(p,[l0,l1],[t0,t1])
                                                 cls._compute_legalMoves(state)
-                                                if count%100==0:
-                                                    print(f'\rProcessed {count} states in {time.time()-start:.1f}s',end='')
+                                                # if count%100==0:
+                                                #     print(f'\rProcessed {count} states in {time.time()-start:.1f}s',end='')
         return len(cls._legalMoves)
         
     def __repr__(self):
