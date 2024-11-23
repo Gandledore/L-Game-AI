@@ -20,12 +20,12 @@ class Agent(Player):
         # visited = {} # compute heuristic once and never again, memory outside of local turn save searched states ( may be too memory intensive except for d = inf)
 
     def getMove(self, state: gamestate) -> packed_action:
-        # print('Thinking...')
+        print('Thinking...')
         start = time.time()
         value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
         # print(f'Move: {bestAction} | Value: {value}')
-        # print(f'Time: {end-start:.1f} | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
+        print(f'Time: {end-start:.1f}s | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
         # print(f'CH: {gamestate._cache_hits} | CM:{gamestate._cache_misses} | Cache Hit Rate: {100*gamestate._cache_hits/(gamestate._cache_misses+gamestate._cache_hits):.1f}%')
         return bestAction
     
@@ -34,15 +34,16 @@ class Agent(Player):
         corner_weight = 40
         killer_token_weight = 10
         
-        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, token_id, new_token_pos_x,new_token_pos_y = move.get_rep()
+        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
         new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
+        curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
         new_t_pos = (new_token_pos_x,new_token_pos_y)
         
         l_set = L_piece._compute_L_coords(*new_l_pos)
 
         control_core = core_weight * len(l_set & Agent._CORE)           #reward controlling core
         avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))   #penalize touching corner
-        killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if token_id!=255 else 0) #reward placing tokens in killer positions
+        killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if curr_t_pos!=(0,0) else 0) #reward placing tokens in killer positions
         
         return control_core + avoid_corner + killer_token
     

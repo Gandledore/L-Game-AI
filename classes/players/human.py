@@ -9,6 +9,7 @@ class Human(Player):
     #interface for a play code to get human input
     def getMove(self, state: gamestate) -> packed_action:
         print('Valid Moves:',len(state.getLegalMoves()))
+        # print('\nRecieved State:',state)
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         move_parts = wholeMoves.split()
     
@@ -28,11 +29,10 @@ class Human(Player):
             except ValueError as e:
                 raise ValueError('Use integers for token locations')
             
-            token_id = next((i for i, token in enumerate(state.token_pieces) if current_token_pos == token.get_position()), -1)
-            assert token_id!=-1, f'No Token at {new_token_pos}.'
         elif len(move_parts)==3:
-            token_id=255
+            current_token_pos=(0,0)
             new_token_pos = (0,0)
         
-        move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,token_id=token_id,new_token_pos=new_token_pos)
+        move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,current_token_pos=current_token_pos,new_token_pos=new_token_pos)
+        move.normalize(state.transform)
         return move

@@ -3,6 +3,7 @@ from classes.game import Game
 
 from typing import Tuple,List
 import numpy as np
+import time
 import cProfile
 import pstats
 
@@ -10,7 +11,11 @@ def getGameMode()->int:
     # gamemode input, exception handling
     while True:
         try:
-            modeInput = int(input("0 = human vs human\n1 = human vs agent\n2 = agent vs agent\nEnter your mode: "))
+            modeInput = int(input( "\
+                                    0 = human vs human\n\
+                                    1 = human vs agent\n\
+                                    2 = agent vs agent\n\
+                                    Enter your mode: "))
             
             if modeInput not in [0, 1, 2, 3, 4, 5]:
                 raise ValueError("Invalid input")
@@ -37,7 +42,7 @@ def setGameMode(mode)->Tuple[int,List[Players.Player]]:
         print(f'Gamemode {mode} not defined')
     return mode,players
 
-def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray]:
+def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
     game = Game()
     
     # Enter gamemode 0, 1, or 2
@@ -47,6 +52,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray]:
         gamemode,players = setGameMode(gm)    
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
+    turn_times = [[],[]]
     for n in range(N):
         while game.whoWins()==None:
             # print('Gamestates Generated:',gamestate._count)
@@ -56,13 +62,16 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray]:
             
             current_player = players[turn]
             success=False
-            K = 5
+            K = 3
             for k in range(K):#while True
                 try:
+                    start = time.time()
                     move = current_player.getMove(game.getState()) #value error if invalid input format
-                    if display: print("Move:",move)
+                    end=time.time()
+                    # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
                     success=True
+                    turn_times[turn].append(end-start)
                     break
                 except ValueError as e:
                     print(f'Invalid Input. {e}\n')
@@ -83,18 +92,23 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray]:
             print('Total Turns',game.totalTurns())
             
         game.reset()
-    return winners, turns
+        if not display: print(f'{100*(n+1)/(N):.1f}%',end='\r')
+    print()
+    length = max(len(turn_times[0]),len(turn_times[1]))
+    turn_times = [row + [0] * (length - len(row)) for row in turn_times]
+    return winners, turns, turn_times
 
 if __name__ == "__main__":
-    # profiler = cProfile.Profile()
-    # profiler.enable()
+    profiler = cProfile.Profile()
+    profiler.enable()
     
-    _,_ = play()
+    _,_,_ = play()
     
-    # profiler.disable()
+    profiler.disable()
     
-    # stats = pstats.Stats(profiler)
+    stats = pstats.Stats(profiler)
     
-    # # Sort by 'time' (total time in each function) and print the top 10 functions
-    # stats.strip_dirs()  # Optional: remove long file paths for readability
-    # stats.sort_stats("time").print_stats(10)
+    # Sort by 'time' (total time in each function) and print the top 10 functions
+    stats.strip_dirs()  # Optional: remove long file paths for readability
+    stats.sort_stats("time").print_stats(10)
+    

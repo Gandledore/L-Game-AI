@@ -1,6 +1,5 @@
 import numpy as np
-from typing import Tuple,Set
-import sys
+from typing import Tuple,Set,List
 
 class L_piece():
     #dictionary with keys being initialization params, values being their respective possible assignments
@@ -17,6 +16,18 @@ class L_piece():
         'E': ('S', 'N'),
         'S': ('E', 'W'),
         'W': ('S', 'N')
+    }
+    _transpose_map = {
+        'N': 'W',
+        'W': 'N',
+        'S': 'E',
+        'E': 'S'
+    }
+    _reflection_map = {
+        'N': 'S',
+        'S': 'N',
+        'W': 'E',
+        'E': 'W'
     }
     _l_coords = {}
     @classmethod
@@ -51,6 +62,7 @@ class L_piece():
         
         return cls._l_coords[(x,y,d)]
     
+    
     def __init__(self,x:int=1,y:int=1,d:str='E'):
         assert x in L_piece._POSSIBLE_SETS['x'], f"L piece x={x} is not in {L_piece._POSSIBLE_SETS['x']}"
         assert y in L_piece._POSSIBLE_SETS['y'], f"L piece y={y} is not in {L_piece._POSSIBLE_SETS['y']}"
@@ -59,11 +71,9 @@ class L_piece():
         self.x = x
         self.y = y
         self.d = d
-        
-        self.coords = L_piece._compute_L_coords(x,y,d)
     
     def get_coords(self)->Set[Tuple[int,int]]:
-        return self.coords
+        return L_piece._compute_L_coords(self.x,self.y,self.d)
     
     def get_tuple(self)->Tuple[int,int,str]:
         return self.x,self.y,self.d
@@ -85,3 +95,32 @@ class L_piece():
     
     def __hash__(self):
         return hash((self.x,self.y,self.d))
+    
+    def reflect_x(self)->None:
+        self.x = 5 - self.x
+        self.d = L_piece._reflection_map[self.d] if self.d in ['E','W'] else self.d
+    
+    def reflect_y(self)->None:
+        self.y = 5 - self.y
+        self.d = L_piece._reflection_map[self.d] if self.d in ['N','S'] else self.d
+    
+    def transpose(self)->None:
+        temp = self.x
+        self.x = self.y
+        self.y = temp
+        
+        self.d = L_piece._transpose_map[self.d]
+
+    def compute_normalization(self)->np.ndarray[bool]:
+        return np.array([self.x>2, self.y>2, self.d in ['E', 'W']])
+    
+    def normalize(self,transform:np.ndarray[bool])->None:
+        if transform[0]:
+            self.reflect_x()
+        if transform[1]:
+            self.reflect_y()
+        if transform[2]:
+            self.transpose()
+        
+        self.coords = L_piece._compute_L_coords(self.x,self.y,self.d)
+        

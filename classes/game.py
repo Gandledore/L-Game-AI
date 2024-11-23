@@ -14,7 +14,7 @@ class Game:
         return self.state.player
     
     def getState(self)->gamestate:
-        return gamestate(self.state.player,self.state.L_pieces[:],self.state.token_pieces[:])
+        return gamestate(self.state.player,self.state.L_pieces[:],self.state.token_pieces.copy(),self.state.transform[:])
     
     #updates game state with action if it is valid, returns true iff successfuly
     #feedback passed through to valid moves
@@ -23,8 +23,11 @@ class Game:
         self.turns+=1
         
     #interface to display game board and pieces
-    def display(self)->None:
+    def display(self,internal_display:bool=False)->None:
         board = np.full((4, 4), "  ") # 4 by 4 of empty string
+        
+        #denormalize to display what human expects to see
+        if not internal_display: self.state.denormalize()
         
         for i,l in enumerate(self.state.L_pieces):
             for px, py in l.get_coords():
@@ -32,7 +35,7 @@ class Game:
 
         for i,t in enumerate(self.state.token_pieces):
             tx, ty = t.get_position()
-            board[ty - 1, tx - 1] = "T"+str(i+1)
+            board[ty - 1, tx - 1] = "■■"
 
 
         rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
@@ -43,7 +46,9 @@ class Game:
         
         board_str = horizontal_separator + f"\n{horizontal_separator}".join(rows) + "\n" + horizontal_separator
         print(board_str)
-        #checks who wins. Either None, 0 or 1
+        
+        #renormalize for internal use
+        if not internal_display: self.state.normalize(self.state.transform)
     
     #determines who wins, returns None, 0 or 1
     # made a copy of this in gamestate
