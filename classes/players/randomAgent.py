@@ -12,6 +12,6 @@ class RandomAgent(Player):
         if seed!=-1:
             random.seed(seed)
         
-    def getMove(self, state: gamestate) -> packed_action:
+    def getMove(self, state: gamestate,display:bool=False) -> packed_action:
         legal_moves = state.getLegalMoves()
         return random.choice(legal_moves)

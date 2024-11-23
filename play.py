@@ -6,6 +6,7 @@ import numpy as np
 import time
 import cProfile
 import pstats
+from tqdm import tqdm
 
 def getGameMode()->int:
     # gamemode input, exception handling
@@ -53,7 +54,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
-    for n in range(N):
+    for n in tqdm(range(N)):
         while game.whoWins()==None:
             # print('Gamestates Generated:',gamestate._count)
             if display: game.display()
@@ -66,7 +67,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             for k in range(K):#while True
                 try:
                     start = time.time()
-                    move = current_player.getMove(game.getState()) #value error if invalid input format
+                    move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     end=time.time()
                     # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
@@ -92,7 +93,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             print('Total Turns',game.totalTurns())
             
         game.reset()
-        if not display: print(f'{100*(n+1)/(N):.1f}%',end='\r')
+        # if not display: print(f'{100*(n+1)/(N):.1f}%',end='\r')
     print()
     length = max(len(turn_times[0]),len(turn_times[1]))
     turn_times = [row + [0] * (length - len(row)) for row in turn_times]

@@ -19,14 +19,12 @@ class Agent(Player):
         self.depth = depth
         self.prune = prune
     
-    def getMove(self, state: gamestate) -> packed_action:
-        print('Thinking...')
+    def getMove(self, state: gamestate,display:bool=False) -> packed_action:
+        if display: print('Thinking...')
         start = time.time()
         value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
-        # print(f'Move: {bestAction} | Value: {value}')
-        print(f'Time: {end-start:.1f}s | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
-        # print(f'CH: {gamestate._cache_hits} | CM:{gamestate._cache_misses} | Cache Hit Rate: {100*gamestate._cache_hits/(gamestate._cache_misses+gamestate._cache_hits):.1f}%')
+        if display: print(f'Time: {end-start:.1f}s | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
         return bestAction
     
     def action_heuristic(self,move:packed_action)->int:

@@ -7,8 +7,8 @@ class Human(Player):
         super().__init__(id)
     
     #interface for a play code to get human input
-    def getMove(self, state: gamestate) -> packed_action:
-        print('Valid Moves:',len(state.getLegalMoves()))
+    def getMove(self, state: gamestate, display:bool=True) -> packed_action:
+        if display: print('Valid Moves:',len(state.getLegalMoves()))
         # print('\nRecieved State:',state)
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         move_parts = wholeMoves.split()

@@ -8,7 +8,7 @@ class Player(ABC):
         self.id = id
     
     @abstractmethod
-    def getMove(self, game: gamestate) -> packed_action:
+    def getMove(self, game: gamestate,display:bool=False) -> packed_action:
         pass
     
 

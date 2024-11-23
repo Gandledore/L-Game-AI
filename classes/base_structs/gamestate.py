@@ -14,8 +14,6 @@ class gamestate():
     _general_T_pos = []
     _legalMoves = {}
     _legalMoves_path = 'legal_moves.pkl' #relative to play file
-    _cache_hits = 0
-    _cache_misses = 0
     
     _preprocessing_done = False
     
@@ -179,11 +177,6 @@ class gamestate():
         cls = type(self)
         if self not in cls._legalMoves:
             cls._compute_legalMoves(self)
-            cls._cache_misses+=1
-        #     print(f'Cached {len(cls._legalMoves)} states')
-        else:
-            cls._cache_hits+=1
-        #     print('Already Computed Legal moves for this state'+20*'-')
         return cls._legalMoves[self]
 
     #return True if valid move, False if invalid
