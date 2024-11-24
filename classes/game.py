@@ -30,7 +30,7 @@ class Game:
         if not internal_display: self.state.denormalize()
         
         for i, l in enumerate(self.state.L_pieces):
-            color = "\033[1;31m□□\033[0m" if i == 0 else "\033[1;34m▲▲\033[0m"  # Red for L1, Blue for L2
+            color = "\033[1;31m1□\033[0m" if i == 0 else "\033[1;34m2▲\033[0m"  # Red for L1, Blue for L2
             for px, py in l.get_coords():
                 board[py - 1, px - 1] = color #+ "L" + str(i + 1) + "\033[0m"
         
