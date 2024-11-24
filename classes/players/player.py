@@ -1,5 +1,5 @@
 from abc import ABC,abstractmethod
-from classes.base_structs.action import action
+from classes.base_structs.action import packed_action
 from classes.base_structs.gamestate import gamestate
 
 class Player(ABC):
@@ -8,7 +8,7 @@ class Player(ABC):
         self.id = id
     
     @abstractmethod
-    def getMove(self, game: gamestate) -> action:
+    def getMove(self, game: gamestate,display:bool=False) -> packed_action:
         pass
     
 
