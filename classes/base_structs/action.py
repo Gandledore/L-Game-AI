@@ -3,7 +3,8 @@ import struct
 from classes.base_structs.L_piece import L_piece
 from classes.base_structs.token_piece import token_piece
 
-from typing import Tuple,Optional,List
+from typing import Tuple
+import numpy as np
 
 class packed_action:
     __slots__ = ('data',)
@@ -29,7 +30,7 @@ class packed_action:
         unpacked = struct.unpack(packed_action._format,self.data)
         return f'({unpacked[0]},({unpacked[1]},{unpacked[2]},{unpacked[3].decode('utf-8')}),({unpacked[4]},{unpacked[5]}),({unpacked[6]},{unpacked[7]}))'
     
-    def normalize(self,transform:List[bool]=[False,False,False])->None:
+    def normalize(self,transform:np.ndarray[bool])->None:
         l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = struct.unpack(packed_action._format,self.data)
         new_l_pos_d = new_l_pos_d.decode('utf-8')
         
@@ -49,7 +50,7 @@ class packed_action:
         
         #transpose
         if transform[2]:
-            new_l_pos_d = (L_piece._transpose_map(new_l_pos_d.decode('utf-8'))).encode('utf-8')
+            new_l_pos_d = (L_piece._transpose_map[new_l_pos_d])
             
             temp = curr_token_pos_x
             curr_token_pos_x = curr_token_pos_y
@@ -64,3 +65,33 @@ class packed_action:
                                 l_piece_id,new_l_pos_x,new_l_pos_y,new_l_pos_d.encode('utf-8'),
                                 curr_token_pos_x,curr_token_pos_y,
                                 new_token_pos_x,new_token_pos_y)
+        
+    def denormalize(self,transform:np.ndarray[bool])->None:
+        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = struct.unpack(packed_action._format,self.data)
+        new_l_pos_d = new_l_pos_d.decode('utf-8')
+        
+        #transpose
+        if transform[2]:
+            new_l_pos_d = (L_piece._transpose_map[new_l_pos_d])
+            
+            temp = curr_token_pos_x
+            curr_token_pos_x = curr_token_pos_y
+            curr_token_pos_y = temp
+            
+            temp = new_token_pos_x
+            new_token_pos_x = new_token_pos_y
+            new_token_pos_y = temp
+        
+        #reflect y
+        if transform[1]:
+            new_l_pos_y = 5 - new_l_pos_y
+            curr_token_pos_y = 5 - curr_token_pos_y
+            new_token_pos_y = 5 - new_token_pos_y
+            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['N','S'] else new_l_pos_d
+        
+        #reflect x
+        if transform[0]:
+            new_l_pos_x = 5 - new_l_pos_x
+            curr_token_pos_x = 5 - curr_token_pos_x
+            new_token_pos_x = 5 - new_token_pos_x
+            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d

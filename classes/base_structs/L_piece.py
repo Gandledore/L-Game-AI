@@ -121,6 +121,11 @@ class L_piece():
             self.reflect_y()
         if transform[2]:
             self.transpose()
-        
-        self.coords = L_piece._compute_L_coords(self.x,self.y,self.d)
-        
+
+    def denormalize(self,transform:np.ndarray[bool])->None:
+        if transform[2]:
+            self.transpose()
+        if transform[1]:
+            self.reflect_y()
+        if transform[0]:
+            self.reflect_x()

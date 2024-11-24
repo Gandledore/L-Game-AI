@@ -57,6 +57,8 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     for n in tqdm(range(N)):
         while game.whoWins()==None:
             # print('Gamestates Generated:',gamestate._count)
+            print(game.state)
+            if display: game.display(internal_display=True)
             if display: game.display()
             turn = game.getTurn()
             if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
