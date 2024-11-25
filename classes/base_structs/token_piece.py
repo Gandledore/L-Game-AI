@@ -1,4 +1,5 @@
 from typing import Tuple,Set,List,Union
+import numpy as np
 
 class token_piece():
     #dictionary with keys being initialization params, values being their respective possible assignments
@@ -57,11 +58,18 @@ class token_piece():
         self.x = self.y
         self.y = temp
         
-    def normalize(self,transform:List[bool]=None)->None:
+    def normalize(self,transform:np.ndarray[bool]=None)->None:
         if transform[0]:
             self.reflect_x()
         if transform[1]:
             self.reflect_y()
         if transform[2]:
             self.transpose()
-        
+    
+    def denormalize(self,transform:np.ndarray[bool])->None:
+        if transform[2]:
+            self.transpose()
+        if transform[1]:
+            self.reflect_y()
+        if transform[0]:
+            self.reflect_x()

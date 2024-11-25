@@ -77,74 +77,77 @@ class Agent(Player):
     def AlphaBetaSearch(self, state: gamestate) -> Tuple[int,packed_action]:
         self.max_prune = 0
         self.num_prune = 0
-        self.visited = set() #store states already seen for this turn
+        self.seen = {} #store states already seen for this turn
+        self.finished = {}
         return self.MaxValueAB(state, self.depth)
 
     def MaxValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
         if depth == 0 or state.isGoal():
-            # print(depth,len(self.visited))
-            return self.heuristic(state), None
+            self.finished[state] = self.heuristic(state)
+            return self.finished[state], None
 
         moves = state.getLegalMoves()
         numMoves = len(moves)
         self.max_prune+= numMoves
         
-        if state in self.visited:
+        if state in self.finished: #and (self.depth==-1 or (state in self.seen and depth<=self.seen[state])):
             self.num_prune+=numMoves
-            # print(depth,len(self.visited))
-            return self.heuristic(state),None
+            return self.finished[state],None
         
         heuristics = np.array([self.action_heuristic(move) for move in moves])
         sort_indexes = np.argsort(heuristics)[::-1]
         moves = moves[sort_indexes]
         
         next_states = [state.getSuccessor(m) for m in moves]
-        self.visited |= set(next_states)
+        self.seen |= {next_state:depth-1 for next_state in next_states if next_state not in self.seen or (depth-1>self.seen[next_state] and self.depth!=-1)}
         
         v = float('-inf')
+        move = None
         for i,m in enumerate(moves):
-            v2, _ = self.MinValueAB(next_states[i], depth-1, alpha, beta)
-            if v2 > v:
-                v, move = v2, m
-                alpha = max(alpha, v)
-            if self.prune and v >= beta:
-                # print(f'Pruned {numMoves-i}/{numMoves} actions')
-                self.num_prune+= numMoves-i
-                break
-        # print(depth,len(self.visited))
+            next_state = next_states[i]
+            if depth-1>=self.seen[next_state]:
+                v2, _ = self.MinValueAB(next_states[i], depth-1, alpha, beta)
+                if v2 > v:
+                    v, move = v2, m
+                    alpha = max(alpha, v)
+                if self.prune and v >= beta:
+                    self.num_prune+= numMoves-i
+                    break
+                
+        self.finished[state] = v
         return v, move
     
-
     def MinValueAB(self, state: gamestate, depth:int, alpha:float, beta:float) -> Tuple[int, packed_action]:
         if depth == 0 or state.isGoal():
-            # print(depth,len(self.visited))
-            return self.heuristic(state), None
+            self.finished[state] = self.heuristic(state)
+            return self.finished[state], None
       
         moves = state.getLegalMoves()
         numMoves = len(moves)
         self.max_prune+= numMoves
         
-        if state in self.visited:
+        if state in self.finished: #and (self.depth==-1 or (state in self.seen and depth<=self.seen[state])):
             self.num_prune+=numMoves
-            # print(depth,len(self.visited))
-            return self.heuristic(state),None
+            return self.finished[state],None
             
         heuristics = np.array([self.action_heuristic(move) for move in moves])
         sort_indexes = np.argsort(heuristics)[::-1]
         moves = moves[sort_indexes]
         
         next_states = [state.getSuccessor(m) for m in moves]
-        self.visited |= set(next_states)
+        self.seen |= {next_state:depth-1 for next_state in next_states if next_state not in self.seen or (depth-1>self.seen[next_state] and self.depth!=-1)}
         
         v = float('inf')
+        move = None
         for i,m in enumerate(moves):
-            v2, _ = self.MaxValueAB(next_states[i], depth-1, alpha, beta)
-            if v2 < v:
-                v, move = v2, m
-                beta = min(beta, v)
-            if self.prune and v <= alpha:
-                # print(f'Pruned {numMoves-i}/{numMoves} actions')
-                self.num_prune+=numMoves-i
-                break
-        # print(depth,len(self.visited))
+            next_state = next_states[i]
+            if depth-1>=self.seen[next_state]:
+                v2, _ = self.MaxValueAB(next_states[i], depth-1, alpha, beta)
+                if v2 < v:
+                    v, move = v2, m
+                    beta = min(beta, v)
+                if self.prune and v <= alpha:
+                    self.num_prune+=numMoves-i
+                    break
+        self.finished[state] = v
         return v, move

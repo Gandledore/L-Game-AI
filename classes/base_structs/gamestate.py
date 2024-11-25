@@ -150,8 +150,7 @@ class gamestate():
     def update_normalization(self,transform:np.ndarray[bool])->None:
         self.transform = np.logical_xor(self.transform,transform)
         
-    def normalize(self,transform):
-        
+    def normalize(self,transform):        
         #normalize the L pieces
         for piece in self.L_pieces:
             piece.normalize(transform)
@@ -164,8 +163,15 @@ class gamestate():
     #just a wrapper, cause each part of transformation is binary and independent, 
     # so doing it twice reverses it (basically an xor operation)
     def denormalize(self)->None:
-        self.normalize(self.transform)
-    
+        #normalize the L pieces
+        for piece in self.L_pieces:
+            piece.denormalize(self.transform)
+        
+        #'or' comprehension necessary because 
+        #   1) normalize returns none
+        #   2) modifying elements in a set in place changes hash and results in unexpected behavior
+        self.token_pieces = {piece.denormalize(self.transform) or piece for piece in self.token_pieces}
+
     def renormalize(self)->None:
         partial_transform = self.compute_normalization()
         # if not all(partial_transform==self.transform):
@@ -247,7 +253,9 @@ class gamestate():
         # moving L2 doesn't change normalization 
         # (normalization defined by L1)
         if self.player==0:
+            print('PRE-Norm State:',state)
             state.renormalize()
+            print('POST-Norm State:',state)
         return state
     
     #checks state is goal
