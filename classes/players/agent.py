@@ -19,8 +19,8 @@ class Agent(Player):
         self.depth = depth
         self.prune = prune
         self.finished = {} #stores state:(d,v) tuple of depth and best backpropagated value of highest depth search (-1 = infinite depth)
-        self.check_tie_depth = 5 #look 5 ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
-        self.ties = set()
+        self.check_tie_depth = 7 #look 5 ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
+        # self.ties = set()
         self.last = 0
         self.max_score = 1
         self.heuristics = {}
@@ -86,7 +86,7 @@ class Agent(Player):
     def AlphaBetaSearch(self, state: gamestate) -> Tuple[int,packed_action]:
         self.max_prune = 1
         self.num_prune = 0
-        self.parity = self.depth%2
+        # self.parity = self.depth%2
         self.seen = {state:[self.depth]}
         return self.MaxValueAB(state, self.depth)
 
@@ -122,14 +122,14 @@ class Agent(Player):
         # testing_state=False
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
-            if next_state in self.ties:
-                v2 = 0
-            elif next_state in self.seen and len(self.seen[next_state])>0:
+            # if next_state in self.ties:
+            #     v2 = 0
+            if next_state in self.seen and len(self.seen[next_state])>0:
                 d = self.check_tie_depth-1 if depth<0 else min(depth-1,self.check_tie_depth-1)
                 self.seen[next_state].append(d)
                 v2,_ = self.MinValueAB(next_state,d,alpha,beta)
-                if v2==0 and d==self.check_tie_depth-1:
-                    self.ties.add(next_state)
+                # if v2==0 and d==self.check_tie_depth-1:
+                #     self.ties.add(next_state)
                 self.seen[next_state].pop()
             else:
                 self.seen[next_state] = []
@@ -176,14 +176,14 @@ class Agent(Player):
         move = None
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
-            if next_state in self.ties:
-                v2=0
-            elif next_state in self.seen and len(self.seen[next_state])>0:
+            # if next_state in self.ties:
+            #     v2=0
+            if next_state in self.seen and len(self.seen[next_state])>0:
                 d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
                 self.seen[next_state].append(d)
                 v2,_ = self.MaxValueAB(next_state,d,alpha,beta)
-                if v2==0 and d==self.check_tie_depth:
-                    self.ties.add(next_state)
+                # if v2==0 and d==self.check_tie_depth:
+                #     self.ties.add(next_state)
                 self.seen[next_state].pop()
             else:
                 self.seen[next_state] = []

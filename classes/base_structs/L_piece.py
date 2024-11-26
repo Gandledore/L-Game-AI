@@ -2,6 +2,7 @@ import numpy as np
 from typing import Tuple,Set,List
 
 class L_piece():
+    __slots__ = ('x','y','d')
     #dictionary with keys being initialization params, values being their respective possible assignments
     _POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4},'d':{'N','E','S','W'}}
     _POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4],'d':['N','E','S','W']}

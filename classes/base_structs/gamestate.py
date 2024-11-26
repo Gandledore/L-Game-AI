@@ -9,6 +9,7 @@ from typing import Union,List,Optional,Tuple,Set
 from tqdm import tqdm
 
 class gamestate():
+    __slots__ = ('player','L_pieces','token_pieces','transform','token_pair_id')
     #precompute with static stuff
     _general_L_pos = []
     _general_T_pos = []
@@ -34,6 +35,7 @@ class gamestate():
         else:
             self.transform = transform
         
+        self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
         #preprocess everything
         if not gamestate._preprocessing_done:
             gamestate._precompute_gen_L_pos()
@@ -81,8 +83,8 @@ class gamestate():
                 
                 #if L piece fails, no point trying tokens
                 #sorting tokens so that it is consistent order (only necessary for repeatability)
-                tokens = sorted(list(state.token_pieces))
-                for token in tokens:
+                # tokens = sorted(list(state.token_pieces))
+                for token in state.token_pieces:
                     token_pos = token.get_position()
                     for Tpos in cls._general_T_pos:
                         if (Tpos != token.get_position()):                                   #only consider actually moving the token.
@@ -140,9 +142,9 @@ class gamestate():
     def __repr__(self):
         return f"Player: {self.player}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}\nTransform:{self.transform}"
     def __hash__(self):
-        return hash((self.player,tuple(self.L_pieces),tuple(sorted(self.token_pieces))))
+        return hash((self.player,tuple(self.L_pieces),self.token_pair_id))
     def __eq__(self,other:"gamestate"):
-        return self.player==other.player and self.L_pieces==other.L_pieces and self.token_pieces==other.token_pieces
+        return self.token_pair_id==other.token_pair_id and self.player==other.player and self.L_pieces==other.L_pieces
     
     def compute_normalization(self)->np.ndarray[bool]:
         return self.L_pieces[0].compute_normalization()
@@ -159,6 +161,7 @@ class gamestate():
         #   1) normalize returns none
         #   2) modifying elements in a set in place changes hash and results in unexpected behavior
         self.token_pieces = {piece.normalize(transform) or piece for piece in self.token_pieces}
+        self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
 
     #just a wrapper, cause each part of transformation is binary and independent, 
     # so doing it twice reverses it (basically an xor operation)
@@ -171,6 +174,7 @@ class gamestate():
         #   1) normalize returns none
         #   2) modifying elements in a set in place changes hash and results in unexpected behavior
         self.token_pieces = {piece.denormalize(self.transform) or piece for piece in self.token_pieces}
+        self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
 
     def renormalize(self)->None:
         partial_transform = self.compute_normalization()

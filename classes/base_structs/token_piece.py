@@ -2,6 +2,7 @@ from typing import Tuple,Set,List,Union
 import numpy as np
 
 class token_piece():
+    __slots__ = ('x','y')
     #dictionary with keys being initialization params, values being their respective possible assignments
     _POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4]}
     _POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4}}
@@ -30,20 +31,7 @@ class token_piece():
     
     def __repr__(self):
         return f'({self.x}, {self.y})'
-    
-    #compare less than for either ints or another token (sorting)
-    def __lt__(self,other:Union[int,"token_piece"])->bool:
-        if isinstance(other, token_piece):
-            #1.2 slightly prioritizes x by making y larger, so that all board spots are unique. 
-            return self.x + 1.2*self.y < other.x + 1.2*other.y
-        elif isinstance(other, int):
-            return self.x < other and self.y<other
-        else:
-            raise NotImplementedError(f'Comparison of token and {type(other)} not supported')
         
-    def __gt__(self,value:int)->bool:
-        return self.x>value and self.y>value
-    
     def __hash__(self):
         return hash((self.x,self.y))
 
