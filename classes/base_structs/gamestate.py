@@ -211,7 +211,7 @@ class gamestate():
         #already know other token doesn't collide with other l
         current_token_pos = {token.get_position() for token in self.token_pieces}
         if current_token_pos & new_l_set:
-            return False, f'Moved l piece collides with token(s)'
+            return False, f'Moved L piece collides with token(s)'
         
         #check moved l piece is inside game board
         if not new_l_set <= cls._board:
@@ -253,9 +253,9 @@ class gamestate():
         # moving L2 doesn't change normalization 
         # (normalization defined by L1)
         if self.player==0:
-            print('PRE-Norm State:',state)
+            # print('PRE-Norm State:',state)
             state.renormalize()
-            print('POST-Norm State:',state)
+            # print('POST-Norm State:',state)
         return state
     
     #checks state is goal

@@ -48,12 +48,12 @@ class Human(Player):
     def getMove(self, state: gamestate, display:bool=True) -> packed_action:
 
         if display: print('Valid Moves:',len(state.getLegalMoves()))
-        # evals = {}
-        # for suggestmove in state.getLegalMoves(): # i htink the iseu is the moves are normalized moves...
-        #     successor = state.getSuccessor(suggestmove)
-        #     evals[suggestmove] = self.heuristic(successor)
-        # suggestedmove = max(evals, key=evals.get)
-        suggestedmove = state.getLegalMoves()[0]
+        evals = {}
+        for suggestmove in state.getLegalMoves(): # i htink the iseu is the moves are normalized moves...
+            successor = state.getSuccessor(suggestmove)
+            evals[suggestmove] = self.heuristic(successor)
+        suggestedmove = max(evals, key=evals.get)
+        # suggestedmove = state.getLegalMoves()[0]
         suggestedmove.denormalize(state.transform)
         print("Suggested Move: ", suggestedmove.suggest_format())
 
