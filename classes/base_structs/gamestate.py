@@ -253,9 +253,7 @@ class gamestate():
         # moving L2 doesn't change normalization 
         # (normalization defined by L1)
         if self.player==0:
-            print('PRE-Norm State:',state)
             state.renormalize()
-            print('POST-Norm State:',state)
         return state
     
     #checks state is goal

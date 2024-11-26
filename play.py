@@ -55,11 +55,12 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
     for n in tqdm(range(N)):
+        if gamemode==3:
+            players[1].set_seed(n)
         while game.whoWins()==None:
-            # print('Gamestates Generated:',gamestate._count)
-            print(game.state)
-            if display: game.display(internal_display=True)
-            if display: game.display()
+            if display:
+                game.display(internal_display=True)
+                game.display()
             turn = game.getTurn()
             if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
             
@@ -99,6 +100,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     print()
     length = max(len(turn_times[0]),len(turn_times[1]))
     turn_times = [row + [0] * (length - len(row)) for row in turn_times]
+    if gamemode==3: print('Finished MinMaxing',len(players[0].finished),'states')
     return winners, turns, turn_times
 
 if __name__ == "__main__":
