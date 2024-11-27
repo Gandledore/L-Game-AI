@@ -59,6 +59,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             players[1].set_seed(n)
         while game.whoWins()==None:
             if display:
+                print(game.state)
                 game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
@@ -115,5 +116,5 @@ if __name__ == "__main__":
     
     # Sort by 'time' (total time in each function) and print the top 10 functions
     stats.strip_dirs()  # Optional: remove long file paths for readability
-    stats.sort_stats("time").print_stats(10)
+    stats.sort_stats("time").print_stats(16)
     

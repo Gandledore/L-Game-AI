@@ -184,16 +184,14 @@ class gamestate():
             
     #returns list of legal actions for current player
     def getLegalMoves(self)->List[packed_action]:
-        cls = type(self)
-        if self not in cls._legalMoves:
-            cls._compute_legalMoves(self)
-        return cls._legalMoves[self]
+        if self not in gamestate._legalMoves:
+            gamestate._compute_legalMoves(self)
+        return gamestate._legalMoves[self]
 
     #return True if valid move, False if invalid
     #feedback to for assertions statements describing first error that's invalid
     def valid_move(self,move:packed_action)->Tuple[bool,str]:
-        cls = type(self)
-        
+
         l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
         new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
         curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
@@ -218,7 +216,7 @@ class gamestate():
             return False, f'Moved l piece collides with token(s)'
         
         #check moved l piece is inside game board
-        if not new_l_set <= cls._board:
+        if not new_l_set <= gamestate._board:
             return False, "L piece not in game board."
         
         #null spots are corners outside board ({0,5},{0,5}) (not just (0,0) because of transforms)
@@ -249,8 +247,8 @@ class gamestate():
         new_t_pos = (new_token_pos_x,new_token_pos_y)
         
         state = gamestate(player=int(not self.player),
-                        L_pieces=[L_piece(*new_l_pos) if self.player==i else L_piece(*l_piece.get_tuple()) for i,l_piece in enumerate(self.L_pieces)],
-                        token_pieces={token_piece(*new_t_pos) if curr_t_pos==token.get_position() else token_piece(*token.get_tuple()) for token in self.token_pieces},
+                        L_pieces=[L_piece(*new_l_pos) if self.player==i else l_piece.copy() for i,l_piece in enumerate(self.L_pieces)],
+                        token_pieces={token_piece(*new_t_pos) if curr_t_pos==token.get_position() else token.copy() for token in self.token_pieces},
                         transform=self.transform.copy())
         
         #only renormalize when L1 moved

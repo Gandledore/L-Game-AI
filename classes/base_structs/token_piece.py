@@ -35,6 +35,9 @@ class token_piece():
     def __hash__(self):
         return hash((self.x,self.y))
 
+    def copy(self):
+        return token_piece(self.x,self.y)
+    
     def reflect_x(self)->None:
         self.x = 5 - self.x
     

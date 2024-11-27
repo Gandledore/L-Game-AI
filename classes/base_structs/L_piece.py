@@ -91,6 +91,9 @@ class L_piece():
     def __gt__(self,value:int)->bool: #true if any are greater than value
         return any(x > value for tpl in self.coords for x in tpl)
     
+    def copy(self):
+        return L_piece(self.x,self.y,self.d)
+    
     def __repr__(self):
         return f'({self.x}, {self.y}, {self.d})'
     

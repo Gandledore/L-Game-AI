@@ -14,8 +14,7 @@ lm = gamestate._legalMoves
 with open(gamestate._legalMoves_path,'rb') as f:
     preprocessed_data = pickle.load(f)
     
-print(f"Saved Memory: {asf.asizeof(lm)/1000000:.2f} MB")
-print(f"Loaded Memory: {asf.asizeof(preprocessed_data)/1000000:.2f} MB")
+print(f"Memory: {asf.asizeof(preprocessed_data)/1000000:.2f} MB")
 
 b = np.array([len(v) for k,v in preprocessed_data.items()])
 avg_b = np.mean(b)
