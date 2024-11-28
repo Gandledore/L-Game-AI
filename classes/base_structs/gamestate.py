@@ -34,7 +34,7 @@ class gamestate():
             self.renormalize()
         else:
             self.transform = transform
-        
+        assert self.valid_state()
         self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
         #preprocess everything
         if not gamestate._preprocessing_done:
@@ -188,6 +188,14 @@ class gamestate():
             gamestate._compute_legalMoves(self)
         return gamestate._legalMoves[self]
 
+    def valid_state(self)->bool:
+        l0_set = self.L_pieces[0].get_coords()
+        l1_set = self.L_pieces[1].get_coords()
+        current_token_pos = {token.get_position() for token in self.token_pieces}
+        if len(l0_set | l1_set | current_token_pos)!=10:
+            return False
+        return True
+        
     #return True if valid move, False if invalid
     #feedback to for assertions statements describing first error that's invalid
     def valid_move(self,move:packed_action)->Tuple[bool,str]:

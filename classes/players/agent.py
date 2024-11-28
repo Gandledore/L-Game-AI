@@ -14,20 +14,20 @@ class Agent(Player):
     _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
     _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}
     
-    def __init__(self, id:int, depth=-1, prune:bool=False):
+    def __init__(self, id:int, depth=-1, prune:bool=True):
         super().__init__(id)
         self.depth = depth
         self.prune = prune
         self.finished = {} #stores state:(d,v) tuple of depth and best backpropagated value of highest depth search (-1 = infinite depth)
-        self.check_tie_depth = 7 #look 5 ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
-        # self.ties = set()
+        self.check_tie_depth = 11 #look 5 ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
         self.last = 0
         self.max_score = 1
         self.heuristics = {}
-
     def getMove(self, state: gamestate,display:bool=False) -> packed_action:
         self.display=display
-        if self.display: print('Thinking...')
+        if self.display: 
+            print('Thinking...')
+            print(len(state.getLegalMoves()))
         start = time.time()
         value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
@@ -88,8 +88,14 @@ class Agent(Player):
         self.max_prune = 1
         self.num_prune = 0
         self.seen = {state:[self.depth]}
-        return self.MaxValueAB(state, self.depth)
-
+        bestVal = float('-inf')
+        bestMove = None
+        for val,move in self.MaxValueAB(state, self.depth):
+            if val>bestVal:
+                bestVal = val
+                bestMove = move
+        return bestVal,bestMove
+    
     def MaxValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
         if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
             self.last = len(self.finished)
@@ -104,14 +110,15 @@ class Agent(Player):
             tied_state = stored_depth>=self.check_tie_depth
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
                 if self.display and depth==-1: print(f'MAX USING Saved evaluation {stored_depth,val,move} for depth {depth}')
-                return val,move
-            # else: print(f'NOT using saved {stored_depth,val,move} for current depth {depth}')
+                yield val,move
+                return
         
         if depth == 0 or state.isGoal():
             h =self.heuristic(state)
-            # self.finished[state] = (depth,self.heuristic(state),None)
+            self.finished[state] = (depth,h,None)
             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
-            return h, None
+            yield h, None
+            return
         
         moves = state.getLegalMoves()
         numMoves = len(moves)
@@ -123,26 +130,34 @@ class Agent(Player):
         
         v = float('-inf')
         move = None
+        prune_yielded = False
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
+            
             if next_state in self.seen and len(self.seen[next_state])>0:
                 d = self.check_tie_depth-1 if depth<0 else min(depth-1,self.check_tie_depth-1)
                 self.seen[next_state].append(d)
-                v2,_ = self.MinValueAB(next_state,d,alpha,beta)
-                self.seen[next_state].pop()
             else:
+                d = depth-1
                 self.seen[next_state] = [depth]
-                v2, _ = self.MinValueAB(next_state, depth-1, alpha, beta)
-                self.seen[next_state].pop()
-            if v2 > v:
-                v, move = v2, m
-                alpha = max(alpha, v)
-            if self.prune and v >= beta:
-                self.num_prune+= numMoves-i-1
-                return v,move
+            
+            child_evals = self.MinValueAB(next_state, d, alpha, beta)
+            
+            for v2,_ in child_evals:
+                if v2 > v:
+                    v, move = v2, m
+                    alpha = max(alpha, v)
+                if self.prune and not prune_yielded and v >= beta:
+                    self.num_prune+= numMoves-i-1
+                    yield v,move
+                    prune_yielded=True
+                    
+            self.seen[next_state].pop()
 
         self.finished[state] = (depth,v,move)
-        return v, move
+        if not prune_yielded:
+            yield v,move
+        return
     
     def MinValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
         if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
@@ -158,14 +173,16 @@ class Agent(Player):
             tied_state = stored_depth>=self.check_tie_depth-1
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
                 # print(f'USING Saved evaluation | {self.finished[state]}')
-                return val,move
+                yield val,move
+                return
             # else: print(f'NOT using saved {stored_depth,val,move} for current depth {depth}')
         
         if depth == 0 or state.isGoal():
             h = self.heuristic(state)
-            # self.finished[state] = (depth,h,None)
+            self.finished[state] = (depth,h,None)
             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
-            return h, None
+            yield h, None
+            return
       
         moves = state.getLegalMoves()
         numMoves = len(moves)
@@ -177,23 +194,71 @@ class Agent(Player):
         
         v = float('inf')
         move = None
+        prune_yielded = False
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
+            
             if next_state in self.seen and len(self.seen[next_state])>0:
                 d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
                 self.seen[next_state].append(d)
-                v2, _ = self.MaxValueAB(next_state,d,alpha,beta)
-                self.seen[next_state].pop()
             else:
+                d = depth-1
                 self.seen[next_state] = [depth]
-                v2, _ = self.MaxValueAB(next_state, depth-1, alpha, beta)
-                self.seen[next_state].pop()
-            if v2 < v:
-                v, move = v2, m
-                beta = min(beta, v)
-            if self.prune and v <= alpha:
-                self.num_prune+=numMoves-i-1
-                return v,move
+                
+            child_evals = self.MaxValueAB(next_state, d, alpha, beta)
+            for v2,_ in child_evals:
+                if v2 < v:
+                    v, move = v2, m
+                    beta = min(beta, v)
+                if self.prune and not prune_yielded and v <= alpha:
+                    self.num_prune+=numMoves-i-1
+                    yield v,move
+                    prune_yielded = True
+            
+            self.seen[next_state].pop()
             
         self.finished[state] = (depth,v,move)
-        return v, move
+        if not prune_yielded:
+            yield v,move
+        return
+
+
+    # def alpha_beta_search(self,initial_state:gamestate)->Tuple[int, packed_action]:
+    #     alpha = -1*self.max_score
+    #     beta = self.max_score
+    #     self.max_prune=1
+    #     self.num_prune=0
+    #     depth = self.depth
+    #     self.seen = {state:[depth]}
+    #     stack = LifoQueue()
+    #     stack.put(initial_state)
+    #     while not stack.empty():
+    #         state = stack.get()
+            
+    #         #if we have already finished evaluating this state with at least this much depth, return saved value
+    #         if state in self.finished:
+    #             saved_deeper_search = depth>=0 and self.finished[state][0]>=depth
+    #             guaranteed_terminal = abs(self.finished[state][1])>=self.max_score
+    #             state_fully_searched = self.finished[state][0]<0
+    #             tied_state = self.finished[state][0]>=self.check_tie_depth
+    #             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
+    #                 if self.display and depth==-1: print(f'MAX USING Saved evaluation {self.finished[state]} for depth {depth}')
+    #                 return self.finished[state][1],self.finished[state][2]
+    #             else: print(f'NOT using saved {self.finished[state]} for current depth {depth}')
+        
+    #         if depth == 0 or state.isGoal():
+    #             h =self.heuristic(state)
+    #             self.finished[state] = (depth,h,None)
+    #             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
+    #             return h, None
+            
+    #         moves = state.getLegalMoves()
+    #         numMoves = len(moves)
+    #         self.max_prune+= numMoves
+            
+    #         heuristics = np.array([self.action_heuristic(move) for move in moves])
+    #         sort_indexes = np.argsort(heuristics)[::-1]
+    #         moves = moves[sort_indexes]
+            
+    #         for successor in [state.getSuccessor(move) for move in moves]:
+    #             stack.put(successor)
