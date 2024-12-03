@@ -13,7 +13,7 @@ class Agent(Player):
     _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
     _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}
     
-    def __init__(self, id:int, depth=3, prune:bool=False):
+    def __init__(self, id:int, depth=-1, prune:bool=False):
         super().__init__(id)
         self.depth = depth
         self.prune = prune
