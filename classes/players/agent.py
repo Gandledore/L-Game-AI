@@ -7,27 +7,27 @@ from classes.base_structs.token_piece import token_piece
 from typing import Tuple
 import time
 import numpy as np
-from queue import LifoQueue
 
 class Agent(Player):
     _CORE = {(2,2), (2,3), (3,2), (3,3)}
     _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
     _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}
     
-    def __init__(self, id:int, depth=-1, prune:bool=False):
+    def __init__(self, id:int, depth=3, prune:bool=False):
         super().__init__(id)
         self.depth = depth
         self.prune = prune
         self.finished = {} #stores state:(d,v) tuple of depth and best backpropagated value of highest depth search (-1 = infinite depth)
-        self.check_tie_depth = 7 #look 5 ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
-        # self.ties = set()
+        self.check_tie_depth = min(depth,11)%12 #look >5 ply ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
         self.last = 0
-        self.max_score = 1
+        self.max_score = 900
         self.heuristics = {}
-
+        
     def getMove(self, state: gamestate,display:bool=False) -> packed_action:
         self.display=display
-        if self.display: print('Thinking...')
+        if self.display: 
+            print('Thinking...')
+            print(len(state.getLegalMoves()))
         start = time.time()
         value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
@@ -57,16 +57,17 @@ class Agent(Player):
     
     def heuristic(self, state:gamestate) -> int:
         if state not in self.heuristics:
-            player = not state.player   #not state.player is person who called heuristic
-            opponent = state.player     # reward and penalize from caller's perspective
+            player = self.id
+            opponent = int(not self.id)
+            flip_factor = 2*int(player == state.player) - 1 #1 if my turn, -1 if opponent's turn
 
-            opponent_options_weight = 0#-1
-            core_weight = 0#20
-            corner_weight = 0#40
-            win_weight = 1#1000
+            options_weight = 1
+            core_weight = 25
+            corner_weight = 40
+            win_weight = 1000
 
             #penalize number of moves other person has
-            legalmovesofother = opponent_options_weight*len(state.getLegalMoves()) #state is already the other player, just call getLegalMoves
+            control_options = flip_factor * options_weight * len(state.getLegalMoves()) #state is already the other player, just call getLegalMoves
             
             player_l_set = state.L_pieces[player].get_coords()
             opponent_l_set = state.L_pieces[opponent].get_coords()
@@ -76,10 +77,11 @@ class Agent(Player):
             avoid_corner = -1*corner_weight * len(player_l_set & Agent._CORNERS)   #penalize touching corner
             force_corner = corner_weight * len(opponent_l_set & Agent._CORNERS)    #reward oponent being in corner
 
-            #reward true if they lose
-            winning = win_weight * (2*int(self.id != state.player) - 1) * state.isGoal() #colinear with legalmovesofother
+            #negative flip because if state is goal, current player lost. 
+            # flip is +1 when its agent's turn, but want to penalize losing
+            winning = -1*flip_factor*win_weight * state.isGoal() #colinear with legalmovesofother
 
-            score = legalmovesofother + control_core + expel_core + avoid_corner + force_corner + winning
+            score = control_options + control_core + expel_core + avoid_corner + force_corner + winning
             self.heuristics[state]=score
 
         return self.heuristics[state]
@@ -103,13 +105,12 @@ class Agent(Player):
             state_fully_searched = stored_depth<0
             tied_state = stored_depth>=self.check_tie_depth
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
-                if self.display and depth==-1: print(f'MAX USING Saved evaluation {stored_depth,val,move} for depth {depth}')
+                # if self.display and depth==-1: print(f'MAX USING Saved evaluation {stored_depth,val,move} for depth {depth}')
                 return val,move
-            # else: print(f'NOT using saved {stored_depth,val,move} for current depth {depth}')
         
         if depth == 0 or state.isGoal():
             h =self.heuristic(state)
-            # self.finished[state] = (depth,self.heuristic(state),None)
+            self.finished[state] = (depth,h,None)
             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
             return h, None
         
@@ -125,15 +126,17 @@ class Agent(Player):
         move = None
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
+            
             if next_state in self.seen and len(self.seen[next_state])>0:
                 d = self.check_tie_depth-1 if depth<0 else min(depth-1,self.check_tie_depth-1)
                 self.seen[next_state].append(d)
-                v2,_ = self.MinValueAB(next_state,d,alpha,beta)
-                self.seen[next_state].pop()
             else:
+                d = depth-1
                 self.seen[next_state] = [depth]
-                v2, _ = self.MinValueAB(next_state, depth-1, alpha, beta)
-                self.seen[next_state].pop()
+            
+            v2,_ = self.MinValueAB(next_state, d, alpha, beta)
+            self.seen[next_state].pop()
+            
             if v2 > v:
                 v, move = v2, m
                 alpha = max(alpha, v)
@@ -163,7 +166,7 @@ class Agent(Player):
         
         if depth == 0 or state.isGoal():
             h = self.heuristic(state)
-            # self.finished[state] = (depth,h,None)
+            self.finished[state] = (depth,h,None)
             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
             return h, None
       
@@ -179,15 +182,17 @@ class Agent(Player):
         move = None
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
+            
             if next_state in self.seen and len(self.seen[next_state])>0:
                 d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
                 self.seen[next_state].append(d)
-                v2, _ = self.MaxValueAB(next_state,d,alpha,beta)
-                self.seen[next_state].pop()
             else:
+                d = depth-1
                 self.seen[next_state] = [depth]
-                v2, _ = self.MaxValueAB(next_state, depth-1, alpha, beta)
-                self.seen[next_state].pop()
+                
+            v2,_ = self.MaxValueAB(next_state, d, alpha, beta)
+            self.seen[next_state].pop()
+            
             if v2 < v:
                 v, move = v2, m
                 beta = min(beta, v)

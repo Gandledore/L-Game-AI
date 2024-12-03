@@ -38,6 +38,8 @@ def setGameMode(mode)->Tuple[int,List[Players.Player]]:
     elif mode == 3:
         players = [Players.Agent(0),Players.RandomAgent(1)]
     elif mode == 4:
+        players = [Players.RandomAgent(0),Players.Agent(1)]
+    elif mode == 5:
         players = [Players.RandomAgent(0),Players.RandomAgent(1)]
     else:
         print(f'Gamemode {mode} not defined')
@@ -57,7 +59,9 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     for n in tqdm(range(N)):
         if gamemode==3:
             players[1].set_seed(n)
-        while game.whoWins()==None:
+        if gamemode==4:
+            players[0].set_seed(n)
+        while game.whoWins()==None and game.totalTurns()<64:
             if display:
                 print(game.state)
                 game.display(internal_display=True)
@@ -88,6 +92,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
 
         winner = game.whoWins()
         winner = int(not turn)+1 if winner==None else winner+1
+        winner = winner if game.totalTurns()<64 else 0
         winners[n] = winner
         turns[n] = game.totalTurns()
 
@@ -95,6 +100,8 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             game.display()
             print('Player',winner,'wins!')
             print('Total Turns',game.totalTurns())
+            print(type(game.getState())._count_successors,'unique successors')
+            print(players[0].deepest)
             
         game.reset()
         # if not display: print(f'{100*(n+1)/(N):.1f}%',end='\r')

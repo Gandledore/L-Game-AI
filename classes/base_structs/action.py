@@ -25,7 +25,10 @@ class packed_action:
 
     def get_rep(self):
         return struct.unpack(packed_action._format, self.data)
-
+    def __hash__(self):
+        return hash(self.data)
+    def __eq__(self, other):
+        return self.data == other.data
     def __repr__(self):
         unpacked = struct.unpack(packed_action._format,self.data)
         return f'({unpacked[0]},({unpacked[1]},{unpacked[2]},{unpacked[3].decode('utf-8')}),({unpacked[4]},{unpacked[5]}),({unpacked[6]},{unpacked[7]}))'

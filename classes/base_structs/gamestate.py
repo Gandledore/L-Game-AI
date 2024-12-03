@@ -19,7 +19,8 @@ class gamestate():
     _preprocessing_done = False
     
     _board = {(x,y) for x in range(1,5) for y in range(1,5)}
-    
+    _count_successors = 0
+    _successors = {}
     #normalized state defined as L1 piece in upper left quadrant (x,y)<=2, long leg east (6)
     _normalized_L_tuples = [(x,y,d) for x in range(1,3) for y in range(1,3) for d in ['N','S'] if not (y==1 and d=='N')]
     
@@ -142,7 +143,7 @@ class gamestate():
     def __repr__(self):
         return f"Player: {self.player}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}\nTransform:{self.transform}"
     def __hash__(self):
-        return hash((self.player,tuple(self.L_pieces),self.token_pair_id))
+        return hash((self.player,*self.L_pieces[0].get_tuple(),*self.L_pieces[1].get_tuple(),self.token_pair_id))
     def __eq__(self,other:"gamestate"):
         return self.token_pair_id==other.token_pair_id and self.player==other.player and self.L_pieces==other.L_pieces
     
@@ -240,25 +241,28 @@ class gamestate():
     
     #take state and move, return new gamestate where move is applied
     def getSuccessor(self, move: packed_action) -> "gamestate":
-        valid, feedback = self.valid_move(move)
-        assert valid, feedback#+f'\n\nMove: {move}\nState: {self}'
-        
-        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
-        new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
-        curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
-        new_t_pos = (new_token_pos_x,new_token_pos_y)
-        
-        state = gamestate(player=int(not self.player),
-                        L_pieces=[L_piece(*new_l_pos) if self.player==i else l_piece.copy() for i,l_piece in enumerate(self.L_pieces)],
-                        token_pieces={token_piece(*new_t_pos) if curr_t_pos==token.get_position() else token.copy() for token in self.token_pieces},
-                        transform=self.transform.copy())
-        
-        #only renormalize when L1 moved
-        # moving L2 doesn't change normalization 
-        # (normalization defined by L1)
-        if self.player==0:
-            state.renormalize()
-        return state
+        if (self,move) not in gamestate._successors:
+            valid, feedback = self.valid_move(move)
+            assert valid, feedback#+f'\n\nMove: {move}\nState: {self}'
+            
+            l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
+            new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
+            curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
+            new_t_pos = (new_token_pos_x,new_token_pos_y)
+            
+            state = gamestate(player=int(not self.player),
+                            L_pieces=[L_piece(*new_l_pos) if self.player==i else l_piece.copy() for i,l_piece in enumerate(self.L_pieces)],
+                            token_pieces={token_piece(*new_t_pos) if curr_t_pos==token.get_position() else token.copy() for token in self.token_pieces},
+                            transform=self.transform.copy())
+            
+            #only renormalize when L1 moved
+            # moving L2 doesn't change normalization 
+            # (normalization defined by L1)
+            if self.player==0:
+                state.renormalize()
+            gamestate._successors[(self,move)] = state
+            gamestate._count_successors+=1
+        return gamestate._successors[(self,move)]
     
     #checks state is goal
     def isGoal(self)->bool:
