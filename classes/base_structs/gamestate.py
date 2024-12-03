@@ -150,6 +150,8 @@ class gamestate():
         return self.L_pieces[0].compute_normalization()
     
     def update_normalization(self,transform:np.ndarray[bool])->None:
+        if self.transform[2] and transform[0]!=transform[1]:
+            transform[:2] = np.logical_not(transform[:2])
         self.transform = np.logical_xor(self.transform,transform)
         
     def normalize(self,transform):        
