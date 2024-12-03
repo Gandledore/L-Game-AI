@@ -101,10 +101,8 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             print('Player',winner,'wins!')
             print('Total Turns',game.totalTurns())
             print(type(game.getState())._count_successors,'unique successors')
-            print(players[0].deepest)
             
         game.reset()
-        # if not display: print(f'{100*(n+1)/(N):.1f}%',end='\r')
     print()
     length = max(len(turn_times[0]),len(turn_times[1]))
     turn_times = [row + [0] * (length - len(row)) for row in turn_times]
