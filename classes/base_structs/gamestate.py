@@ -110,11 +110,11 @@ class gamestate():
         """
         try:
             with open(cls._legalMoves_path,'rb') as f:
-                print('Loading Preprocessed States...',end='',flush=True)
+                # print('Loading Preprocessed States...',end='',flush=True)
                 cls._legalMoves = pickle.load(f)
-                print('\rLoaded Preprocessed States')
+                # print('\rLoaded Preprocessed States')
         except FileNotFoundError as e:
-            print('Legal Moves not Preprocessed. Processing them now...')
+            # print('Legal Moves not Preprocessed. Processing them now...')
             for l0_pos in tqdm(cls._normalized_L_tuples):
                 l0_set = L_piece._compute_L_coords(*l0_pos)
                 l0 = L_piece(*l0_pos)
@@ -135,10 +135,12 @@ class gamestate():
                                                 cls._compute_legalMoves(state)
             
             #save legal moves since not already saved
-            with open(cls._legalMoves_path,'wb') as f:
-                print('Saving Legal Moves...',end='',flush=True)
-                pickle.dump(cls._legalMoves,f)
-                print('\rSaved Legal Moves')
+
+            # uncomment to save legal moves
+            # with open(cls._legalMoves_path,'wb') as f:
+            #     print('Saving Legal Moves...',end='',flush=True)
+            #     pickle.dump(cls._legalMoves,f)
+            #     print('\rSaved Legal Moves')
         
     def __repr__(self):
         return f"Player: {self.player}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}\nTransform:{self.transform}"
