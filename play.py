@@ -68,8 +68,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 players[i].set_seed(n+i)
         while game.whoWins()==None and game.totalTurns()<64:
             if display:
-                print(game.state)
-                game.display(internal_display=True)
+                # print(game.state)
+                # game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
             if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
