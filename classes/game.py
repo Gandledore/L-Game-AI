@@ -24,18 +24,19 @@ class Game:
         
     #interface to display game board and pieces
     def display(self,internal_display:bool=False)->None:
-        board = np.full((4, 4), "  ") # 4 by 4 of empty string
+        board = np.full((4, 4), "  ", dtype=object) # 4 by 4 of empty string
         
         #denormalize to display what human expects to see
         if not internal_display: self.state.denormalize()
         
-        for i,l in enumerate(self.state.L_pieces):
+        for i, l in enumerate(self.state.L_pieces):
+            color = "\033[1;31m1□\033[0m" if i == 0 else "\033[1;34m2▲\033[0m"  # Red for L1, Blue for L2
             for px, py in l.get_coords():
-                board[py-1, px-1] = "L"+str(i+1)
-
-        for i,t in enumerate(self.state.token_pieces):
+                board[py - 1, px - 1] = color #+ "L" + str(i + 1) + "\033[0m"
+        
+        for i, t in enumerate(self.state.token_pieces):
             tx, ty = t.get_position()
-            board[ty - 1, tx - 1] = "■■"
+            board[ty - 1, tx - 1] = "\033[33m○○\033[0m"
 
 
         rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
