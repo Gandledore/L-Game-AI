@@ -106,15 +106,17 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
-    for n in tqdm(range(N)):
+    # for n in tqdm(range(N)): # Uncomment for progress bar
+    for n in range(N):
         if gamemode==3:
             players[1].set_seed(n)
         if gamemode==4:
             players[0].set_seed(n)
         while game.whoWins()==None and game.totalTurns()<64:
             if display:
-                print(game.state)
-                game.display(internal_display=True)
+                print()
+                # print(game.state)
+                # game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
             if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
@@ -150,14 +152,16 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
         if display: 
             game.display()
             print('Player',winner,'wins!')
-            print('Total Turns',game.totalTurns())
-            print(type(game.getState())._count_successors,'unique successors')
+            print('Total Turns:',game.totalTurns())
+            # print(type(game.getState())._count_successors,'unique successors')
             
         game.reset()
     print()
     length = max(len(turn_times[0]),len(turn_times[1]))
     turn_times = [row + [0] * (length - len(row)) for row in turn_times]
+
     if gamemode==3: print('Finished MinMaxing',len(players[0].finished),'states')
+
     return winners, turns, turn_times
 
 if __name__ == "__main__":
@@ -165,7 +169,13 @@ if __name__ == "__main__":
     profiler = cProfile.Profile()
     profiler.enable()
     
-    _,_,_ = play()
+    # _,_,_ = play()
+
+    while True:
+        play()
+        cont = input('Play again? (y/n): ')
+        if cont.lower() != 'y'.strip():
+            break
     
     profiler.disable()
     
@@ -173,5 +183,5 @@ if __name__ == "__main__":
     
     # Sort by 'time' (total time in each function) and print the top 10 functions
     stats.strip_dirs()  # Optional: remove long file paths for readability
-    stats.sort_stats("time").print_stats(16)
+    # stats.sort_stats("time").print_stats(16)
     
