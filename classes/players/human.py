@@ -15,12 +15,14 @@ class Human(Player):
         super().__init__(id)
     
     def heuristic(self, state:gamestate) -> int:
-        if state not in Human._heuristics:
+        try:
+            return Human._heuristics[state]
+        except KeyError:
             player = not state.player   #not state.player is person who called heuristic
             opponent = state.player     # reward and penalize from caller's perspective
 
             opponent_options_weight = -1
-            core_weight = 20
+            core_weight = 25
             corner_weight = 40
             win_weight = 1000
 
@@ -40,48 +42,53 @@ class Human(Player):
 
             score = legalmovesofother + control_core + expel_core + avoid_corner + force_corner + winning
             Human._heuristics[state]=score
-
-        return Human._heuristics[state]
-
+            return score
 
     #interface for a play code to get human input
     def getMove(self, state: gamestate, display:bool=True) -> packed_action:
 
         if display: print('Valid Moves:',len(state.getLegalMoves()))
-        evals = {}
+        
+        bestVal = float('-inf')
+        bestMove = None
         for suggestmove in state.getLegalMoves(): # i htink the iseu is the moves are normalized moves...
             successor = state.getSuccessor(suggestmove)
-            evals[suggestmove] = self.heuristic(successor)
-        suggestedmove = max(evals, key=evals.get)
-        # suggestedmove = state.getLegalMoves()[0]
-        suggestedmove.denormalize(state.transform)
-        print("Suggested Move: ", suggestedmove.suggest_format())
-
+            v = self.heuristic(successor)
+            if v>bestVal:
+                bestVal = v
+                bestMove = suggestmove
+        bestMove.denormalize(state.transform)
+        print("Suggested Move: ", bestMove.suggest_format())
+        bestMove.normalize(state.transform)
+        
         # print('\nRecieved State:',state)
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         move_parts = wholeMoves.split()
-    
-        if ( (len(move_parts) != 7) and (len(move_parts) != 3) ):
+        
+        if len(move_parts)==0:
+            move = bestMove
+        
+        elif ( (len(move_parts) != 7) and (len(move_parts) != 3) ):
             raise ValueError("Enter commands in specified format")
-        
-        #raises value error if can't cast to int
-        try:
-            new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
-        except ValueError as e:
-            raise ValueError('Use integers for xl1 yl1')
-        
-        if len(move_parts)==7:
+        else:
+            #raises value error if can't cast to int
             try:
-                current_token_pos = (int(move_parts[3]), int(move_parts[4]))
-                new_token_pos = (int(move_parts[5]), int(move_parts[6]))
+                new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
             except ValueError as e:
-                raise ValueError('Use integers for token locations')
+                raise ValueError('Use integers for xl1 yl1')
             
-        elif len(move_parts)==3:
-            current_token_pos=(0,0)
-            new_token_pos = (0,0)
+            if len(move_parts)==7:
+                try:
+                    current_token_pos = (int(move_parts[3]), int(move_parts[4]))
+                    new_token_pos = (int(move_parts[5]), int(move_parts[6]))
+                except ValueError as e:
+                    raise ValueError('Use integers for token locations')
+                
+            elif len(move_parts)==3:
+                current_token_pos=(0,0)
+                new_token_pos = (0,0)
         
-        move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,current_token_pos=current_token_pos,new_token_pos=new_token_pos)
-        move.normalize(state.transform)
+            move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,current_token_pos=current_token_pos,new_token_pos=new_token_pos)
+            move.normalize(state.transform)
         return move
     

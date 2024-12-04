@@ -72,7 +72,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     end=time.time()
-                    # if display: print("Move:",move)
+                    if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
                     success=True
                     turn_times[turn].append(end-start)
