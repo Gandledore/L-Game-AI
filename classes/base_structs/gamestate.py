@@ -112,12 +112,13 @@ class gamestate():
         """
         try:
             with open(cls._legalMoves_path,'rb') as f:
-                print('Loading Preprocessed States...',end='',flush=True)
+                # print('Loading Preprocessed States...',end='',flush=True)
                 cls._legalMoves = pickle.load(f)
-                print('\rLoaded Preprocessed States')
+                # print('\rLoaded Preprocessed States')
         except FileNotFoundError as e:
-            print('Legal Moves not Preprocessed. Processing them now...')
-            for l0_pos in tqdm(cls._normalized_L_tuples):
+            print('Legal Moves not preprocessed. Processing them now...')
+            # for l0_pos in tqdm(cls._normalized_L_tuples): # Uncomment to enable loading bar
+            for l0_pos in cls._normalized_L_tuples:
                 l0_set = L_piece._compute_L_coords(*l0_pos)
                 l0 = L_piece(*l0_pos)
                 for l1_pos in cls._general_L_pos:
@@ -137,13 +138,17 @@ class gamestate():
                                                 cls._compute_legalMoves(state)
             
             #save legal moves since not already saved
-            with open(cls._legalMoves_path,'wb') as f:
-                print('Saving Legal Moves...',end='',flush=True)
-                pickle.dump(cls._legalMoves,f)
-                print('\rSaved Legal Moves')
+
+            print('Finished preprocessing Legal Moves')
+            # uncomment to save legal moves
+            # with open(cls._legalMoves_path,'wb') as f:
+            #     print('Saving Legal Moves...',end='',flush=True)
+            #     pickle.dump(cls._legalMoves,f)
+            #     print('\rSaved Legal Moves')
         
     def __repr__(self):
-        return f"Player: {self.player}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}\nTransform:{self.transform}"
+        # return f"Player: {self.player}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}\nTransform:{self.transform}"
+        return f"\nPlayer: {self.player+1}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}"
     def __hash__(self):
         return hash((self.player,*self.L_pieces[0].get_tuple(),*self.L_pieces[1].get_tuple(),self.token_pair_id))
     def __eq__(self,other:"gamestate"):
@@ -189,15 +194,14 @@ class gamestate():
             
     #returns list of legal actions for current player
     def getLegalMoves(self)->List[packed_action]:
-        try:
-            return gamestate._legalMoves[self]
-        except KeyError:
+        if self not in gamestate._legalMoves:
             gamestate._compute_legalMoves(self)
-            return gamestate._legalMoves[self]
+        return gamestate._legalMoves[self]
 
     #return True if valid move, False if invalid
     #feedback to for assertions statements describing first error that's invalid
     def valid_move(self,move:packed_action)->Tuple[bool,str]:
+
         l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
         new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
         curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
@@ -244,9 +248,7 @@ class gamestate():
     
     #take state and move, return new gamestate where move is applied
     def getSuccessor(self, move: packed_action) -> "gamestate":
-        try:
-            return gamestate._successors[(self,move)]
-        except KeyError:
+        if (self,move) not in gamestate._successors:
             valid, feedback = self.valid_move(move)
             assert valid, feedback#+f'\n\nMove: {move}\nState: {self}'
             
@@ -267,7 +269,7 @@ class gamestate():
                 state.renormalize()
             gamestate._successors[(self,move)] = state
             gamestate._count_successors+=1
-            return gamestate._successors[(self,move)]
+        return gamestate._successors[(self,move)]
     
     #checks state is goal
     def isGoal(self)->bool:

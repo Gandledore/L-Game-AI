@@ -1,15 +1,40 @@
 import Players
 from classes.game import Game
 
+# use Python 3.5 and up > typing library built in
 from typing import Tuple,List,Optional
-import numpy as np
+
+import sys
+import subprocess
 import time
+
+# built in?
 import cProfile
 import pstats
-from tqdm import tqdm
+
+# import numpy as np
+# from tqdm import tqdm
 
 from classes.base_structs.L_piece import L_piece
 from classes.base_structs.token_piece import token_piece
+
+### Installing required packages
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def install_all():
+
+    install('numpy')
+    install('tqdm')
+
+try:
+    import numpy as np
+    from tqdm import tqdm
+except ImportError:
+    install_all()
+### End installing
 
 # gamemode input, exception handling
 def getPlayers()->Tuple[
@@ -83,21 +108,23 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     if gm==None:
         randoms,players = setGameMode(*getPlayers())
     else:
-        randoms,players = setGameMode(gm)
+        randoms,players = setGameMode(gm)    
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
-    for n in tqdm(range(N)):
+    # for n in tqdm(range(N)): # Uncomment for progress bar
+    for n in range(N):
         for i,r in enumerate(randoms):
             if r:
                 players[i].set_seed(n+i)
         while game.whoWins()==None and game.totalTurns()<64:
             if display:
-                print(game.state)
-                game.display(internal_display=True)
+                print()
+                # print(game.state)
+                # game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
-            if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
+            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
             
             current_player = players[turn]
             success=False
@@ -105,7 +132,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
             for k in range(K):#while True
                 try:
                     start = time.time()
-                    move = current_player.getMove(game.getState(),display) #value error if invalid input format
+                    # move = current_player.getMove(game.getState(), display) # original: show internals while finding moves
+                    move = current_player.getMove(game.getState(), not display) #value error if invalid input format
                     end=time.time()
                     if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
@@ -129,19 +157,28 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
         if display: 
             game.display()
             print('Player',winner,'wins!')
-            print('Total Turns',game.totalTurns())
+            print('Total Turns:',game.totalTurns())
+            # print(type(game.getState())._count_successors,'unique successors')
             
         game.reset()
     print()
     length = max(len(turn_times[0]),len(turn_times[1]))
     turn_times = [row + [0] * (length - len(row)) for row in turn_times]
+
     return winners, turns, turn_times
 
 if __name__ == "__main__":
+
     profiler = cProfile.Profile()
     profiler.enable()
     
-    _,_,_ = play()
+    # _,_,_ = play()
+
+    while True:
+        play()
+        cont = input('Play again? (y/n): ')
+        if cont.lower() != 'y'.strip():
+            break
     
     profiler.disable()
     
@@ -149,5 +186,5 @@ if __name__ == "__main__":
     
     # Sort by 'time' (total time in each function) and print the top 10 functions
     stats.strip_dirs()  # Optional: remove long file paths for readability
-    stats.sort_stats("time").print_stats(16)
+    # stats.sort_stats("time").print_stats(16)
     
