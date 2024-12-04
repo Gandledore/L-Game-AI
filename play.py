@@ -8,6 +8,9 @@ import cProfile
 import pstats
 from tqdm import tqdm
 
+from classes.base_structs.L_piece import L_piece
+from classes.base_structs.token_piece import token_piece
+
 # gamemode input, exception handling
 def getPlayers()->Tuple[
                     Tuple[int,Optional[int],Optional[bool]],
@@ -53,8 +56,30 @@ def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
     return np.array([p1[0]==2,p2[0]==2]),players
 
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
-    game = Game()
-    
+    while True:
+        InitialStateCoordinates = input(f"Enter Initial State Coords [L1 L2 T1 T2] or Enter: ")
+        try:
+            InitialStateCoordinatesList = InitialStateCoordinates.split()
+
+            if len(InitialStateCoordinatesList) != 10:
+                game = Game(L_pieces=None, token_pieces=None)
+            else:
+                L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
+                L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
+                T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
+                T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
+
+                L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
+                token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
+
+                game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
+            break
+        except AssertionError as e:
+            print(e)
+        except ValueError as e:
+            print(e)
+
+    # Enter gamemode 0, 1, or 2
     if gm==None:
         randoms,players = setGameMode(*getPlayers())
     else:
