@@ -26,14 +26,22 @@ class gamestate():
     
     def __init__(self, 
                  player: int = 0, 
-                 L_pieces: List[L_piece] = None, 
-                 token_pieces: Set[token_piece] = None, 
+                 L_pieces: List[Tuple[int,int,str]] = None, 
+                 token_pieces: Set[Tuple[int,int]] = None, 
                  transform: np.ndarray = np.array([False, False, False])):
         
         self.player:int = player
-        self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=1, y=3, d='N'), L_piece(x=4, y=2, d='S')]
-        self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1, y=1), token_piece(x=4, y=4)}
-
+        if L_pieces is not None:
+            if isinstance(L_pieces[0],L_piece):
+                self.L_pieces: List[L_piece] = L_pieces
+                self.token_pieces: Set[token_piece] = token_pieces
+            else:
+                self.L_pieces: List[L_piece] = [L_piece(*pos) for pos in L_pieces]
+                self.token_pieces: Set[token_piece] = [token_piece(*pos) for pos in token_pieces]
+        else:
+            self.L_pieces:List[L_piece] = [L_piece(x=1, y=3, d='N'), L_piece(x=4, y=2, d='S')]
+            self.token_pieces:Set[token_piece] = {token_piece(x=1, y=1), token_piece(x=4, y=4)}
+            
         #if transform is default value, renormalize
         # if it should be all False, this won't change anything
         if not any(transform):
