@@ -13,7 +13,7 @@ class Agent(Player):
     _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
     _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}
     
-    def __init__(self, id:int, depth=-1, prune:bool=False):
+    def __init__(self, id:int, depth=3, prune:bool=False):
         super().__init__(id)
         self.depth = depth
         if depth<0 and prune: self.prune = False
@@ -57,9 +57,7 @@ class Agent(Player):
         return control_core + avoid_corner + killer_token
     
     def heuristic(self, state:gamestate) -> int:
-        # try:
-        #     return self.heuristics[state]
-        # except KeyError:            
+        if state not in self.heuristics:
             player = self.id
             opponent = int(not self.id)
             flip_factor = 2*int(player == state.player) - 1 #1 if my turn, -1 if opponent's turn
@@ -85,8 +83,9 @@ class Agent(Player):
             winning = -1*flip_factor*win_weight * state.isGoal() #colinear with legalmovesofother
 
             score = control_options + control_core + expel_core + avoid_corner + force_corner + winning
-            # self.heuristics[state]=score
-            return score
+            self.heuristics[state]=score
+
+        return self.heuristics[state]
     
     def AlphaBetaSearch(self, state: gamestate) -> Tuple[int,packed_action]:
         self.max_prune = 1
@@ -100,7 +99,7 @@ class Agent(Player):
             print(f'Cached: {self.last} states')
 
         #if we have already finished evaluating this state with at least this much depth, return saved value
-        try:
+        if state in self.finished:
             stored_depth,val,move = self.finished[state]
             saved_deeper_search = depth>=0 and stored_depth>=depth
             guaranteed_terminal = abs(val)>=self.max_score
@@ -109,8 +108,6 @@ class Agent(Player):
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
                 # if self.display and depth==-1: print(f'MAX USING Saved evaluation {stored_depth,val,move} for depth {depth}')
                 return val,move
-        except KeyError:
-            pass
         
         if depth == 0 or state.isGoal():
             h =self.heuristic(state)
@@ -131,14 +128,10 @@ class Agent(Player):
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
             
-            try:
-                next_state_seen_depths = self.seen[next_state]
-                if len(next_state_seen_depths)>0:
-                    d = self.check_tie_depth-1 if depth<0 else min(depth-1,self.check_tie_depth-1)
-                else:
-                    d = depth-1
-                next_state_seen_depths.append(d)
-            except KeyError:
+            if next_state in self.seen and len(self.seen[next_state])>0:
+                d = self.check_tie_depth-1 if depth<0 else min(depth-1,self.check_tie_depth-1)
+                self.seen[next_state].append(d)
+            else:
                 d = depth-1
                 self.seen[next_state] = [depth]
             
@@ -161,7 +154,7 @@ class Agent(Player):
             print(f'Cached: {self.last} states')
         
         #if we have already finished evaluating this state with at least this much depth, return saved value
-        try:
+        if state in self.finished:
             stored_depth,val,move = self.finished[state]
             saved_deeper_search = depth>=0 and stored_depth>=depth
             guaranteed_terminal = abs(val)>=self.max_score
@@ -171,8 +164,7 @@ class Agent(Player):
                 # print(f'USING Saved evaluation | {self.finished[state]}')
                 return val,move
             # else: print(f'NOT using saved {stored_depth,val,move} for current depth {depth}')
-        except KeyError:
-            pass
+        
         if depth == 0 or state.isGoal():
             h = self.heuristic(state)
             self.finished[state] = (depth,h,None)
@@ -191,14 +183,11 @@ class Agent(Player):
         move = None
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
-            try:
-                next_state_seen_depths = self.seen[next_state]
-                if len(next_state_seen_depths)>0:
-                    d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
-                else:
-                    d=depth-1
-                next_state_seen_depths.append(d)
-            except KeyError:
+            
+            if next_state in self.seen and len(self.seen[next_state])>0:
+                d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
+                self.seen[next_state].append(d)
+            else:
                 d = depth-1
                 self.seen[next_state] = [depth]
                 
