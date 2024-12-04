@@ -16,7 +16,8 @@ class Agent(Player):
     def __init__(self, id:int, depth=-1, prune:bool=False):
         super().__init__(id)
         self.depth = depth
-        self.prune = prune
+        if depth<0 and prune: self.prune = False
+        else: self.prune = prune
         self.finished = {} #stores state:(d,v) tuple of depth and best backpropagated value of highest depth search (-1 = infinite depth)
         self.check_tie_depth = min(depth,11)%12 #look >5 ply ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
         self.last = 0

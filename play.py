@@ -1,66 +1,71 @@
 import Players
 from classes.game import Game
 
-from typing import Tuple,List
+from typing import Tuple,List,Optional
 import numpy as np
 import time
 import cProfile
 import pstats
 from tqdm import tqdm
 
-def getGameMode()->int:
-    # gamemode input, exception handling
-    while True:
-        try:
-            modeInput = int(input( "\
-                                    0 = human vs human\n\
-                                    1 = human vs agent\n\
-                                    2 = agent vs agent\n\
-                                    Enter your mode: "))
-            
-            if modeInput not in [0, 1, 2, 3, 4, 5]:
-                raise ValueError("Invalid input")
-            break
-
-        except ValueError:
-            print(f"Invalid input")
-    return modeInput
-
-def setGameMode(mode)->Tuple[int,List[Players.Player]]:
-    # instantiating players
-    if mode == 0:
-        players = [Players.Human(0),Players.Human(1)]
-    elif mode == 1:
-        players = [Players.Agent(0),Players.Human(1)]
-    elif mode == 2:
-        players = [Players.Agent(0),Players.Agent(1)]
+# gamemode input, exception handling
+def getPlayers()->Tuple[
+                    Tuple[int,Optional[int],Optional[bool]],
+                    Tuple[int,Optional[int],Optional[bool]]]:
+    print(f"\
+                                0 = human\n\
+                                1 = agent\n\
+                                2 = random\n")
     
-    elif mode == 3:
-        players = [Players.Agent(0),Players.RandomAgent(1)]
-    elif mode == 4:
-        players = [Players.RandomAgent(0),Players.Agent(1)]
-    elif mode == 5:
-        players = [Players.RandomAgent(0),Players.RandomAgent(1)]
-    else:
-        print(f'Gamemode {mode} not defined')
-    return mode,players
+    players = []
+    for i in range(2):
+        while True:
+            try:
+                p = int(input(f"\
+                                Enter Player {i+1}: "))
+                if p not in {0, 1, 2}:
+                    raise ValueError()
+                if p==1:
+                    depth = int(input(f"\
+                                Player {i+1} Depth (int or -1): "))
+                    prune = bool(input(f"\
+                                Player {i+1} Prune (0 or 1): "))
+                    player = [p,depth,prune]
+                else: player = [p,None,None]
+                players.append(tuple(player))
+                print()
+                break
+            except ValueError:
+                print('Invalid Input')
+        
+    return tuple(players)
 
-def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
+def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
+    # instantiating players
+    player_dict = {
+        0: Players.Human,
+        1: Players.Agent,
+        2: Players.RandomAgent,
+    }
+    player1 = player_dict[p1[0]](0) if p1[1]==None else player_dict[p1[0]](0,p1[1],p1[2])
+    player2 = player_dict[p2[0]](1) if p2[1]==None else player_dict[p2[0]](1,p2[1],p2[2])
+    players = np.array([player1,player2])
+    return np.array([p1[0]==2,p2[0]==2]),players
+
+def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
     game = Game()
     
-    # Enter gamemode 0, 1, or 2
-    if gm==-1:
-        gamemode,players = setGameMode(getGameMode())
+    if gm==None:
+        randoms,players = setGameMode(*getPlayers())
     else:
-        gamemode,players = setGameMode(gm)    
+        randoms,players = setGameMode(gm)
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
     for n in tqdm(range(N)):
-        if gamemode==3:
-            players[1].set_seed(n)
-        if gamemode==4:
-            players[0].set_seed(n)
+        for i,r in enumerate(randoms):
+            if r:
+                players[i].set_seed(n+i)
         while game.whoWins()==None and game.totalTurns()<64:
             if display:
                 print(game.state)
@@ -100,13 +105,11 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             game.display()
             print('Player',winner,'wins!')
             print('Total Turns',game.totalTurns())
-            print(type(game.getState())._count_successors,'unique successors')
             
         game.reset()
     print()
     length = max(len(turn_times[0]),len(turn_times[1]))
     turn_times = [row + [0] * (length - len(row)) for row in turn_times]
-    if gamemode==3: print('Finished MinMaxing',len(players[0].finished),'states')
     return winners, turns, turn_times
 
 if __name__ == "__main__":
