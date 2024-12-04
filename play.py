@@ -75,6 +75,8 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             break
         except AssertionError as e:
             print(e)
+        except ValueError as e:
+            print(e)
 
     # Enter gamemode 0, 1, or 2
     if gm==-1:
