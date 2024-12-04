@@ -23,7 +23,7 @@ class Agent(Player):
         self.max_score = 900
         self.heuristics = {}
         
-    def getMove(self, state: gamestate,display:bool=False) -> packed_action:
+    def getMove(self, state: gamestate, display:bool=False) -> packed_action:
         self.display=display
         if self.display: 
             print('Thinking...')

@@ -1,15 +1,40 @@
 import Players
 from classes.game import Game
 
+# use Python 3.5 and up > typing library built in
 from typing import Tuple,List
-import numpy as np
+
+import sys
+import subprocess
 import time
+
+# built in?
 import cProfile
 import pstats
-from tqdm import tqdm
+
+# import numpy as np
+# from tqdm import tqdm
 
 from classes.base_structs.L_piece import L_piece
 from classes.base_structs.token_piece import token_piece
+
+### Installing required packages
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def install_all():
+
+    install('numpy')
+    install('tqdm')
+
+install_all()
+
+import numpy as np
+from tqdm import tqdm
+
+### End installing
 
 def getGameMode()->int:
     # gamemode input, exception handling
@@ -92,7 +117,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
                 game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
-            if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
+            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
             
             current_player = players[turn]
             success=False
@@ -100,7 +125,8 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
             for k in range(K):#while True
                 try:
                     start = time.time()
-                    move = current_player.getMove(game.getState(),display) #value error if invalid input format
+                    # move = current_player.getMove(game.getState(), display) # original: show internals while finding moves
+                    move = current_player.getMove(game.getState(), not display) #value error if invalid input format
                     end=time.time()
                     # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
@@ -135,6 +161,7 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     return winners, turns, turn_times
 
 if __name__ == "__main__":
+
     profiler = cProfile.Profile()
     profiler.enable()
     
