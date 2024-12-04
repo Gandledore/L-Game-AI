@@ -57,6 +57,33 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     
     if gm==None:
         randoms,players = setGameMode(*getPlayers())
+    
+    while True:
+        InitialStateCoordinates = input(f"Enter Initial State Coords [L1 L2 T1 T2] or Enter: ")
+        try:
+            InitialStateCoordinatesList = InitialStateCoordinates.split()
+
+            if len(InitialStateCoordinatesList) != 10:
+                game = Game(L_pieces=None, token_pieces=None)
+            else:
+                L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
+                L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
+                T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
+                T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
+
+                L_pieces = [(L1_x, L1_y, L1_d), (L2_x, L2_y, L2_d)]
+                token_pieces = {(T1_x, T1_y), (T2_x, T2_y)}
+
+                game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
+            break
+        except AssertionError as e:
+            print(e)
+        except ValueError as e:
+            print(e)
+
+    # Enter gamemode 0, 1, or 2
+    if gm==None:
+        randoms,players = setGameMode(getPlayers())
     else:
         randoms,players = setGameMode(gm)
     winners  = np.empty(shape=(N),dtype=int)
