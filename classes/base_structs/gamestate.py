@@ -34,13 +34,8 @@ class gamestate():
         self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=1, y=3, d='N'), L_piece(x=4, y=2, d='S')]
         self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1, y=1), token_piece(x=4, y=4)}
 
-        #if transform is default value, renormalize
-        # if it should be all False, this won't change anything
-        if not any(transform):
-            self.transform = transform
-            self.renormalize()
-        else:
-            self.transform = transform
+        self.transform = transform
+        self.renormalize()
         
         self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
         #preprocess everything
