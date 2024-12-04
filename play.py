@@ -2,7 +2,7 @@ import Players
 from classes.game import Game
 
 # use Python 3.5 and up > typing library built in
-from typing import Tuple,List,Optional
+from typing import Tuple,List
 
 import sys
 import subprocess
@@ -36,39 +36,25 @@ from tqdm import tqdm
 
 ### End installing
 
-# gamemode input, exception handling
-def getPlayers()->Tuple[
-                    Tuple[int,Optional[int],Optional[bool]],
-                    Tuple[int,Optional[int],Optional[bool]]]:
-    print(f"\
-                                0 = human\n\
-                                1 = agent\n\
-                                2 = random\n")
-    
-    players = []
-    for i in range(2):
-        while True:
-            try:
-                p = int(input(f"\
-                                Enter Player {i+1}: "))
-                if p not in {0, 1, 2}:
-                    raise ValueError()
-                if p==1:
-                    depth = int(input(f"\
-                                Player {i+1} Depth (int or -1): "))
-                    prune = bool(input(f"\
-                                Player {i+1} Prune (0 or 1): "))
-                    player = [p,depth,prune]
-                else: player = [p,None,None]
-                players.append(tuple(player))
-                print()
-                break
-            except ValueError:
-                print('Invalid Input')
-        
-    return tuple(players)
+def getGameMode()->int:
+    # gamemode input, exception handling
+    while True:
+        try:
+            modeInput = int(input( "\
+                                    0 = human vs human\n\
+                                    1 = human vs agent\n\
+                                    2 = agent vs agent\n\
+                                    Enter your mode: "))
+            
+            if modeInput not in [0, 1, 2, 3, 4, 5]:
+                raise ValueError("Invalid input")
+            break
 
-def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
+        except ValueError:
+            print(f"Invalid input")
+    return modeInput
+
+def setGameMode(mode)->Tuple[int,List[Players.Player]]:
     # instantiating players
     if mode == 0:
         players = [Players.Human(0),Players.Human(1)]
@@ -115,11 +101,6 @@ def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[
     # Enter gamemode 0, 1, or 2
     if gm==-1:
         gamemode,players = setGameMode(getGameMode())
-def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
-    game = Game()
-    
-    if gm==None:
-        randoms,players = setGameMode(*getPlayers())
     else:
         gamemode,players = setGameMode(gm)    
     winners  = np.empty(shape=(N),dtype=int)
