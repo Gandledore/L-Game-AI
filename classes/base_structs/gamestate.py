@@ -51,6 +51,7 @@ class gamestate():
             #preprocessing below setting done=True so it doesn't recursively call itself
             # upon initialization of states in preprocessing
             gamestate._preprocess_all_legalMoves()
+        assert self in gamestate._legalMoves, "Invalid Gamestate"
 
     #precompute L positions that are generally possible, 
     # assuming no other pieces on the board (ie within board)

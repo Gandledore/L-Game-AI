@@ -50,28 +50,31 @@ def setGameMode(mode)->Tuple[int,List[Players.Player]]:
 
 def play(gm:int=-1,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
     
-    InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
-    InitialStateCoordinatesList = InitialStateCoordinates.split()
+    
 
     # if len(InitialStateCoordinatesList) != 10:
     #     game = Game(L_pieces=None, token_pieces=None)
     # else:
-    try:
-        InitialStateCoordinatesList = InitialStateCoordinates.split()
-        if len(InitialStateCoordinatesList) != 10:
-            game = Game(L_pieces=None, token_pieces=None)
-        else:
-            L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
-            L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
-            T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
-            T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
+    while True:
+        InitialStateCoordinates = input(f"Enter Initial State Coords [L1 L2 T1 T2] or Enter: ")
+        try:
+            InitialStateCoordinatesList = InitialStateCoordinates.split()
 
-            L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
-            token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
+            if len(InitialStateCoordinatesList) != 10:
+                game = Game(L_pieces=None, token_pieces=None)
+            else:
+                L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
+                L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
+                T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
+                T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
 
-            game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
-    except ValueError as e:
-        raise ValueError('Enter Valid Intial States')
+                L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
+                token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
+
+                game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
+            break
+        except AssertionError as e:
+            print(e)
 
     # Enter gamemode 0, 1, or 2
     if gm==-1:
