@@ -220,7 +220,7 @@ class gamestate():
         #already know other token doesn't collide with other l
         current_token_pos = {token.get_position() for token in self.token_pieces}
         if current_token_pos & new_l_set:
-            return False, f'Moved l piece collides with token(s)'
+            return False, f'Moved L piece collides with token(s)'
         
         #check moved l piece is inside game board
         if not new_l_set <= gamestate._board:
