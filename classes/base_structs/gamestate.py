@@ -16,7 +16,7 @@ class gamestate():
     _legalMoves = {}
     _legalMoves_path = 'legal_moves.pkl' #relative to play file
     
-    _preprocessing_done = False
+    _preprocessing_done = 0
     
     _board = {(x,y) for x in range(1,5) for y in range(1,5)}
     _count_successors = 0
@@ -32,27 +32,24 @@ class gamestate():
                  token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
                  transform:np.ndarray[bool]=np.array([False,False,False])):
         self.player:int = player
-        self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=1, y=3, d='N'), L_piece(x=4, y=2, d='S')]
-        self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1, y=1), token_piece(x=4, y=4)}
+        self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')]
+        self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1,y=1),token_piece(x=4,y=4)}
 
-        #if transform is default value, renormalize
-        # if it should be all False, this won't change anything
-        if not any(transform):
-            self.transform = transform
-            self.renormalize()
-        else:
-            self.transform = transform
-        
+        self.transform = transform
+        self.renormalize()
+
         self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
         #preprocess everything
-        if not gamestate._preprocessing_done:
+        if gamestate._preprocessing_done==0:
             gamestate._precompute_gen_L_pos()
             gamestate._precompute_gen_T_pos()
-            gamestate._preprocessing_done = True    
+            gamestate._preprocessing_done = 1    
             #preprocessing below setting done=True so it doesn't recursively call itself
             # upon initialization of states in preprocessing
             gamestate._preprocess_all_legalMoves()
-        assert self in gamestate._legalMoves, "Invalid Gamestate"
+            gamestate._preprocessing_done = 2
+        if gamestate._preprocessing_done==2:
+            assert self in gamestate._legalMoves, "Invalid Gamestate"
 
     #precompute L positions that are generally possible, 
     # assuming no other pieces on the board (ie within board)
