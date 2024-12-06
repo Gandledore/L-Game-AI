@@ -1,0 +1,2052 @@
+Loading Preprocessed States...Loaded Preprocessed States
+                                    0 = human vs human
+                                    1 = human vs agent
+                                    2 = agent vs agent
+                                    Enter your mode: Player: 0
+L pieces: [(1, 2, S), (4, 3, N)]
+T pieces: {(4, 1), (1, 4)}
+Transform:[False  True False]
+-------------
+|  |  |  |■■|
+-------------
+|L1|L1|L1|L2|
+-------------
+|L1|L2|L2|L2|
+-------------
+|■■|  |  |  |
+-------------
+
+-------------
+|■■|  |  |  |
+-------------
+|L1|L2|L2|L2|
+-------------
+|L1|L1|L1|L2|
+-------------
+|  |  |  |■■|
+-------------
+
+Player 1's turn (0)
+Thinking...
+65
+Cached: 100 states
+Cached: 200 states
+Cached: 300 states
+Cached: 400 states
+Cached: 500 states
+Cached: 600 states
+Cached: 700 states
+Cached: 800 states
+Cached: 900 states
+Cached: 1000 states
+Cached: 1100 states
+Cached: 1200 states
+Cached: 1300 states
+Cached: 1400 states
+Cached: 1500 states
+Cached: 1600 states
+Cached: 1700 states
+Cached: 1800 states
+Cached: 1900 states
+Cached: 2000 states
+Cached: 2100 states
+Cached: 2200 states
+Cached: 2300 states
+Cached: 2400 states
+Cached: 2500 states
+Cached: 2600 states
+Cached: 2700 states
+Cached: 2800 states
+Cached: 2900 states
+Cached: 3000 states
+Cached: 3100 states
+Cached: 3200 states
+Cached: 3300 states
+Cached: 3400 states
+Cached: 3500 states
+Cached: 3600 states
+Cached: 3700 states
+Cached: 3800 states
+Cached: 3900 states
+Cached: 4000 states
+Cached: 4100 states
+Cached: 4200 states
+Cached: 4300 states
+Cached: 4400 states
+Cached: 4500 states
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(4,1),(4,4)) for value: -26
+Time: 26.5s | Pruned: 0.0% (0/1285584)
+Player: 1
+L pieces: [(2, 2, N), (1, 3, N)]
+T pieces: {(4, 4), (1, 4)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|L2|L1|L1|L1|
+-------------
+|L2|L2|L2|  |
+-------------
+|■■|  |  |■■|
+-------------
+
+-------------
+|■■|  |  |■■|
+-------------
+|  |L2|L2|L2|
+-------------
+|L1|L1|L1|L2|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (1)
+Thinking...
+39
+Cached: 100 states
+Cached: 200 states
+Cached: 300 states
+Cached: 400 states
+Cached: 500 states
+Cached: 600 states
+Cached: 700 states
+Cached: 800 states
+Cached: 900 states
+Cached: 1000 states
+Cached: 1100 states
+Cached: 1200 states
+Cached: 1300 states
+Cached: 1400 states
+Cached: 1500 states
+Cached: 1600 states
+Cached: 1700 states
+Cached: 1800 states
+Cached: 1900 states
+Cached: 2000 states
+Cached: 2100 states
+Cached: 2200 states
+Cached: 2300 states
+Cached: 2400 states
+Cached: 2500 states
+Cached: 2600 states
+Cached: 2700 states
+Cached: 2800 states
+Cached: 2900 states
+Cached: 3000 states
+Cached: 3100 states
+Cached: 3200 states
+Cached: 3300 states
+Cached: 3400 states
+Cached: 3500 states
+Cached: 3600 states
+Cached: 3700 states
+Cached: 3800 states
+Cached: 3900 states
+Cached: 4000 states
+Cached: 4100 states
+Cached: 4200 states
+Cached: 4300 states
+Cached: 4400 states
+Cached: 4500 states
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(4,4),(3,1)) for value: -66
+Time: 18.9s | Pruned: 0.0% (0/1292266)
+Player: 0
+L pieces: [(2, 2, N), (2, 3, S)]
+T pieces: {(3, 1), (1, 4)}
+Transform:[False False  True]
+-------------
+|  |L1|■■|  |
+-------------
+|  |L1|L1|L1|
+-------------
+|  |L2|L2|L2|
+-------------
+|■■|L2|  |  |
+-------------
+
+-------------
+|  |  |  |■■|
+-------------
+|L1|L1|L2|L2|
+-------------
+|■■|L1|L2|  |
+-------------
+|  |L1|L2|  |
+-------------
+
+Player 1's turn (2)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(1,2,S),(3,1),(4,4)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, S), (2, 3, S)]
+T pieces: {(4, 4), (1, 4)}
+Transform:[ True  True False]
+-------------
+|  |  |  |  |
+-------------
+|L1|L1|L1|  |
+-------------
+|L1|L2|L2|L2|
+-------------
+|■■|L2|  |■■|
+-------------
+
+-------------
+|■■|  |L2|■■|
+-------------
+|L2|L2|L2|L1|
+-------------
+|  |L1|L1|L1|
+-------------
+|  |  |  |  |
+-------------
+
+Player 2's turn (3)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(4,3,N),(1,4),(2,1)) for value: -66
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, S), (4, 3, N)]
+T pieces: {(4, 4), (2, 1)}
+Transform:[False  True False]
+-------------
+|  |■■|  |  |
+-------------
+|L1|L1|L1|L2|
+-------------
+|L1|L2|L2|L2|
+-------------
+|  |  |  |■■|
+-------------
+
+-------------
+|  |  |  |■■|
+-------------
+|L1|L2|L2|L2|
+-------------
+|L1|L1|L1|L2|
+-------------
+|  |■■|  |  |
+-------------
+
+Player 1's turn (4)
+Thinking...
+65
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(2,1),(3,4)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (1, 3, N)]
+T pieces: {(2, 4), (1, 4)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|L2|L1|L1|L1|
+-------------
+|L2|L2|L2|  |
+-------------
+|■■|■■|  |  |
+-------------
+
+-------------
+|  |  |■■|■■|
+-------------
+|  |L2|L2|L2|
+-------------
+|L1|L1|L1|L2|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (5)
+Thinking...
+39
+Finished MinMaxing 4592 states
+Choosing Move:(1,(3,3,S),(1,4),(3,1)) for value: -39
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(3, 1), (2, 4)}
+Transform:[False False  True]
+-------------
+|  |L1|■■|  |
+-------------
+|  |L1|L1|L1|
+-------------
+|L2|L2|L2|  |
+-------------
+|  |■■|L2|  |
+-------------
+
+-------------
+|  |  |L2|  |
+-------------
+|L1|L1|L2|■■|
+-------------
+|■■|L1|L2|L2|
+-------------
+|  |L1|  |  |
+-------------
+
+Player 1's turn (6)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,S),(3,1),(1,4)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, S), (2, 3, S)]
+T pieces: {(4, 4), (3, 4)}
+Transform:[False  True False]
+-------------
+|  |  |  |  |
+-------------
+|L1|L1|L1|  |
+-------------
+|L1|L2|L2|L2|
+-------------
+|  |L2|■■|■■|
+-------------
+
+-------------
+|  |L2|■■|■■|
+-------------
+|L1|L2|L2|L2|
+-------------
+|L1|L1|L1|  |
+-------------
+|  |  |  |  |
+-------------
+
+Player 2's turn (7)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(4,3,N),(4,4),(3,1)) for value: -39
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, S), (4, 3, N)]
+T pieces: {(3, 1), (3, 4)}
+Transform:[False  True False]
+-------------
+|  |  |■■|  |
+-------------
+|L1|L1|L1|L2|
+-------------
+|L1|L2|L2|L2|
+-------------
+|  |  |■■|  |
+-------------
+
+-------------
+|  |  |■■|  |
+-------------
+|L1|L2|L2|L2|
+-------------
+|L1|L1|L1|L2|
+-------------
+|  |  |■■|  |
+-------------
+
+Player 1's turn (8)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(1,2,N),(3,1),(4,4)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, N)]
+T pieces: {(4, 4), (3, 4)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|L2|
+-------------
+|  |L2|L2|L2|
+-------------
+|  |  |■■|■■|
+-------------
+
+-------------
+|  |  |■■|■■|
+-------------
+|  |L2|L2|L2|
+-------------
+|L1|L1|L1|L2|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (9)
+Thinking...
+65
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(4,4),(3,1)) for value: -39
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(3, 1), (3, 4)}
+Transform:[False  True  True]
+-------------
+|L1|  |■■|  |
+-------------
+|L1|L1|L1|  |
+-------------
+|  |L2|L2|L2|
+-------------
+|  |L2|■■|  |
+-------------
+
+-------------
+|  |  |L2|  |
+-------------
+|■■|L1|L2|■■|
+-------------
+|  |L1|L2|L2|
+-------------
+|L1|L1|  |  |
+-------------
+
+Player 1's turn (10)
+Thinking...
+65
+Finished MinMaxing 4592 states
+Choosing Move:(0,(2,2,N),(3,1),(4,4)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (2, 3, S)]
+T pieces: {(4, 4), (3, 4)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|  |L1|L1|L1|
+-------------
+|  |L2|L2|L2|
+-------------
+|  |L2|■■|■■|
+-------------
+
+-------------
+|■■|■■|L2|  |
+-------------
+|L2|L2|L2|  |
+-------------
+|L1|L1|L1|  |
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (11)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,N),(4,4),(4,3)) for value: -39
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, N)]
+T pieces: {(3, 4), (4, 3)}
+Transform:[False  True False]
+-------------
+|  |L1|  |  |
+-------------
+|L2|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |■■|  |
+-------------
+
+-------------
+|  |  |■■|  |
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|L1|L1|L1|
+-------------
+|  |L1|  |  |
+-------------
+
+Player 1's turn (12)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(3,4),(1,4)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, N)]
+T pieces: {(4, 4), (1, 3)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |■■|
+-------------
+
+-------------
+|  |  |  |■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|L2|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (13)
+Thinking...
+65
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(4,4),(4,2)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True  True]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |■■|L2|  |
+-------------
+|  |L1|L2|  |
+-------------
+|  |L1|L2|L2|
+-------------
+|L1|L1|■■|  |
+-------------
+
+Player 1's turn (14)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (15)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (16)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (17)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (18)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (19)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (20)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (21)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (22)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (23)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (24)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (25)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (26)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (27)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (28)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (29)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (30)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (31)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (32)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (33)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (34)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (35)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (36)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (37)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (38)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (39)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (40)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (41)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (42)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (43)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (44)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (45)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (46)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (47)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (48)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (49)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (50)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (51)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (52)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (53)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (54)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (55)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (56)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (57)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (58)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (59)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(2, 2, N), (1, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|L2|  |  |  |
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 1's turn (60)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(4,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(1, 2, N), (4, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |  |  |L2|
+-------------
+
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 2's turn (61)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(2,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 0
+L pieces: [(1, 2, N), (2, 3, S)]
+T pieces: {(1, 3), (4, 2)}
+Transform:[False  True False]
+-------------
+|L1|  |  |  |
+-------------
+|L1|L1|L1|■■|
+-------------
+|■■|L2|L2|L2|
+-------------
+|  |L2|  |  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|L1|  |  |  |
+-------------
+
+Player 1's turn (62)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(0,(3,2,N),(0,0),(0,0)) for value: -26
+Time: 0.0s | Pruned: 0.0% (0/1)
+Player: 1
+L pieces: [(2, 2, N), (3, 3, S)]
+T pieces: {(1, 2), (4, 3)}
+Transform:[ True  True False]
+-------------
+|  |L1|  |  |
+-------------
+|■■|L1|L1|L1|
+-------------
+|L2|L2|L2|■■|
+-------------
+|  |  |L2|  |
+-------------
+
+-------------
+|  |L2|  |  |
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 2's turn (63)
+Thinking...
+52
+Finished MinMaxing 4592 states
+Choosing Move:(1,(1,3,S),(0,0),(0,0)) for value: 1
+Time: 0.0s | Pruned: 0.0% (0/1)
+-------------
+|  |  |  |L2|
+-------------
+|■■|L2|L2|L2|
+-------------
+|L1|L1|L1|■■|
+-------------
+|  |  |L1|  |
+-------------
+
+Player 0 wins!
+Total Turns 64
+408200 unique successors
+
+         205649612 function calls (203071428 primitive calls) in 52.856 seconds
+
+   Ordered by: internal time
+   List reduced from 622 to 16 due to restriction <16>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 21229518    9.172    0.000   13.306    0.000 gamestate.py:145(__hash__)
+        1    7.003    7.003    7.003    7.003 {built-in method builtins.input}
+ 19169774    5.387    0.000    8.074    0.000 gamestate.py:147(__eq__)
+1210455/64    4.135    0.000   45.405    0.709 agent.py:95(MaxValueAB)
+  2577912    3.869    0.000   15.403    0.000 gamestate.py:243(getSuccessor)
+1367457/104    3.766    0.000   45.403    0.437 agent.py:150(MinValueAB)
+  2577848    2.974    0.000    4.415    0.000 agent.py:40(action_heuristic)
+ 38339508    2.686    0.000    2.686    0.000 L_piece.py:85(__eq__)
+ 42867236    2.517    0.000    2.517    0.000 L_piece.py:79(get_tuple)
+ 28051432    2.132    0.000    2.132    0.000 {built-in method builtins.hash}
+   408200    0.974    0.000    1.494    0.000 gamestate.py:196(valid_move)
+10395112/10395105    0.729    0.000    0.729    0.000 {built-in method builtins.len}
+  5564024    0.717    0.000    1.096    0.000 action.py:28(__hash__)
+   408267    0.593    0.000    1.721    0.000 gamestate.py:27(__init__)
+  3403786    0.547    0.000    0.547    0.000 L_piece.py:34(_compute_L_coords)
+  3394248    0.475    0.000    0.862    0.000 action.py:26(get_rep)
+
+

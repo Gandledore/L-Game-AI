@@ -25,11 +25,16 @@ class gamestate():
     _normalized_L_tuples = [(x,y,d) for x in range(1,3) for y in range(1,3) for d in ['N','S'] if not (y==1 and d=='N')]
     
     # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
-    def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
     # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='E'),L_piece(x=2,y=2,d='N')], token_pieces:Set[token_piece]={token_piece(x=3,y=3),token_piece(x=3,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
+    def __init__(self, 
+                 player:int=0,
+                 L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
+                 token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
+                 transform:np.ndarray[bool]=np.array([False,False,False])):
         self.player:int = player
-        self.L_pieces:List[L_piece] = L_pieces
-        self.token_pieces:Set[token_piece] = token_pieces
+        self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=1, y=3, d='N'), L_piece(x=4, y=2, d='S')]
+        self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1, y=1), token_piece(x=4, y=4)}
+
         #if transform is default value, renormalize
         # if it should be all False, this won't change anything
         if not any(transform):
@@ -47,6 +52,7 @@ class gamestate():
             #preprocessing below setting done=True so it doesn't recursively call itself
             # upon initialization of states in preprocessing
             gamestate._preprocess_all_legalMoves()
+        assert self in gamestate._legalMoves, "Invalid Gamestate"
 
     #precompute L positions that are generally possible, 
     # assuming no other pieces on the board (ie within board)

@@ -8,6 +8,9 @@ import cProfile
 import pstats
 from tqdm import tqdm
 
+from classes.base_structs.L_piece import L_piece
+from classes.base_structs.token_piece import token_piece
+
 # gamemode input, exception handling
 def getPlayers()->Tuple[
                     Tuple[int,Optional[int],Optional[bool]],
