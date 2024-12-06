@@ -24,12 +24,9 @@ class gamestate():
     #normalized state defined as L1 piece in upper left quadrant (x,y)<=2, long leg east (6)
     _normalized_L_tuples = [(x,y,d) for x in range(1,3) for y in range(1,3) for d in ['N','S'] if not (y==1 and d=='N')]
     
-    def __init__(self, 
-                 player: int = 0, 
-                 L_pieces: List[L_piece] = None, 
-                 token_pieces: Set[token_piece] = None, 
-                 transform: np.ndarray = np.array([False, False, False])):
-        
+    # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
+    def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
+    # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='E'),L_piece(x=2,y=2,d='N')], token_pieces:Set[token_piece]={token_piece(x=3,y=3),token_piece(x=3,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
         self.player:int = player
         self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=1, y=3, d='N'), L_piece(x=4, y=2, d='S')]
         self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1, y=1), token_piece(x=4, y=4)}
@@ -118,7 +115,7 @@ class gamestate():
             with open(cls._legalMoves_path,'rb') as f:
                 # print('Loading Preprocessed States...',end='',flush=True)
                 cls._legalMoves = pickle.load(f)
-                # print('\rLoaded Preprocessed States')
+                print('\rLoaded Preprocessed States    ')
         except FileNotFoundError as e:
             print('Legal Moves not preprocessed. Processing them now...')
             # for l0_pos in tqdm(cls._normalized_L_tuples): # Uncomment to enable loading bar
@@ -252,28 +249,25 @@ class gamestate():
     
     #take state and move, return new gamestate where move is applied
     def getSuccessor(self, move: packed_action) -> "gamestate":
-        if (self,move) not in gamestate._successors:
-            valid, feedback = self.valid_move(move)
-            assert valid, feedback#+f'\n\nMove: {move}\nState: {self}'
-            
-            l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
-            new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
-            curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
-            new_t_pos = (new_token_pos_x,new_token_pos_y)
-            
-            state = gamestate(player=int(not self.player),
-                            L_pieces=[L_piece(*new_l_pos) if self.player==i else l_piece.copy() for i,l_piece in enumerate(self.L_pieces)],
-                            token_pieces={token_piece(*new_t_pos) if curr_t_pos==token.get_position() else token.copy() for token in self.token_pieces},
-                            transform=self.transform.copy())
-            
-            #only renormalize when L1 moved
-            # moving L2 doesn't change normalization 
-            # (normalization defined by L1)
-            if self.player==0:
-                state.renormalize()
-            gamestate._successors[(self,move)] = state
-            gamestate._count_successors+=1
-        return gamestate._successors[(self,move)]
+        valid, feedback = self.valid_move(move)
+        assert valid, feedback#+f'\n\nMove: {move}\nState: {self}'
+        
+        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
+        new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
+        curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
+        new_t_pos = (new_token_pos_x,new_token_pos_y)
+        
+        state = gamestate(player=int(not self.player),
+                        L_pieces=[L_piece(*new_l_pos) if self.player==i else l_piece.copy() for i,l_piece in enumerate(self.L_pieces)],
+                        token_pieces={token_piece(*new_t_pos) if curr_t_pos==token.get_position() else token.copy() for token in self.token_pieces},
+                        transform=self.transform.copy())
+        
+        #only renormalize when L1 moved
+        # moving L2 doesn't change normalization 
+        # (normalization defined by L1)
+        if self.player==0:
+            state.renormalize()
+        return state
     
     #checks state is goal
     def isGoal(self)->bool:

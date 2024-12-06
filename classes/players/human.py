@@ -36,3 +36,5 @@ class Human(Player):
         move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,current_token_pos=current_token_pos,new_token_pos=new_token_pos)
         move.normalize(state.transform)
         return move
+    def game_reset(self):
+        pass
