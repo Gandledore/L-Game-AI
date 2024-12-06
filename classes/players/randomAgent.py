@@ -18,5 +18,3 @@ class RandomAgent(Player):
     
     def set_seed(self,s):
         random.seed(s)
-    def game_reset(self):
-        pass

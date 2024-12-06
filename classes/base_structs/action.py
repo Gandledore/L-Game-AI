@@ -81,10 +81,6 @@ class packed_action:
         if transform[2]:
             new_l_pos_d = (L_piece._transpose_map[new_l_pos_d])
             
-            temp = new_l_pos_x
-            new_l_pos_x = new_l_pos_y
-            new_l_pos_y = temp
-            
             temp = curr_token_pos_x
             curr_token_pos_x = curr_token_pos_y
             curr_token_pos_y = temp
@@ -106,9 +102,3 @@ class packed_action:
             curr_token_pos_x = 5 - curr_token_pos_x
             new_token_pos_x = 5 - new_token_pos_x
             new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d
-            
-        #save transformed data
-        self.data = struct.pack(packed_action._format,
-                                l_piece_id,new_l_pos_x,new_l_pos_y,new_l_pos_d.encode('utf-8'),
-                                curr_token_pos_x,curr_token_pos_y,
-                                new_token_pos_x,new_token_pos_y)
