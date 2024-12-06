@@ -26,6 +26,7 @@ class gamestate():
     
     # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
     def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
+    # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='E'),L_piece(x=2,y=2,d='N')], token_pieces:Set[token_piece]={token_piece(x=3,y=3),token_piece(x=3,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
         self.player:int = player
         self.L_pieces:List[L_piece] = L_pieces
         self.token_pieces:Set[token_piece] = token_pieces
@@ -113,7 +114,7 @@ class gamestate():
             with open(cls._legalMoves_path,'rb') as f:
                 print('Loading Preprocessed States...',end='',flush=True)
                 cls._legalMoves = pickle.load(f)
-                print('\rLoaded Preprocessed States')
+                print('\rLoaded Preprocessed States    ')
         except FileNotFoundError as e:
             print('Legal Moves not Preprocessed. Processing them now...')
             for l0_pos in tqdm(cls._normalized_L_tuples):
