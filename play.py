@@ -2,7 +2,7 @@ import Players
 from classes.game import Game
 
 # use Python 3.5 and up > typing library built in
-from typing import Tuple,List
+from typing import Tuple,List,Optional
 
 import sys
 import subprocess

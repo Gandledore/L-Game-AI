@@ -113,7 +113,7 @@ class gamestate():
         """
         try:
             with open(cls._legalMoves_path,'rb') as f:
-                # print('Loading Preprocessed States...',end='',flush=True)
+                print('Loading Preprocessed States...',end='',flush=True)
                 cls._legalMoves = pickle.load(f)
                 print('\rLoaded Preprocessed States    ')
         except FileNotFoundError as e:
