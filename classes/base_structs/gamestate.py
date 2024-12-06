@@ -189,9 +189,11 @@ class gamestate():
             
     #returns list of legal actions for current player
     def getLegalMoves(self)->List[packed_action]:
-        if self not in gamestate._legalMoves:
+        try:
+            return gamestate._legalMoves[self]
+        except KeyError:
             gamestate._compute_legalMoves(self)
-        return gamestate._legalMoves[self]
+            return gamestate._legalMoves[self]
 
     #return True if valid move, False if invalid
     #feedback to for assertions statements describing first error that's invalid
