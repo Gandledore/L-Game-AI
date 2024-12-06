@@ -115,7 +115,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
-    for n in tqdm(range(N)):
+    # for n in tqdm(range(N)):
+    for n in range(N):
         for i,r in enumerate(randoms):
             if r:
                 players[i].set_seed(n+i)
@@ -136,7 +137,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     end=time.time()
-                    if display: print("Move:",move)
+                    # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
                     success=True
                     turn_times[turn].append(end-start)
@@ -157,8 +158,12 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
 
         if display: 
             game.display()
-            print('Player',winner,'wins!')
-            print('Total Turns',game.totalTurns())
+            
+            if game.totalTurns()==64:
+                print('Draw!')
+            else:                
+                print('Player',winner,'wins!')
+                print('Total Turns',game.totalTurns())
             
         game.reset()
         for player in players:
@@ -172,14 +177,14 @@ if __name__ == "__main__":
     profiler = cProfile.Profile()
     profiler.enable()
     
-    _,_,_ = play()
+    # _,_,_ = play()
 
     # Play again?
-    # while True:
-    #     _,_,_ = play()
-    #     cont = input('Play again? (y/n): ')
-    #     if cont.lower() != 'y'.strip():
-    #         break
+    while True:
+        _,_,_ = play()
+        cont = input('Play again? (y/n): ')
+        if cont.lower() != 'y'.strip():
+            break
     
     profiler.disable()
     
