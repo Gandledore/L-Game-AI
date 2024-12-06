@@ -30,6 +30,9 @@ try:
 except ImportError:
     install_all()
 
+from classes.base_structs.L_piece import L_piece
+from classes.base_structs.token_piece import token_piece
+
 # gamemode input, exception handling
 def getPlayers()->Tuple[
                     Tuple[int,Optional[int],Optional[bool]],
@@ -133,7 +136,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     end=time.time()
-                    # if display: print("Move:",move)
+                    if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
                     success=True
                     turn_times[turn].append(end-start)

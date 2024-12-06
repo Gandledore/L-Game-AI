@@ -33,6 +33,10 @@ class packed_action:
         unpacked = struct.unpack(packed_action._format,self.data)
         return f'({unpacked[0]},({unpacked[1]},{unpacked[2]},{unpacked[3].decode('utf-8')}),({unpacked[4]},{unpacked[5]}),({unpacked[6]},{unpacked[7]}))'
     
+    def suggest_format(self):
+        unpacked = struct.unpack(packed_action._format,self.data)
+        return f"{unpacked[1]} {unpacked[2]} {unpacked[3].decode('utf-8')} " + (f"{unpacked[4]} {unpacked[5]} {unpacked[6]} {unpacked[7]}" if unpacked[4] != 0 else f"")
+    
     def normalize(self,transform:np.ndarray[bool])->None:
         l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = struct.unpack(packed_action._format,self.data)
         new_l_pos_d = new_l_pos_d.decode('utf-8')
@@ -40,15 +44,18 @@ class packed_action:
         #reflect x
         if transform[0]:
             new_l_pos_x = 5 - new_l_pos_x
-            curr_token_pos_x = 5 - curr_token_pos_x
-            new_token_pos_x = 5 - new_token_pos_x
+            if curr_token_pos_x != 0:
+                curr_token_pos_x = 5 - curr_token_pos_x
+                new_token_pos_x = 5 - new_token_pos_x
             new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d
         
         #reflect y
         if transform[1]:
             new_l_pos_y = 5 - new_l_pos_y
-            curr_token_pos_y = 5 - curr_token_pos_y
-            new_token_pos_y = 5 - new_token_pos_y
+            if curr_token_pos_y != 0:
+                print("if ther is  token move")
+                curr_token_pos_y = 5 - curr_token_pos_y
+                new_token_pos_y = 5 - new_token_pos_y
             new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['N','S'] else new_l_pos_d
         
         #transpose
@@ -106,9 +113,10 @@ class packed_action:
             curr_token_pos_x = 5 - curr_token_pos_x
             new_token_pos_x = 5 - new_token_pos_x
             new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d
-            
+
         #save transformed data
         self.data = struct.pack(packed_action._format,
                                 l_piece_id,new_l_pos_x,new_l_pos_y,new_l_pos_d.encode('utf-8'),
                                 curr_token_pos_x,curr_token_pos_y,
                                 new_token_pos_x,new_token_pos_y)
+                                
