@@ -28,8 +28,8 @@ def getPlayers()->Tuple[
                 if p==1:
                     depth = int(input(f"\
                                 Player {i+1} Depth (int or -1): "))
-                    prune = bool(input(f"\
-                                Player {i+1} Prune (0 or 1): "))
+                    prune = bool(int(input(f"\
+                                Player {i+1} Prune (0 or 1): ")))
                     player = [p,depth,prune]
                 else: player = [p,None,None]
                 players.append(tuple(player))
@@ -58,7 +58,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     if gm==None:
         randoms,players = setGameMode(*getPlayers())
     else:
-        randoms,players = setGameMode(gm)
+        randoms,players = setGameMode(*gm)
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
@@ -68,8 +68,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 players[i].set_seed(n+i)
         while game.whoWins()==None and game.totalTurns()<64:
             if display:
-                print(game.state)
-                game.display(internal_display=True)
+                # print(game.state)
+                # game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
             if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
@@ -107,6 +107,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
             print('Total Turns',game.totalTurns())
             
         game.reset()
+        for player in players:
+            player.game_reset()
     print()
     length = max(len(turn_times[0]),len(turn_times[1]))
     turn_times = [row + [0] * (length - len(row)) for row in turn_times]
