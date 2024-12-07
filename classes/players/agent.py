@@ -61,7 +61,7 @@ class Agent(Player):
         self.display=display
         if self.display: 
             print('Thinking...')
-            print(len(state.getLegalMoves()))
+            # print(len(state.getLegalMoves()))
         start = time.time()
         value, bestActions = self.AlphaBetaSearch(state)
         end = time.time()
@@ -77,7 +77,8 @@ class Agent(Player):
         if self.display:
             print(f'Finished MinMaxing {len(self.finished)} states')
             bestAction.denormalize(state.transform)
-            print(f'Choosing Move:{bestAction} for value: {value} from depth {self.finished[state][0]} out of {len(bestActions)} options')
+            # print(f'Choosing Move:{bestAction} for value: {value} from depth {self.finished[state][0]} out of {len(bestActions)} options')
+            print(f'Choosing Move:{bestAction} for value: {value}')
             bestAction.normalize(state.transform)
             print(f'Time: {end-start:.1f}s | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
         return bestAction
@@ -139,7 +140,7 @@ class Agent(Player):
     def MaxValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
         if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
             self.last = len(self.finished)
-            print(f'Cached: {self.last} states')
+            # print(f'Cached: {self.last} states')
 
         #if we have already finished evaluating this state with at least this much depth, return saved value
         # try except = reduces hash lookups
@@ -221,7 +222,7 @@ class Agent(Player):
     def MinValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
         if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
             self.last = len(self.finished)
-            print(f'Cached: {self.last} states')
+            # print(f'Cached: {self.last} states')
         
         #if we have already finished evaluating this state with at least this much depth, return saved value
         try:

@@ -1,12 +1,34 @@
+# our imports
 import Players
 from classes.game import Game
+from classes.base_structs.L_piece import L_piece
+from classes.base_structs.token_piece import token_piece
 
+# use Python 3.5 and up (typing library built in)
 from typing import Tuple,List,Optional
-import numpy as np
+
+import sys
+import subprocess
 import time
+
+# profiling (built in?)
 import cProfile
 import pstats
-from tqdm import tqdm
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def install_all():
+
+    install('numpy')
+    install('tqdm')
+
+try:
+    import numpy as np
+    from tqdm import tqdm
+except ImportError:
+    install_all()
 
 from classes.base_structs.L_piece import L_piece
 from classes.base_structs.token_piece import token_piece
@@ -56,6 +78,34 @@ def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
     return np.array([p1[0]==2,p2[0]==2]),players
 
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
+
+    # Set initial state
+    
+    InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
+    InitialStateCoordinatesList = InitialStateCoordinates.split()
+
+    # if len(InitialStateCoordinatesList) != 10:
+    #     game = Game(L_pieces=None, token_pieces=None)
+    # else:
+    try:
+        InitialStateCoordinatesList = InitialStateCoordinates.split()
+        if len(InitialStateCoordinatesList) != 10:
+            game = Game(L_pieces=None, token_pieces=None)
+        else:
+            L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
+            L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
+            T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
+            T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
+
+            L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
+            token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
+
+            game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
+    except ValueError as e:
+        raise ValueError('Enter Valid Intial States')
+    
+    # End set initial state
+
     game = Game()
     
     if gm==None:
@@ -65,17 +115,19 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
-    for n in tqdm(range(N)):
+    # for n in tqdm(range(N)):
+    for n in range(N):
         for i,r in enumerate(randoms):
             if r:
                 players[i].set_seed(n+i)
         while game.whoWins()==None and game.totalTurns()<64:
             if display:
+                print()
                 # print(game.state)
                 # game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
-            if display: print(f"Player {turn+1}'s turn ({game.totalTurns()})")
+            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
             
             current_player = players[turn]
             success=False
@@ -85,7 +137,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     end=time.time()
-                    if display: print("Move:",move)
+                    # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
                     success=True
                     turn_times[turn].append(end-start)
@@ -106,8 +158,12 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
 
         if display: 
             game.display()
-            print('Player',winner,'wins!')
-            print('Total Turns',game.totalTurns())
+            
+            if game.totalTurns()==64:
+                print('Draw!')
+            else:                
+                print('Player',winner,'wins!')
+                print('Total Turns',game.totalTurns())
             
         game.reset()
         for player in players:
@@ -121,7 +177,14 @@ if __name__ == "__main__":
     profiler = cProfile.Profile()
     profiler.enable()
     
-    _,_,_ = play()
+    # _,_,_ = play()
+
+    # Play again?
+    while True:
+        _,_,_ = play()
+        cont = input('Play again? (y/n): ')
+        if cont.lower() != 'y'.strip():
+            break
     
     profiler.disable()
     
@@ -129,5 +192,5 @@ if __name__ == "__main__":
     
     # Sort by 'time' (total time in each function) and print the top 10 functions
     stats.strip_dirs()  # Optional: remove long file paths for readability
-    stats.sort_stats("time").print_stats(16)
+    # stats.sort_stats("time").print_stats(16)
     

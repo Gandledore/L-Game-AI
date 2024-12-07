@@ -53,7 +53,7 @@ class packed_action:
         if transform[1]:
             new_l_pos_y = 5 - new_l_pos_y
             if curr_token_pos_y != 0:
-                print("if ther is  token move")
+                # print("if ther is  token move")
                 curr_token_pos_y = 5 - curr_token_pos_y
                 new_token_pos_y = 5 - new_token_pos_y
             new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['N','S'] else new_l_pos_d
