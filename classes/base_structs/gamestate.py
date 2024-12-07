@@ -11,43 +11,59 @@ from tqdm import tqdm
 class gamestate():
     __slots__ = ('player','L_pieces','token_pieces','transform','token_pair_id')
     #precompute with static stuff
-    _general_L_pos = []
-    _general_T_pos = []
-    _legalMoves = {}
+    _general_L_pos = []     #list of L positions that are generally possible (assuming no other pieces present)
+    _general_T_pos = []     #list of T positions that are generally possible (assuming no other pieces present)
+    _legalMoves = {}        #dictionary mapping states to numpy list of legal actions
     _legalMoves_path = 'legal_moves.pkl' #relative to play file
     
+    #0=nothing, 1=processing legal moves, 2=done preprocessing
     _preprocessing_done = 0
     
-    _board = {(x,y) for x in range(1,5) for y in range(1,5)}
-    _count_successors = 0
-    _successors = {}
-    #normalized state defined as L1 piece in upper left quadrant (x,y)<=2, long leg east (6)
+    _board = {(x,y) for x in range(1,5) for y in range(1,5)}        #set of tuples of valid board coords
+
+    #normalized state defined as L1 piece in upper left quadrant (x,y)<=2, long leg east (6 total possible tuples)
     _normalized_L_tuples = [(x,y,d) for x in range(1,3) for y in range(1,3) for d in ['N','S'] if not (y==1 and d=='N')]
     
-    # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
-    # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='E'),L_piece(x=2,y=2,d='N')], token_pieces:Set[token_piece]={token_piece(x=3,y=3),token_piece(x=3,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
-    # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=4,y=2,d='S'),L_piece(x=2,y=4,d='N')], token_pieces:Set[token_piece]={token_piece(x=3,y=3),token_piece(x=3,y=1)},transform:np.ndarray[bool]=np.array([False,False,False])):
+    #horizontal initial state
+    # def __init__(self,
+    #                 player:int=0,
+    #                 L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')],
+    #                 token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
+    #                 transform:np.ndarray[bool]=np.array([False,False,False])):
+    
+    #vertical initial state
     def __init__(self, 
-                 player:int=0,
-                 L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
-                 token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
-                 transform:np.ndarray[bool]=np.array([False,False,False])):
+                    player:int=0,
+                    L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
+                    token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
+                    transform:np.ndarray[bool]=np.array([False,False,False])):
+        
+        
         self.player:int = player
         self.L_pieces: List[L_piece] = L_pieces
         self.token_pieces: Set[token_piece] = token_pieces
         self.transform = transform
         self.renormalize()
 
-        self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
-        #preprocess everything
-        if gamestate._preprocessing_done==0:
+
+        #compute a unique token id for hashing the set of tokens. gives a unique binary number for each cell, such that summing any pair is also unique
+        self.token_pair_id = sum(1 << (token.x+4*token.y) for token in self.token_pieces)
+        
+        #preprocessing
+        if gamestate._preprocessing_done==0: #(do not run if preprocessing legal moves is currently running, or if it is completely done)
             gamestate._precompute_gen_L_pos()
             gamestate._precompute_gen_T_pos()
+
             gamestate._preprocessing_done = 1    
-            #preprocessing below setting done=True so it doesn't recursively call itself
-            # upon initialization of states in preprocessing
+            #preprocessing legal moves started
+            #this is necessary because otherwise preprocess_all_legalMoves recursively creates gamestates
+
             gamestate._preprocess_all_legalMoves()
             gamestate._preprocessing_done = 2
+
+
+        #trust that preprocess_all_legal moves only generates valid gamestates.
+        # this is for checking that provided initial state is correct.
         if gamestate._preprocessing_done==2:
             assert self in gamestate._legalMoves, "Invalid Gamestate"
 
@@ -149,6 +165,8 @@ class gamestate():
         return f"Player: {self.player}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}\nTransform:{self.transform}"
     def __hash__(self):
         return hash((self.player,*self.L_pieces[0].get_tuple(),*self.L_pieces[1].get_tuple(),self.token_pair_id))
+    
+    #ignore transform equality so that different unormalized states evaluate as equal when equal normalized
     def __eq__(self,other:"gamestate"):
         return self.token_pair_id==other.token_pair_id and self.player==other.player and self.L_pieces==other.L_pieces
     
@@ -156,8 +174,11 @@ class gamestate():
         return self.L_pieces[0].compute_normalization()
     
     def update_normalization(self,transform:np.ndarray[bool])->None:
+        #if previous state was transposed, swap partial transform reflect x and reflect y to compensate cause that's what transpose does
         if self.transform[2] and transform[0]!=transform[1]:
             transform[:2] = np.logical_not(transform[:2])
+            
+        #take xor between states because doing something twice cancels it
         self.transform = np.logical_xor(self.transform,transform)
         
     def normalize(self,transform):        
@@ -166,13 +187,12 @@ class gamestate():
             piece.normalize(transform)
         
         #'or' comprehension necessary because 
-        #   1) normalize returns none
+        #   1) normalize returns none, then 'or piece' uses new version
         #   2) modifying elements in a set in place changes hash and results in unexpected behavior
         self.token_pieces = {piece.normalize(transform) or piece for piece in self.token_pieces}
-        self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
+        self.token_pair_id = sum(1 << (token.x+4*token.y) for token in self.token_pieces)
 
-    #just a wrapper, cause each part of transformation is binary and independent, 
-    # so doing it twice reverses it (basically an xor operation)
+    #reverses normalization with same transpose
     def denormalize(self)->None:
         #normalize the L pieces
         for piece in self.L_pieces:
@@ -182,11 +202,13 @@ class gamestate():
         #   1) normalize returns none
         #   2) modifying elements in a set in place changes hash and results in unexpected behavior
         self.token_pieces = {piece.denormalize(self.transform) or piece for piece in self.token_pieces}
-        self.token_pair_id = sum(2**(token.x+4*token.y-5) for token in self.token_pieces)
+        self.token_pair_id = sum(1 << (token.x+4*token.y) for token in self.token_pieces)
 
+    #computes transformation necessary to get state that was just moved out of normalized space back to normalized space
+    #normalizes state accordingly
+    #updates transform with partial transform, to display correctly
     def renormalize(self)->None:
         partial_transform = self.compute_normalization()
-        # if not all(partial_transform==self.transform):
         self.normalize(partial_transform)
         self.update_normalization(partial_transform)
             
@@ -202,6 +224,7 @@ class gamestate():
     #feedback to for assertions statements describing first error that's invalid
     def valid_move(self,move:packed_action)->Tuple[bool,str]:
 
+        #unpack the move
         l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
         new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
         curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
@@ -249,21 +272,23 @@ class gamestate():
     #take state and move, return new gamestate where move is applied
     def getSuccessor(self, move: packed_action) -> "gamestate":
         valid, feedback = self.valid_move(move)
-        assert valid, feedback#+f'\n\nMove: {move}\nState: {self}'
+        assert valid, feedback
         
+        #unpack move
         l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
         new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
         curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
         new_t_pos = (new_token_pos_x,new_token_pos_y)
         
+        #generate a new state, copy old position if not modified by move
         state = gamestate(player=int(not self.player),
                         L_pieces=[L_piece(*new_l_pos) if self.player==i else l_piece.copy() for i,l_piece in enumerate(self.L_pieces)],
                         token_pieces={token_piece(*new_t_pos) if curr_t_pos==token.get_position() else token.copy() for token in self.token_pieces},
                         transform=self.transform.copy())
         
         #only renormalize when L1 moved
-        # moving L2 doesn't change normalization 
-        # (normalization defined by L1)
+        # because moving L2 doesn't change normalization 
+        #  because (normalization defined by L1)
         if self.player==0:
             state.renormalize()
         return state

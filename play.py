@@ -12,8 +12,8 @@ import subprocess
 import time
 
 # profiling (built in?)
-import cProfile
-import pstats
+# import cProfile
+# import pstats
 
 # Package install routine
 
@@ -82,33 +82,33 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
 
     # Set initial state
     
-    InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
-    InitialStateCoordinatesList = InitialStateCoordinates.split()
-
-    # if len(InitialStateCoordinatesList) != 10:
-    #     game = Game(L_pieces=None, token_pieces=None)
-    # else:
-    try:
+    while True:
+        InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
         InitialStateCoordinatesList = InitialStateCoordinates.split()
-        if len(InitialStateCoordinatesList) != 10:
-            game = Game(L_pieces=None, token_pieces=None)
-        else:
-            L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
-            L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
-            T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
-            T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
 
-            L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
-            token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
+        try:
+            InitialStateCoordinatesList = InitialStateCoordinates.split()
+            if len(InitialStateCoordinatesList) == 0:
+                print('Using Default Initial Gamestate')
+                game = Game()
+            else:
+                L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
+                L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
+                T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
+                T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
 
-            game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
-    except ValueError as e:
-        raise ValueError('Enter Valid Intial States')
-    
-    # End set initial state
+                L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
+                token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
 
-    game = Game()
-    
+                game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
+            break
+        except (ValueError,AssertionError) as e:
+            print('Invalid Intial State')
+        except IndexError as e:
+            print('Enter Moves in correct Format')
+        
+        # End set initial state
+
     if gm==None:
         randoms,players = setGameMode(*getPlayers())
     else:
@@ -175,8 +175,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     return winners, turns, turn_times
 
 if __name__ == "__main__":
-    profiler = cProfile.Profile()
-    profiler.enable()
+    # profiler = cProfile.Profile()
+    # profiler.enable()
     
     # _,_,_ = play()
 
@@ -187,11 +187,11 @@ if __name__ == "__main__":
         if cont.lower() != 'y'.strip():
             break
     
-    profiler.disable()
+    # profiler.disable()
     
-    stats = pstats.Stats(profiler)
+    # stats = pstats.Stats(profiler)
     
     # Sort by 'time' (total time in each function) and print the top 10 functions
-    stats.strip_dirs()  # Optional: remove long file paths for readability
+    # stats.strip_dirs()  # Optional: remove long file paths for readability
     # stats.sort_stats("time").print_stats(16)
     

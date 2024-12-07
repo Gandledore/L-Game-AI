@@ -1,5 +1,4 @@
 import numpy as np
-import copy
 
 from classes.base_structs.gamestate import gamestate # imports as class 
 from classes.base_structs.action import packed_action
@@ -9,7 +8,8 @@ class Game:
     def __init__(self, L_pieces=None, token_pieces=None):
         if L_pieces and token_pieces:
             self.state = gamestate(L_pieces=L_pieces, token_pieces=token_pieces)
-        else: self.state = gamestate()
+        else: 
+            self.state = gamestate()
         self.turns = 0
         
     def getTurn(self)->int:
@@ -64,15 +64,3 @@ class Game:
     def reset(self)->None:
         self.state = gamestate()
         self.turns = 0
-    
-if __name__ == "__main__":
-    print("run python3 play.py instead")
-    test = Game()
-    test.display()
-    test.getInput()
-
-    test.display()
-    test.getInput()
-
-        
-
