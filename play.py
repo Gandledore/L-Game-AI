@@ -15,6 +15,8 @@ import time
 import cProfile
 import pstats
 
+# Package install routine
+
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package],
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -30,8 +32,7 @@ try:
 except ImportError:
     install_all()
 
-from classes.base_structs.L_piece import L_piece
-from classes.base_structs.token_piece import token_piece
+# End package install routine
 
 # gamemode input, exception handling
 def getPlayers()->Tuple[
@@ -158,7 +159,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
 
         if display: 
             game.display()
-            
+
             if game.totalTurns()==64:
                 print('Draw!')
             else:                
