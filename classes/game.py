@@ -7,7 +7,9 @@ from classes.base_structs.action import packed_action
 from typing import Optional
 class Game:
     def __init__(self, L_pieces=None, token_pieces=None):
-        self.state = gamestate(L_pieces=L_pieces, token_pieces=token_pieces)
+        if L_pieces and token_pieces:
+            self.state = gamestate(L_pieces=L_pieces, token_pieces=token_pieces)
+        else: self.state = gamestate()
         self.turns = 0
         
     def getTurn(self)->int:

@@ -6,9 +6,9 @@ class token_piece():
     #dictionary with keys being initialization params, values being their respective possible assignments
     _POSSIBLE_LISTS = {'x':[1,2,3,4],'y':[1,2,3,4]}
     _POSSIBLE_SETS = {'x':{1,2,3,4},'y':{1,2,3,4}}
-    _POSSIBLE_POS = {(x,y) for x in range(1,5) for y in range(1,5)} | {(0,0)}
-    #possible spots for tokens representing no movement, because of transformations
     _NULL_SPOTS = {(0,0),(0,5),(5,0),(5,5)}
+    _POSSIBLE_POS = {(x,y) for x in range(1,5) for y in range(1,5)} | _NULL_SPOTS
+    #possible spots for tokens representing no movement, because of transformations
     
     def __init__(self,x:int,y:int)->None:
         assert x in token_piece._POSSIBLE_SETS['x'], f"Token x={x} not in {token_piece._POSSIBLE_SETS['x']}"

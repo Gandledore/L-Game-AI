@@ -2,9 +2,6 @@ from classes.players.player import Player
 from classes.base_structs.action import packed_action
 from classes.base_structs.gamestate import gamestate
 
-import Players
-import copy
-
 class Human(Player):
     _CORE = {(2,2), (2,3), (3,2), (3,3)}
     _CORNERS = {(1,1), (1,4), (4,1), (4,4)}

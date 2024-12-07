@@ -26,15 +26,15 @@ class gamestate():
     
     # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')], token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
     # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='E'),L_piece(x=2,y=2,d='N')], token_pieces:Set[token_piece]={token_piece(x=3,y=3),token_piece(x=3,y=4)},transform:np.ndarray[bool]=np.array([False,False,False])):
+    # def __init__(self, player:int=0, L_pieces:List[L_piece]=[L_piece(x=4,y=2,d='S'),L_piece(x=2,y=4,d='N')], token_pieces:Set[token_piece]={token_piece(x=3,y=3),token_piece(x=3,y=1)},transform:np.ndarray[bool]=np.array([False,False,False])):
     def __init__(self, 
                  player:int=0,
                  L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
                  token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
                  transform:np.ndarray[bool]=np.array([False,False,False])):
         self.player:int = player
-        self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')]
-        self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1,y=1),token_piece(x=4,y=4)}
-
+        self.L_pieces: List[L_piece] = L_pieces
+        self.token_pieces: Set[token_piece] = token_pieces
         self.transform = transform
         self.renormalize()
 
