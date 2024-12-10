@@ -137,6 +137,25 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 try:
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
+                    
+                    if isinstance(move, str) and move == 'u':
+                        # make sure total turns is even or odd based on who is undoing
+                        # if human is player 0, then total turns should be even
+                        # if human is player 1, then total turns should be odd
+                        if game.totalTurns() % 2 == turn:
+                            
+                            # just to make sure the bottom condition about valid moves does not trigger
+                            success=True
+
+                            if game.undo():
+                                print('Undo Successful')
+                                game.display()
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
+                                continue
+                            else:
+                                print('Undo Unsuccessful')
+                                continue                    
+
                     end=time.time()
                     # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move

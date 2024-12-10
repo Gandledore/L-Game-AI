@@ -58,7 +58,10 @@ class Human(Player):
         bestMove.normalize(state.transform)
         
         # print('\nRecieved State:',state)
+        print('Undo: u')
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
+        if wholeMoves.lower() == 'u':
+            return 'u'
         move_parts = wholeMoves.split()
         
         if len(move_parts)==0:

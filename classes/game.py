@@ -10,18 +10,51 @@ class Game:
             self.state = gamestate(L_pieces=L_pieces, token_pieces=token_pieces)
         else: 
             self.state = gamestate()
+        
         self.turns = 0
+
+        # List of moves for undoing and redoing
+        self.history = []
+        self.saveMove()
+    
+    def saveMove(self)->None:
+        self.history.append(self.getState())
+    
+    def undo(self) -> bool:
+
+        if self.turns < 2:
+            return False
+
+        # example
+        # human action turn 1
+        # agent action turn 2
+        # undo -- this should go back to the first human action (turn 1)
+
+        # sorry messy code here lol
+        self.history.remove(self.history[-1])
+        self.history.remove(self.history[-1])
+
+        self.state = self.history.pop()
+        self.turns -= 2
+        print("this is the undo board")
+        self.saveMove()
+        return True
+
         
     def getTurn(self)->int:
         return self.state.player
     
     def getState(self)->gamestate:
-        return gamestate(self.state.player,self.state.L_pieces[:],self.state.token_pieces.copy(),self.state.transform[:])
+        return gamestate(self.state.player,
+                        self.state.L_pieces[:],
+                        self.state.token_pieces.copy(),
+                        self.state.transform[:])
     
     #updates game state with action if it is valid, returns true iff successfuly
     #feedback passed through to valid moves
     def apply_action(self,move:packed_action)->None:
         self.state = self.state.getSuccessor(move)
+        self.saveMove()
         self.turns+=1
         
     #interface to display game board and pieces
@@ -64,3 +97,6 @@ class Game:
     def reset(self)->None:
         self.state = gamestate()
         self.turns = 0
+
+        self.history.clear()
+        self.saveMove()
