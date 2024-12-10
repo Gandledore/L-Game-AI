@@ -25,19 +25,18 @@ class gamestate():
     _normalized_L_tuples = [(x,y,d) for x in range(1,3) for y in range(1,3) for d in ['N','S'] if not (y==1 and d=='N')]
     
     #horizontal initial state
-    # def __init__(self,
-    #                 player:int=0,
-    #                 L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')],
-    #                 token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
-    #                 transform:np.ndarray[bool]=np.array([False,False,False])):
-    
-    #vertical initial state
-    def __init__(self, 
+    def __init__(self,
                     player:int=0,
-                    L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
+                    L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')],
                     token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
                     transform:np.ndarray[bool]=np.array([False,False,False])):
-        
+    
+    #vertical initial state
+    # def __init__(self, 
+    #                 player:int=0,
+    #                 L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
+    #                 token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
+    #                 transform:np.ndarray[bool]=np.array([False,False,False])):
         
         self.player:int = player
         self.L_pieces: List[L_piece] = L_pieces
@@ -307,4 +306,32 @@ class gamestate():
         return None
     
 
-    
+    #interface to display game board and pieces, added for Human transform display
+    #self.state._____ becomes self.______
+    def display(self,internal_display:bool=False)->None:
+        board = np.full((4, 4), "  ", dtype=object) # 4 by 4 of empty string
+        
+        #denormalize to display what human expects to see
+        if not internal_display: self.denormalize()
+        
+        for i, l in enumerate(self.L_pieces):
+            color = "\033[1;31m1□\033[0m" if i == 0 else "\033[32m2▲\033[0m"  # Red for L1, Blue for L2
+            for px, py in l.get_coords():
+                board[py - 1, px - 1] = color #+ "L" + str(i + 1) + "\033[0m"
+        
+        for i, t in enumerate(self.token_pieces):
+            tx, ty = t.get_position()
+            board[ty - 1, tx - 1] = "\033[33m○○\033[0m"
+
+
+        rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
+        #left wall then the row then the ending right wall
+        # f"{cell:>2}" align cell to the right > with a width of 2 spaces. 
+
+        horizontal_separator = "-------------\n"
+        
+        board_str = horizontal_separator + f"\n{horizontal_separator}".join(rows) + "\n" + horizontal_separator
+        print(board_str)
+        
+        #renormalize for internal use
+        if not internal_display: self.normalize(self.transform)
