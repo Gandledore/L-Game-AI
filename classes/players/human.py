@@ -84,10 +84,8 @@ class Human(Player):
                     transformList = [False,True,True]
                 else:
                     raise ValueError("Enter commands in specified format")
-                print(state)
                 state.update_denormalization(transformList)
                 state.display()
-                print(state)
                 bestMove.denormalize(state.transform)
                 print("Suggested Move: ", bestMove.suggest_format())
                 bestMove.normalize(state.transform)
