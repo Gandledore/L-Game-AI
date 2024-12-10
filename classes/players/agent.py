@@ -30,6 +30,7 @@ class Agent(Player):
         # <1 = assuming fully solved, may not be correct assumption
         # stores all moves of equivalent value
         self.finished = {} #stores state:(d,v) tuple of depth and best backpropagated value of highest depth search (-1 = infinite depth)
+        self.action_heuristics = {}
         self.check_tie_depth = 11#min(depth,11)%12 #look >5 ply ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
         # how to check ties: if encounter a looped state or a state we've already seen, say hey we've already seen this state, potentially a tie, then depth limited search starting from depth 11 because wikipedia says a player can win in 4 turns (check assumption)
         # in the next 11 turns, can a win or loss be forced? backtrack
@@ -65,6 +66,7 @@ class Agent(Player):
         start = time.time()
         value, bestActions = self.AlphaBetaSearch(state)
         end = time.time()
+
         try:
             attempt = self.played_states[state]
         except KeyError:
@@ -84,22 +86,27 @@ class Agent(Player):
         return bestAction
     
     def action_heuristic(self,move:packed_action)->int:
-        core_weight = 20
-        corner_weight = 40
-        killer_token_weight = 10
-        
-        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
-        new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
-        curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
-        new_t_pos = (new_token_pos_x,new_token_pos_y)
-        
-        l_set = L_piece._compute_L_coords(*new_l_pos)
+        try: 
+            return self.action_heuristics[move]
+        except KeyError:
+            core_weight = 25
+            corner_weight = 40
+            killer_token_weight = 10
+            
+            l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
+            new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
+            curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
+            new_t_pos = (new_token_pos_x,new_token_pos_y)
+            
+            l_set = L_piece._compute_L_coords(*new_l_pos)
 
-        control_core = core_weight * len(l_set & Agent._CORE)           #reward controlling core
-        avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))   #penalize touching corner
-        killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if curr_t_pos!=(0,0) else 0) #reward placing tokens in killer positions
-        
-        return control_core + avoid_corner + killer_token
+            control_core = core_weight * len(l_set & Agent._CORE)           #reward controlling core
+            avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))   #penalize touching corner
+            killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if curr_t_pos!=(0,0) else 0) #reward placing tokens in killer positions
+            
+            score = control_core + avoid_corner + killer_token
+            self.action_heuristics[move]=score
+            return score
     
     def heuristic(self, state:gamestate) -> int:
         player = self.id
@@ -157,7 +164,7 @@ class Agent(Player):
 
             # if the value we backpropagated is greater than the max score (or our estimate of the max score), then no matter what depth you searched from, someone can force a win or loss (force a terminal state)
             # CHECK THIS
-            guaranteed_terminal = abs(val)>=self.max_score
+            guaranteed_terminal = False#abs(val)>=self.max_score
 
             # we want for negative depth saved = this has been fully searched
             # CHECK THIS (check maintaining)
@@ -176,7 +183,7 @@ class Agent(Player):
         
         if depth == 0 or state.isGoal():
             h =self.heuristic(state)
-            self.finished[state] = (depth,h,[])
+            self.finished[state] = (depth,h,np.array([]))
             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
             return h, []
         
@@ -216,6 +223,10 @@ class Agent(Player):
                 self.num_prune+= numMoves-i-1
                 return v,optimal_moves
 
+        optimal_moves = np.array(optimal_moves)
+        heuristics = np.array([self.action_heuristic(move) for move in optimal_moves])
+        sort_indexes = np.argsort(heuristics)[::-1]
+        optimal_moves = optimal_moves[sort_indexes]
         self.finished[state] = (depth,v,optimal_moves)
         return v, optimal_moves
     
@@ -228,7 +239,7 @@ class Agent(Player):
         try:
             stored_depth,val,optimal_moves = self.finished[state]
             saved_deeper_search = depth>=0 and stored_depth>=depth
-            guaranteed_terminal = abs(val)>=self.max_score
+            guaranteed_terminal = False#abs(val)>=self.max_score
             state_fully_searched = stored_depth<0
             tied_state = stored_depth>=self.check_tie_depth-1
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
@@ -240,7 +251,7 @@ class Agent(Player):
         
         if depth == 0 or state.isGoal():
             h = self.heuristic(state)
-            self.finished[state] = (depth,h,[])
+            self.finished[state] = (depth,h,np.array([]))
             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
             return h, []
       
@@ -275,7 +286,11 @@ class Agent(Player):
             if self.prune and v < alpha:
                 self.num_prune+=numMoves-i-1
                 return v,optimal_moves
-            
+        
+        optimal_moves = np.array(optimal_moves)
+        heuristics = np.array([self.action_heuristic(move) for move in optimal_moves])
+        sort_indexes = np.argsort(heuristics)[::-1]
+        optimal_moves = optimal_moves[sort_indexes]
         self.finished[state] = (depth,v,optimal_moves)
         return v, optimal_moves
 

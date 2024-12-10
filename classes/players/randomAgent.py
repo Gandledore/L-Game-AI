@@ -16,7 +16,7 @@ class RandomAgent(Player):
         legal_moves = state.getLegalMoves()
         move = random.choice(legal_moves)
         move.denormalize(state.transform)
-        print(f"Random Agent played {move}")
+        if display: print(f"Random Agent played {move}")
         move.normalize(state.transform)
         return random.choice(legal_moves)
     

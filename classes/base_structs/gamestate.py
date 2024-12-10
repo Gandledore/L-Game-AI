@@ -157,7 +157,7 @@ class gamestate():
             
             #save legal moves since not already saved
             with open(cls._legalMoves_path,'wb') as f:
-                print('Saving Legal Moves...',end='',flush=True)
+                print('Saving Legal Moves...',end='')
                 pickle.dump(cls._legalMoves,f)
                 print('\rSaved Legal Moves')
         
