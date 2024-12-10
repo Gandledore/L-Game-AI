@@ -75,14 +75,17 @@ class Human(Player):
                 if transformInput in ("x", "X"):
                     transformList = [1,0,0]
                     state.normalize(transformList)
+                    bestMove.normalize(transformList)
                     state.display()
                 elif transformInput in ("y", "Y"):
                     transformList = [0,1,0]
                     state.normalize(transformList)
+                    bestMove.normalize(transformList)
                     state.display()
                 elif transformInput in ("t", "T"):
                     transformList = [0,0,1]
                     state.normalize(transformList)
+                    bestMove.normalize(transformList)
                     state.display()
                 else:
                     move = bestMove
