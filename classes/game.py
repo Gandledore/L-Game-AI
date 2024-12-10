@@ -15,6 +15,8 @@ class Game:
 
         # List of moves for undoing and redoing
         self.history = []
+        self.redo_stack = []
+
         self.saveMove()
     
     def saveMove(self)->None:
@@ -31,12 +33,22 @@ class Game:
         # undo -- this should go back to the first human action (turn 1)
 
         # sorry messy code here lol
+        self.redo_stack.append(self.history[-1])
         self.history.remove(self.history[-1])
         self.history.remove(self.history[-1])
 
         self.state = self.history.pop()
         self.turns -= 2
-        print("this is the undo board")
+        # print("this is the undo board")
+        self.saveMove()
+        return True
+
+    def redo(self) -> bool:
+        if len(self.redo_stack) == 0:
+            return False
+
+        self.state = self.redo_stack.pop()
+        self.turns += 2
         self.saveMove()
         return True
 
@@ -55,6 +67,7 @@ class Game:
     def apply_action(self,move:packed_action)->None:
         self.state = self.state.getSuccessor(move)
         self.saveMove()
+        self.redo_stack.clear()
         self.turns+=1
         
     #interface to display game board and pieces
@@ -99,4 +112,5 @@ class Game:
         self.turns = 0
 
         self.history.clear()
+        self.redo_stack.clear()
         self.saveMove()

@@ -59,9 +59,12 @@ class Human(Player):
         
         # print('\nRecieved State:',state)
         print('Undo: u')
+        print('Redo: r')
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         if wholeMoves.lower() == 'u':
             return 'u'
+        elif wholeMoves.lower() == 'r':
+            return 'r'
         move_parts = wholeMoves.split()
         
         if len(move_parts)==0:
