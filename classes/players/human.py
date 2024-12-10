@@ -61,7 +61,7 @@ class Human(Player):
         # print('\nRecieved State:',state)
 
         while True: #this is to capture a transform or a move
-            wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty or x, y, t transforms: ")
+            wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty or x, y, t, r, l transforms: ")
             move_parts = wholeMoves.split()
 
             if len(move_parts)==0:
@@ -73,23 +73,24 @@ class Human(Player):
                 transformInput = move_parts[0]
                 
                 if transformInput in ("x", "X"):
-                    transformList = [1,0,0]
-                    state.normalize(transformList)
-                    bestMove.normalize(transformList)
-                    state.display()
+                    transformList = [True,False,False]
                 elif transformInput in ("y", "Y"):
-                    transformList = [0,1,0]
-                    state.normalize(transformList)
-                    bestMove.normalize(transformList)
-                    state.display()
+                    transformList = [False,True,False]
                 elif transformInput in ("t", "T"):
-                    transformList = [0,0,1]
-                    state.normalize(transformList)
-                    bestMove.normalize(transformList)
-                    state.display()
+                    transformList = [False,False,True]
+                elif transformInput in ("r","R"):
+                    transformList = [True,False,True]
+                elif transformInput in ("l","L"):
+                    transformList = [False,True,True]
                 else:
-                    move = bestMove
-                    return move
+                    raise ValueError("Enter commands in specified format")
+                print(state)
+                state.update_denormalization(transformList)
+                state.display()
+                print(state)
+                bestMove.denormalize(state.transform)
+                print("Suggested Move: ", bestMove.suggest_format())
+                bestMove.normalize(state.transform)
                 continue
 
 

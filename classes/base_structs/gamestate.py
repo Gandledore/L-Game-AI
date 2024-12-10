@@ -179,6 +179,14 @@ class gamestate():
             
         #take xor between states because doing something twice cancels it
         self.transform = np.logical_xor(self.transform,transform)
+
+    def update_denormalization(self,transform:np.ndarray[bool])->None:
+        #if new state is transposed, swap original reflect x and reflect y to compensate cause that's what transpose does
+        if transform[2] and self.transform[0]!=self.transform[1]:
+            self.transform[:2] = np.logical_not(self.transform[:2])
+        
+        #take xor between states because doing something twice cancels it
+        self.transform = np.logical_xor(self.transform,transform)
         
     def normalize(self,transform):        
         #normalize the L pieces
