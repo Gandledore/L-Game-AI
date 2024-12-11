@@ -91,6 +91,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
             if len(InitialStateCoordinatesList) == 0:
                 print('Using Default Initial Gamestate')
                 game = Game()
+                break
+
             else:
                 L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
                 L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
@@ -100,8 +102,18 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
                 token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
 
+                # print board to get confirmation from user that they want to use this board
+
                 game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
-            break
+                game.display()
+
+                confirm = input('Confirm this board? (y/n): ')
+                if confirm.lower() == 'y':
+                    break
+                else:
+                    continue
+
+            # break
         except (ValueError,AssertionError) as e:
             print('Invalid Intial State')
         except IndexError as e:
