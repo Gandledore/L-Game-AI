@@ -70,17 +70,17 @@ class Human(Player):
 
             #Transpose, Reflect x, Reflect y
             if len(move_parts)==1:
-                transformInput = move_parts[0]
+                transformInput = move_parts[0].lower()
                 
-                if transformInput in ("x", "X"):
+                if transformInput == "x":
                     transformList = [True,False,False]
-                elif transformInput in ("y", "Y"):
+                elif transformInput == "y":
                     transformList = [False,True,False]
-                elif transformInput in ("t", "T"):
+                elif transformInput == "t":
                     transformList = [False,False,True]
-                elif transformInput in ("r","R"):
+                elif transformInput == "cw":
                     transformList = [True,False,True]
-                elif transformInput in ("l","L"):
+                elif transformInput == "ccw":
                     transformList = [False,True,True]
                 else:
                     raise ValueError("Enter commands in specified format")
