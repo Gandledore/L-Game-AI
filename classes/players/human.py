@@ -58,30 +58,11 @@ class Human(Player):
         print("Suggested Move: ", bestMove.suggest_format())
         bestMove.normalize(state.transform)
         
-        # print('\nRecieved State:',state)
-        print('Undo: u')
-        print('Redo: r')
-        print('Replay: replay')
-        print('Save: s') 
-        
-        wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
-
-        if wholeMoves.lower() == 'u':
-            return 'u'
-        elif wholeMoves.lower() == 'r':
-            return 'r'
-        elif wholeMoves.lower() == 'replay':
-            return 'replay'
-        elif wholeMoves.lower() == 's':
-            return 'save'
-        else:
-            print(wholeMoves.lower())
-        move_parts = wholeMoves.split()
-        
         while True: #this is to capture a transform or a move
             print('Undo: u')
             print('Redo: r')
             print('Replay: replay')
+            print('Save: s') 
             wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty or x, y, t, r, l transforms: ")
             move_parts = wholeMoves.split()
 
@@ -98,6 +79,8 @@ class Human(Player):
                     return 'r'
                 elif instruction == 'replay':
                     return 'replay'
+                elif instruction == 's':
+                    return 'save'
                 
                 elif instruction == "x":
                     transformList = [True,False,False]
