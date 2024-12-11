@@ -65,6 +65,10 @@ class Human(Player):
             return 'u'
         elif wholeMoves.lower() == 'r':
             return 'r'
+        elif wholeMoves.lower() == 'replay':
+            return 'replay'
+        else:
+            print(wholeMoves.lower())
         move_parts = wholeMoves.split()
         
         if len(move_parts)==0:
