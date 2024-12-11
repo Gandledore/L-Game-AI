@@ -212,7 +212,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 break
 
         winner = game.whoWins()
-        winner = int(not turn)+1 if winner==None else winner+1
+        winner = int(not game.getTurn())+1 if winner==None else winner+1
         winner = winner if game.totalTurns()<64 else 0
         winners[n] = winner
         turns[n] = game.totalTurns()
