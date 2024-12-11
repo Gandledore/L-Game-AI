@@ -76,11 +76,17 @@ def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
     player1 = player_dict[p1[0]](0) if p1[1]==None else player_dict[p1[0]](0,p1[1],p1[2])
     player2 = player_dict[p2[0]](1) if p2[1]==None else player_dict[p2[0]](1,p2[1],p2[2])
     players = np.array([player1,player2])
-    return np.array([p1[0]==2,p2[0]==2]),players
+    return np.array([p1[0]==2,p2 [0]==2]),players
+
+# change player from human to agent and take input
+def changePlayer(player:Players.Player)->Players.Player:
+    if isinstance(player,Players.Human):
+        depth = int(input(f"Enter Depth (int or -1): "))
+        prune = bool(int(input(f"Enter Prune (0 or 1): ")))
+        return Players.Agent(player.id,depth,prune)
+    return player
 
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
-
-    # handling loading game
 
     # Set initial state
     
@@ -164,7 +170,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     
-                    if isinstance(move, str) and move in {'u','r','replay','save'}:
+                    if isinstance(move, str) and move in {'u','r','replay','save', 'ai'}:
 
                         # ensures repeated u/r/re does not trigger the auto game termination (parsed as valid move)
                         success=True
@@ -194,6 +200,11 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                         elif move == 'save':
                             filename = input('Enter filename: ')
                             game.save(filename)
+                            continue
+                        elif move == 'ai':
+                            players[turn] = changePlayer(current_player)
+                            current_player = players[turn]
+                            print(f'Player {turn+1} changed to AI')
                             continue
 
                     end=time.time()

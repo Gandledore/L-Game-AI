@@ -59,10 +59,12 @@ class Human(Player):
         bestMove.normalize(state.transform)
         
         while True: #this is to capture a transform or a move
+            
             print('Undo: u')
             print('Redo: r')
             print('Replay: replay')
-            print('Save: s') 
+            print('Save: s')
+            print('Pass off to AI: ai')
             wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty or x, y, t, cw, ccw transforms: ")
             move_parts = wholeMoves.split()
 
@@ -81,6 +83,8 @@ class Human(Player):
                     return 'replay'
                 elif instruction == 's':
                     return 'save'
+                elif instruction == 'ai':
+                    return 'ai'
                 
                 elif instruction == "x":
                     transformList = [True,False,False]
