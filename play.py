@@ -140,7 +140,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 # game.display(internal_display=True)
                 game.display()
             turn = game.getTurn()
-            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
+            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
             
             current_player = players[turn]
             success=False
@@ -151,28 +151,33 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     
                     if isinstance(move, str) and move in {'u','r','replay'}:
+
+                        # ensures repeated u/r/re does not trigger the auto game termination (parsed as valid move)
+                        success=True
+
                         if move == 'u':
                             if game.undo():
-                                print('Undo Successful')
+                                print('\nUndo Successful')
                                 game.display()
-                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
                                 continue
                             else:
-                                print('Undo Unsuccessful')
+                                print('\nUndo Unsuccessful')
                                 continue
                         elif move == 'r':
                             if game.redo():
-                                print('Redo Successful')
+                                print('\nRedo Successful')
                                 game.display()
-                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
                                 continue
                             else:
-                                print('Redo Unsuccessful')
+                                print('\nRedo Unsuccessful')
                                 continue
                         elif move == 'replay':
                             print('Replaying Game until current turn')
                             game.replay()
                             continue
+
                     end=time.time()
                     # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
@@ -183,6 +188,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     print(f'Invalid Input. {e}\n')
                 except AssertionError as e:
                     print(f'Invalid Move. {e}\n')
+
             if not success: #if no valid move provided after K attempts, kill game
                 print(f'\n\nNo valid play after {K} moves. Game over.')
                 break

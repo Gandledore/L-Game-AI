@@ -60,6 +60,7 @@ class Human(Player):
         # print('\nRecieved State:',state)
         print('Undo: u')
         print('Redo: r')
+        print('Replay: replay')
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
         if wholeMoves.lower() == 'u':
             return 'u'
