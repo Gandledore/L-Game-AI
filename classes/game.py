@@ -94,6 +94,7 @@ class Game:
 
     @staticmethod
     def load(filename: str) -> 'Game':
+        filename = filename + '.pkl'
         with open(filename, 'rb') as f:
             save_dict = pickle.load(f)
         game = Game()

@@ -225,7 +225,23 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
             else:                
                 print('Player',winner,'wins!')
                 print('Total Turns',game.totalTurns())
-            
+        
+        print()
+        while True:
+            menu = input("Menu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n")
+            print()
+
+            if menu == 'r':
+                print('Replaying Game')
+                game.replay()
+                continue
+            elif menu == 's':
+                filename = input('Enter filename: ')
+                game.save(filename)
+                continue
+            else:
+                break
+
         game.reset()
         for player in players:
             player.game_reset()
