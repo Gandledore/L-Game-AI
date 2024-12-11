@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import pickle
 
 from classes.base_structs.gamestate import gamestate # imports as class 
 from classes.base_structs.action import packed_action
@@ -47,6 +48,7 @@ class Game:
         for i in range(self.turns):
             self.history[i].display()
             time.sleep(1)
+
     def getTurn(self)->int:
         return self.state.player
     
@@ -80,3 +82,22 @@ class Game:
         self.turns = 0
         self.state = gamestate()
         self.saveMove()
+
+    def save(self, filename: str = None) -> None:
+        save_dict = {'history': self.history[:self.turns], 'turns': self.turns}
+        if filename is None:
+            filename = str(round(time.time())) + '.pkl'
+        else:
+            filename = filename + '.pkl'
+        with open(filename, 'wb') as f:
+            pickle.dump(save_dict, f)
+
+    @staticmethod
+    def load(filename: str) -> 'Game':
+        with open(filename, 'rb') as f:
+            save_dict = pickle.load(f)
+        game = Game()
+        game.history = save_dict['history']
+        game.turns = save_dict['turns']
+        game.state = game.history[game.turns-1]
+        return game
