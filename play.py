@@ -132,39 +132,35 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
             
             current_player = players[turn]
             success=False
-            K = 3
+            K = 5
             for k in range(K):#while True
                 try:
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     
-                    if isinstance(move, str) and (move == 'u' or move == 'r'):
-                        # make sure total turns is even or odd based on who is undoing
-                        # if human is player 0, then total turns should be even
-                        # if human is player 1, then total turns should be odd
-                        if game.totalTurns() % 2 == turn:
-                            
-                            # just to make sure the bottom condition about valid moves does not trigger
-                            success=True
-                            if move == 'u':
-                                if game.undo():
-                                    print('Undo Successful')
-                                    game.display()
-                                    print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
-                                    continue
-                                else:
-                                    print('Undo Unsuccessful')
-                                    continue
-                            elif move == 'r':
-                                if game.redo():
-                                    print('Redo Successful')
-                                    game.display()
-                                    print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
-                                    continue
-                                else:
-                                    print('Redo Unsuccessful')
-                                    continue                    
-
+                    if isinstance(move, str) and move in {'u','r','replay'}:
+                        if move == 'u':
+                            if game.undo():
+                                print('Undo Successful')
+                                game.display()
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
+                                continue
+                            else:
+                                print('Undo Unsuccessful')
+                                continue
+                        elif move == 'r':
+                            if game.redo():
+                                print('Redo Successful')
+                                game.display()
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
+                                continue
+                            else:
+                                print('Redo Unsuccessful')
+                                continue
+                        elif move == 'replay':
+                            print('Replaying Game until current turn')
+                            game.replay()
+                            continue
                     end=time.time()
                     # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
