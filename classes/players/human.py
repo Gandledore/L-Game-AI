@@ -63,7 +63,7 @@ class Human(Player):
             print('Redo: r')
             print('Replay: replay')
             print('Save: s') 
-            wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty or x, y, t, r, l transforms: ")
+            wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty or x, y, t, cw, ccw transforms: ")
             move_parts = wholeMoves.split()
 
             if len(move_parts)==0:
