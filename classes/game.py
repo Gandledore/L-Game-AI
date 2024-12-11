@@ -84,7 +84,7 @@ class Game:
         self.saveMove()
 
     def save(self, filename: str = None) -> None:
-        save_dict = {'history': self.history, 'turns': self.turns}
+        save_dict = {'history': self.history[:self.turns], 'turns': self.turns}
         if filename is None:
             filename = str(round(time.time())) + '.pkl'
         else:
