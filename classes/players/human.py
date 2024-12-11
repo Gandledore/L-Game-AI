@@ -61,13 +61,18 @@ class Human(Player):
         print('Undo: u')
         print('Redo: r')
         print('Replay: replay')
+        print('Save: s')
+        
         wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
+
         if wholeMoves.lower() == 'u':
             return 'u'
         elif wholeMoves.lower() == 'r':
             return 'r'
         elif wholeMoves.lower() == 'replay':
             return 'replay'
+        elif wholeMoves.lower() == 's':
+            return 'save'
         else:
             print(wholeMoves.lower())
         move_parts = wholeMoves.split()

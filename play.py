@@ -80,9 +80,23 @@ def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
 
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
 
+    # handling loading game
+
     # Set initial state
     
     while True:
+
+        load = input('Load Game? (y/n): ')
+        if load.lower() == 'y':
+            try:
+                filename = input('Enter filename: ')
+                print(filename)
+                game = Game.load(filename)
+                break
+            except FileNotFoundError as e:
+                print('File not found')
+
+
         InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
         InitialStateCoordinatesList = InitialStateCoordinates.split()
 
@@ -150,7 +164,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
                     
-                    if isinstance(move, str) and move in {'u','r','replay'}:
+                    if isinstance(move, str) and move in {'u','r','replay','save'}:
 
                         # ensures repeated u/r/re does not trigger the auto game termination (parsed as valid move)
                         success=True
@@ -176,6 +190,10 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                         elif move == 'replay':
                             print('Replaying Game until current turn')
                             game.replay()
+                            continue
+                        elif move == 'save':
+                            filename = input('Enter filename: ')
+                            game.save(filename)
                             continue
 
                     end=time.time()
