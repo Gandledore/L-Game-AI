@@ -86,9 +86,12 @@ class Agent(Player):
             # print(f'Choosing Move:{bestAction} for value: {value} from depth {self.finished[state][0]} out of {len(bestActions)} options')
             print(f'Choosing Move:{bestAction} for value: {value}')
             bestAction.normalize(state.transform)
+
+            # is this working still?
             print(f'Time: {end-start:.1f}s | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
         return bestAction
     
+    # evaluating value of a single move
     def action_heuristic(self,move:packed_action)->int:
         try: 
             return self.action_heuristics[move]
@@ -112,6 +115,7 @@ class Agent(Player):
             self.action_heuristics[move]=score
             return score
     
+    # evaluating value of the state as a whole
     def heuristic(self, state:gamestate) -> int:
         player = self.id
         opponent = int(not self.id)
