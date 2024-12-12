@@ -23,8 +23,9 @@ class Agent(Player):
         
         self.display=False
         self.depth = depth
-        if depth<0: self.prune = False
-        else: self.prune = bool(prune)
+        # if depth<0: self.prune = False
+        # else: self.prune = bool(prune)
+        self.prune = bool(prune)
         # TRANSPOSITION TABLE
         # check bugs here (saving depth it solved to)
         # <1 = assuming fully solved, may not be correct assumption
@@ -64,17 +65,17 @@ class Agent(Player):
             print('Thinking...')
             # print(len(state.getLegalMoves()))
         start = time.time()
-        value, bestActions = self.AlphaBetaSearch(state)
+        value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
 
-        try:
-            attempt = self.played_states[state]
-        except KeyError:
-            attempt = 0
-            self.played_states[state]=0
-        self.played_states[state]+=1
+        # try:
+        #     attempt = self.played_states[state]
+        # except KeyError:
+        #     attempt = 0
+        #     self.played_states[state]=0
+        # self.played_states[state]+=1
         
-        bestAction = bestActions[attempt%len(bestActions)]
+        # bestAction = bestActions[attempt%len(bestActions)]
         
         if self.display:
             print(f'Finished MinMaxing {len(self.finished)} states')
@@ -113,10 +114,10 @@ class Agent(Player):
         opponent = int(not self.id)
         flip_factor = 2*int(player == state.player) - 1 #1 if my turn, -1 if opponent's turn
 
-        options_weight = 1
-        core_weight = 25
-        corner_weight = 40
-        win_weight = 1000
+        options_weight = 0#1
+        core_weight = 0#25
+        corner_weight = 0#40
+        win_weight = 1#000
 
         #penalize number of moves other person has
         control_options = flip_factor * options_weight * len(state.getLegalMoves()) #state is already the other player, just call getLegalMoves
@@ -147,7 +148,7 @@ class Agent(Player):
     def MaxValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
         if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
             self.last = len(self.finished)
-            # print(f'Cached: {self.last} states')
+            print(f'Cached: {self.last} states')
 
         #if we have already finished evaluating this state with at least this much depth, return saved value
         # try except = reduces hash lookups
@@ -157,14 +158,14 @@ class Agent(Player):
             # - value it backpropagated
             # - optimal move for state being accessed (var "state")
 
-            stored_depth,val,optimal_moves = self.finished[state]
+            stored_depth,saved_alpha,saved_beta,optimal_move = self.finished[state]
 
             # if using finite depth and stored depth is deeper than what's necessary, use it
             saved_deeper_search = depth>=0 and stored_depth>=depth
 
             # if the value we backpropagated is greater than the max score (or our estimate of the max score), then no matter what depth you searched from, someone can force a win or loss (force a terminal state)
             # CHECK THIS
-            guaranteed_terminal = False#abs(val)>=self.max_score
+            guaranteed_terminal = False#abs(saved_alpha)>=self.max_score
 
             # we want for negative depth saved = this has been fully searched
             # CHECK THIS (check maintaining)
@@ -174,18 +175,19 @@ class Agent(Player):
             # if we've seen this state before, and we've seen it at a depth greater than the check_tie_depth, then we can assume it's a tie
             tied_state = stored_depth>=self.check_tie_depth
 
-            #
+            prunable = saved_alpha>=beta and (saved_deeper_search or state_fully_searched)
+            exact = saved_beta==saved_alpha
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
-                # if self.display and depth==-1: print(f'MAX USING Saved evaluation {stored_depth,val,move} for depth {depth}')
-                return val,optimal_moves
+                if exact or prunable:
+                    return saved_alpha,optimal_move
         except KeyError:
             pass
         
         if depth == 0 or state.isGoal():
             h =self.heuristic(state)
-            self.finished[state] = (depth,h,np.array([]))
+            self.finished[state] = (depth,h,h,None)
             # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
-            return h, []
+            return h, None
         
         moves = state.getLegalMoves()
         numMoves = len(moves)
@@ -199,7 +201,7 @@ class Agent(Player):
         
         # v is the value of the best move
         v = float('-inf')
-        optimal_moves = None
+        optimal_move = None
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
             # if we've seen this state before, then we've seen it at a depth of at least check_tie_depth or negative depth
@@ -215,56 +217,52 @@ class Agent(Player):
             self.seen[next_state].pop()
             
             if v2 > v:
-                v, optimal_moves = v2, [m]
+                v, optimal_move = v2, m
                 alpha = max(alpha, v)
-            elif v2==v:
-                optimal_moves.append(m)
-            if self.prune and v > beta:
+            if self.prune and v >= beta:
                 self.num_prune+= numMoves-i-1
-                return v,optimal_moves
+                
+                # self.finished[state] = (depth,alpha, float('inf'),optimal_move)
+                return v,optimal_move
 
-        optimal_moves = np.array(optimal_moves)
-        heuristics = np.array([self.action_heuristic(move) for move in optimal_moves])
-        sort_indexes = np.argsort(heuristics)[::-1]
-        optimal_moves = optimal_moves[sort_indexes]
-        self.finished[state] = (depth,v,optimal_moves)
-        return v, optimal_moves
+        self.finished[state] = (depth,v,v,optimal_move)
+        return v, optimal_move
     
     def MinValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
         if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
             self.last = len(self.finished)
-            # print(f'Cached: {self.last} states')
+            print(f'Cached: {self.last} states')
         
         #if we have already finished evaluating this state with at least this much depth, return saved value
         try:
-            stored_depth,val,optimal_moves = self.finished[state]
+            stored_depth,saved_alpha,saved_beta,optimal_move = self.finished[state]
             saved_deeper_search = depth>=0 and stored_depth>=depth
             guaranteed_terminal = False#abs(val)>=self.max_score
             state_fully_searched = stored_depth<0
             tied_state = stored_depth>=self.check_tie_depth-1
+            prunable = saved_beta<=alpha and (saved_deeper_search or state_fully_searched)
+            exact = saved_beta==saved_alpha
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
-                # print(f'USING Saved evaluation | {self.finished[state]}')
-                return val,optimal_moves
-            # else: print(f'NOT using saved {stored_depth,val,move} for current depth {depth}')
+                if exact or prunable:
+                    return saved_beta,optimal_move
         except KeyError:
             pass
         
         if depth == 0 or state.isGoal():
             h = self.heuristic(state)
-            self.finished[state] = (depth,h,np.array([]))
-            # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
-            return h, []
+            self.finished[state] = (depth,h,h,None)
+            return h, None
       
         moves = state.getLegalMoves()
         numMoves = len(moves)
         self.max_prune+= numMoves
         
         heuristics = np.array([self.action_heuristic(move) for move in moves])
-        sort_indexes = np.argsort(heuristics)[::-1]
+        sort_indexes = np.argsort(heuristics,stable=True)[::-1]
         moves = moves[sort_indexes]
         
         v = float('inf')
-        optimal_moves = None
+        optimal_move = None
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
             
@@ -279,20 +277,15 @@ class Agent(Player):
             self.seen[next_state].pop()
             
             if v2 < v:
-                v, optimal_moves = v2, [m]
+                v, optimal_move = v2, m
                 beta = min(beta, v)
-            elif v2==v:
-                optimal_moves.append(m)
-            if self.prune and v < alpha:
+            if self.prune and v <= alpha:
                 self.num_prune+=numMoves-i-1
-                return v,optimal_moves
+                # self.finished[state] = (depth,float('-inf'),beta,optimal_move)
+                return v,optimal_move
         
-        optimal_moves = np.array(optimal_moves)
-        heuristics = np.array([self.action_heuristic(move) for move in optimal_moves])
-        sort_indexes = np.argsort(heuristics)[::-1]
-        optimal_moves = optimal_moves[sort_indexes]
-        self.finished[state] = (depth,v,optimal_moves)
-        return v, optimal_moves
+        self.finished[state] = (depth,v,v,optimal_move)
+        return v, optimal_move
 
     def game_reset(self):
         # pass
