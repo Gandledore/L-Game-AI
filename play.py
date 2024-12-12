@@ -177,24 +177,24 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
 
                         if move == 'u':
                             if game.undo():
-                                print('\nUndo Successful')
+                                print('\nUndo Successful\n')
                                 game.display()
                                 print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
                                 continue
                             else:
-                                print('\nUndo Unsuccessful')
+                                print('\nUndo Unsuccessful\n')
                                 continue
                         elif move == 'r':
                             if game.redo():
-                                print('\nRedo Successful')
+                                print('\nRedo Successful\n')
                                 game.display()
                                 print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
                                 continue
                             else:
-                                print('\nRedo Unsuccessful')
+                                print('\nRedo Unsuccessful\n')
                                 continue
                         elif move == 'replay':
-                            print('Replaying Game until current turn')
+                            print('\nReplaying Game until current turn')
                             game.replay()
                             continue
                         elif move == 'save':
@@ -237,9 +237,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 print('Player',winner,'wins!')
                 print('Total Turns',game.totalTurns())
         
-        print()
         while True:
-            menu = input("Menu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n")
+            menu = input("\nMenu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n\n")
             print()
 
             if menu == 'r':

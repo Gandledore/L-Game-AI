@@ -6,6 +6,7 @@ from classes.base_structs.gamestate import gamestate # imports as class
 from classes.base_structs.action import packed_action
 
 from typing import Optional
+
 class Game:
     def __init__(self, L_pieces=None, token_pieces=None):
         if L_pieces and token_pieces:
@@ -18,6 +19,7 @@ class Game:
         # List of moves for undoing and redoing
         self.history = []
 
+        # Save initial state
         self.saveMove()
     
     def saveMove(self)->None:
@@ -88,15 +90,21 @@ class Game:
         if filename is None:
             filename = str(round(time.time())) + '.pkl'
         else:
-            filename = filename + '.pkl'
+            if filename[-4:] != '.pkl':
+                filename = filename + '.pkl'
         with open(filename, 'wb') as f:
             pickle.dump(save_dict, f)
 
     @staticmethod
     def load(filename: str) -> 'Game':
-        filename = filename + '.pkl'
+        # if filename doesnt end with pkl, add it
+        if filename[-4:] != '.pkl':
+            filename = filename + '.pkl'
+        # filename = filename + '.pkl'
         with open(filename, 'rb') as f:
             save_dict = pickle.load(f)
+        
+        print()
         game = Game()
         game.history = save_dict['history']
         game.turns = save_dict['turns']

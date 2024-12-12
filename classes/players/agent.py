@@ -23,8 +23,12 @@ class Agent(Player):
         
         self.display=False
         self.depth = depth
+
+        # self.prune = bool(prune)
+        # print(f'Agent {id} | Depth: {depth} | Prune: {self.prune}')
         if depth<0: self.prune = False
         else: self.prune = bool(prune)
+
         # TRANSPOSITION TABLE
         # check bugs here (saving depth it solved to)
         # <1 = assuming fully solved, may not be correct assumption
@@ -118,19 +122,25 @@ class Agent(Player):
         corner_weight = 40
         win_weight = 1000
 
-        #penalize number of moves other person has
+        # penalize number of moves other person has
         control_options = flip_factor * options_weight * len(state.getLegalMoves()) #state is already the other player, just call getLegalMoves
+        # penalized because we want to minimize the number of moves the opponent has
         
         player_l_set = state.L_pieces[player].get_coords()
         opponent_l_set = state.L_pieces[opponent].get_coords()
         
-        control_core = core_weight * len(player_l_set & Agent._CORE)           #reward controlling core
-        expel_core = -1*core_weight * len(opponent_l_set & Agent._CORE)        #penalize oponent in core
-        avoid_corner = -1*corner_weight * len(player_l_set & Agent._CORNERS)   #penalize touching corner
-        force_corner = corner_weight * len(opponent_l_set & Agent._CORNERS)    #reward oponent being in corner
+        # reward for controlling core
+        control_core = core_weight * len(player_l_set & Agent._CORE)
+        # penalize opponent in core
+        expel_core = -1*core_weight * len(opponent_l_set & Agent._CORE)
+        # penalize touching corner
+        avoid_corner = -1*corner_weight * len(player_l_set & Agent._CORNERS)
+        # reward opponent being in corner (we want to trap them in a corner / basically all win states involve opponent in corner)
+        force_corner = corner_weight * len(opponent_l_set & Agent._CORNERS)
 
-        #negative flip because if state is goal, current player lost. 
+        # negative flip because if state is goal, current player lost. 
         # flip is +1 when its agent's turn, but want to penalize losing
+        # state here is the state of the opponent
         winning = -1*flip_factor*win_weight * state.isGoal() #colinear with legalmovesofother
 
         score = control_options + control_core + expel_core + avoid_corner + force_corner + winning
