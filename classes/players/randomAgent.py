@@ -18,7 +18,7 @@ class RandomAgent(Player):
         move.denormalize(state.transform)
         if display: print(f"Random Agent played {move}")
         move.normalize(state.transform)
-        return random.choice(legal_moves)
+        return move
     
     def set_seed(self,s):
         random.seed(s)
