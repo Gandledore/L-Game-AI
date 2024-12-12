@@ -68,6 +68,8 @@ class Agent(Player):
         value, bestAction = self.AlphaBetaSearch(state)
         end = time.time()
 
+        # this is different in the original alpha beta
+
         # try:
         #     attempt = self.played_states[state]
         # except KeyError:
@@ -77,6 +79,8 @@ class Agent(Player):
         
         # bestAction = bestActions[attempt%len(bestActions)]
         
+        # end tis is different in the original alpha beta
+
         if self.display:
             print(f'Finished MinMaxing {len(self.finished)} states')
             bestAction.denormalize(state.transform)
@@ -114,7 +118,10 @@ class Agent(Player):
         opponent = int(not self.id)
         flip_factor = 2*int(player == state.player) - 1 #1 if my turn, -1 if opponent's turn
 
+
+        # changed from 1 to 0
         options_weight = 0#1
+        # changed from 25 to 0
         core_weight = 0#25
         corner_weight = 0#40
         win_weight = 1#000
@@ -175,14 +182,20 @@ class Agent(Player):
             # if we've seen this state before, and we've seen it at a depth greater than the check_tie_depth, then we can assume it's a tie
             tied_state = stored_depth>=self.check_tie_depth
 
+            # assume these do not work
             prunable = saved_alpha>=beta and (saved_deeper_search or state_fully_searched)
             exact = saved_beta==saved_alpha
+
             if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
+
+                # thus assume this is nonsense too
                 if exact or prunable:
                     return saved_alpha,optimal_move
         except KeyError:
             pass
-        
+
+        # returning None instead of empty array
+        # this is because remove keeping track of multiple equivalent value moves
         if depth == 0 or state.isGoal():
             h =self.heuristic(state)
             self.finished[state] = (depth,h,h,None)
