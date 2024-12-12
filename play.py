@@ -89,6 +89,9 @@ def changePlayer(player:Players.Player)->Players.Player:
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
 
     # Set initial state
+
+    fileLoaded = False
+    filename = ""
     
     while True:
 
@@ -96,8 +99,9 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
         if load.lower() == 'y':
             try:
                 filename = input('Enter filename: ')
-                print(filename)
+                # print(filename)
                 game = Game.load(filename)
+                fileLoaded = True
                 break
             except FileNotFoundError as e:
                 print('File not found')
@@ -139,6 +143,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
         except IndexError as e:
             print('Enter Moves in correct Format')
         
+    if fileLoaded: print(filename + " loaded.\n")
+    fileLoaded = False
         # End set initial state
 
     if gm==None:
