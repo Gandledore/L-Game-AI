@@ -146,7 +146,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     for n in tqdm(range(N)):
         for i,r in enumerate(randoms):
             if r:
-                players[i].set_seed(n+i+123456)
+                players[i].set_seed(2900+n+i)
         while game.whoWins()==None and game.totalTurns()<64:
             turn = game.getTurn()
             
@@ -228,21 +228,21 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 print('Player',winner,'wins!')
                 print('Total Turns',game.totalTurns())
         
-        print()
-        while True:
-            menu = input("Menu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n")
-            print()
+        # print()
+        # while True:
+        #     menu = input("Menu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n")
+        #     print()
 
-            if menu == 'r':
-                print('Replaying Game')
-                game.replay()
-                continue
-            elif menu == 's':
-                filename = input('Enter filename: ')
-                game.save(filename)
-                continue
-            else:
-                break
+        #     if menu == 'r':
+        #         print('Replaying Game')
+        #         game.replay()
+        #         continue
+        #     elif menu == 's':
+        #         filename = input('Enter filename: ')
+        #         game.save(filename)
+        #         continue
+        #     else:
+        #         break
 
         game.reset()
         for player in players:
