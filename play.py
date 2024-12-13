@@ -80,32 +80,58 @@ def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
 
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
 
+    # handling loading game
+
     # Set initial state
-    game = Game()
-    # while True:
-    #     InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
-    #     InitialStateCoordinatesList = InitialStateCoordinates.split()
+    
+    while True:
 
-    #     try:
-    #         InitialStateCoordinatesList = InitialStateCoordinates.split()
-    #         if len(InitialStateCoordinatesList) == 0:
-    #             print('Using Default Initial Gamestate')
-    #             game = Game()
-    #         else:
-    #             L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
-    #             L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
-    #             T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
-    #             T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
+        load = input('Load Game? (y/n): ')
+        if load.lower() == 'y':
+            try:
+                filename = input('Enter filename: ')
+                print(filename)
+                game = Game.load(filename)
+                break
+            except FileNotFoundError as e:
+                print('File not found')
 
-    #             L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
-    #             token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
 
-    #             game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
-    #         break
-    #     except (ValueError,AssertionError) as e:
-    #         print('Invalid Intial State')
-    #     except IndexError as e:
-    #         print('Enter Moves in correct Format')
+        InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
+        InitialStateCoordinatesList = InitialStateCoordinates.split()
+
+        try:
+            InitialStateCoordinatesList = InitialStateCoordinates.split()
+            if len(InitialStateCoordinatesList) == 0:
+                print('Using Default Initial Gamestate')
+                game = Game()
+                break
+
+            else:
+                L1_x, L1_y, L1_d = int(InitialStateCoordinatesList[0]), int(InitialStateCoordinatesList[1]), InitialStateCoordinatesList[2]
+                L2_x, L2_y, L2_d = int(InitialStateCoordinatesList[3]), int(InitialStateCoordinatesList[4]), InitialStateCoordinatesList[5]
+                T1_x, T1_y = int(InitialStateCoordinatesList[6]), int(InitialStateCoordinatesList[7])
+                T2_x, T2_y = int(InitialStateCoordinatesList[8]), int(InitialStateCoordinatesList[9])
+
+                L_pieces = [L_piece(x=L1_x, y=L1_y, d=L1_d), L_piece(x=L2_x, y=L2_y, d=L2_d)]
+                token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
+
+                # print board to get confirmation from user that they want to use this board
+
+                game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
+                game.display()
+
+                confirm = input('Confirm this board? (y/n): ')
+                if confirm.lower() == 'y':
+                    break
+                else:
+                    continue
+
+            # break
+        except (ValueError,AssertionError) as e:
+            print('Invalid Intial State')
+        except IndexError as e:
+            print('Enter Moves in correct Format')
         
     #     # End set initial state
 
@@ -120,7 +146,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     for n in tqdm(range(N)):
         for i,r in enumerate(randoms):
             if r:
-                players[i].set_seed(n+i+123456)
+                players[i].set_seed(2900+n+i)
         while game.whoWins()==None and game.totalTurns()<64:
             turn = game.getTurn()
             
@@ -129,7 +155,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 # print(game.state)
                 # game.display(internal_display=True)
                 game.display()
-                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
+            turn = game.getTurn()
+            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
             
             current_player = players[turn]
             success=False
@@ -138,6 +165,39 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 try:
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
+                    
+                    if isinstance(move, str) and move in {'u','r','replay','save'}:
+
+                        # ensures repeated u/r/re does not trigger the auto game termination (parsed as valid move)
+                        success=True
+
+                        if move == 'u':
+                            if game.undo():
+                                print('\nUndo Successful')
+                                game.display()
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
+                                continue
+                            else:
+                                print('\nUndo Unsuccessful')
+                                continue
+                        elif move == 'r':
+                            if game.redo():
+                                print('\nRedo Successful')
+                                game.display()
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
+                                continue
+                            else:
+                                print('\nRedo Unsuccessful')
+                                continue
+                        elif move == 'replay':
+                            print('Replaying Game until current turn')
+                            game.replay()
+                            continue
+                        elif move == 'save':
+                            filename = input('Enter filename: ')
+                            game.save(filename)
+                            continue
+
                     end=time.time()
                     # if display: print("Move:",move)
                     game.apply_action(move)  #assertion error if invalid move
@@ -148,12 +208,13 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                     print(f'Invalid Input. {e}\n')
                 except AssertionError as e:
                     print(f'Invalid Move. {e}\n')
+
             if not success: #if no valid move provided after K attempts, kill game
                 print(f'\n\nNo valid play after {K} moves. Game over.')
                 break
 
         winner = game.whoWins()
-        winner = int(not turn)+1 if winner==None else winner+1
+        winner = int(not game.getTurn())+1 if winner==None else winner+1
         winner = winner if game.totalTurns()<64 else 0
         winners[n] = winner
         turns[n] = game.totalTurns()
@@ -166,7 +227,23 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
             else:                
                 print('Player',winner,'wins!')
                 print('Total Turns',game.totalTurns())
-            
+        
+        # print()
+        # while True:
+        #     menu = input("Menu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n")
+        #     print()
+
+        #     if menu == 'r':
+        #         print('Replaying Game')
+        #         game.replay()
+        #         continue
+        #     elif menu == 's':
+        #         filename = input('Enter filename: ')
+        #         game.save(filename)
+        #         continue
+        #     else:
+        #         break
+
         game.reset()
         for player in players:
             player.game_reset()
