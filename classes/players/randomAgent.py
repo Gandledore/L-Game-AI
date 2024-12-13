@@ -19,6 +19,9 @@ class RandomAgent(Player):
         if display: print(f"Random Agent played {move}")
         move.normalize(state.transform)
         return random.choice(legal_moves)
+
+    # def instructionHandler(self, state: gamestate, display:bool=False):
+    #     self.getMove(state,display)
     
     def set_seed(self,s):
         random.seed(s)

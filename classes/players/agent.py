@@ -90,10 +90,14 @@ class Agent(Player):
             # is this working still?
             print(f'Time: {end-start:.1f}s | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
         return bestAction
+
+    # def instructionHandler(self, state:gamestate, display:bool=False):
+    #     self.getMove(state,display)
     
     # evaluating value of a single move
     def action_heuristic(self,move:packed_action)->int:
         try: 
+            # if we've already calculated the heuristic for this move, return it
             return self.action_heuristics[move]
         except KeyError:
             core_weight = 25
@@ -218,6 +222,8 @@ class Agent(Player):
             next_state = state.getSuccessor(m)
             # if we've seen this state before, then we've seen it at a depth of at least check_tie_depth or negative depth
             if next_state in self.seen and len(self.seen[next_state])>0:
+
+                # if we're doing a depth limited search, then we want to start from the check_tie_depth
                 d = self.check_tie_depth-1 if depth<0 else min(depth-1,self.check_tie_depth-1)
                 self.seen[next_state].append(d)
             else:
@@ -262,7 +268,8 @@ class Agent(Player):
             # else: print(f'NOT using saved {stored_depth,val,move} for current depth {depth}')
         except KeyError:
             pass
-        
+
+        # if we're at the end of the search, or we've reached a terminal state, return the heuristic value
         if depth == 0 or state.isGoal():
             h = self.heuristic(state)
             self.finished[state] = (depth,h,np.array([]))

@@ -175,6 +175,7 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 try:
                     start = time.time()
                     move = current_player.getMove(game.getState(),display) #value error if invalid input format
+                    # move = current_player.instructionHandler(game.getState(),display) #value error if invalid input format
                     
                     if isinstance(move, str) and move in {'u','r','replay','save', 'ai'}:
 
