@@ -124,27 +124,27 @@ class Agent(Player):
         return bestAction
     
     def action_heuristic(self,move:packed_action)->int:
-        try: 
-            return self.action_heuristics[move]
-        except KeyError:
-            core_weight = 25
-            corner_weight = 40
-            killer_token_weight = 10
-            
-            l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
-            new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
-            curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
-            new_t_pos = (new_token_pos_x,new_token_pos_y)
-            
-            l_set = L_piece._compute_L_coords(*new_l_pos)
+        h = self.action_heuristics.get(move)
+        if h is not None:
+            return h
+        core_weight = 25
+        corner_weight = 40
+        killer_token_weight = 10
+        
+        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
+        new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
+        curr_t_pos = (curr_token_pos_x,curr_token_pos_y)
+        new_t_pos = (new_token_pos_x,new_token_pos_y)
+        
+        l_set = L_piece._compute_L_coords(*new_l_pos)
 
-            control_core = core_weight * len(l_set & Agent._CORE)           #reward controlling core
-            avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))   #penalize touching corner
-            killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if curr_t_pos!=(0,0) else 0) #reward placing tokens in killer positions
-            
-            score = control_core + avoid_corner + killer_token
-            self.action_heuristics[move]=score
-            return score
+        control_core = core_weight * len(l_set & Agent._CORE)           #reward controlling core
+        avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))   #penalize touching corner
+        killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if curr_t_pos!=(0,0) else 0) #reward placing tokens in killer positions
+        
+        score = control_core + avoid_corner + killer_token
+        self.action_heuristics[move]=score
+        return score
     
     def heuristic(self, state:gamestate) -> float:
         player = self.id
@@ -190,13 +190,14 @@ class Agent(Player):
 
         #if we have already finished evaluating this state with at least this much depth, return saved value
         # try except = reduces hash lookups
-        try:
+        cached_data = self.finished.get(state)
+        if cached_data is not None:
             # finished state stores
             # - initiating a search from that depth on that state, as in knows the depth # of next moves
             # - value it backpropagated
             # - optimal move for state being accessed (var "state")
 
-            stored_depth,saved_alpha,saved_beta,optimal_moves = self.finished[state]
+            stored_depth,saved_alpha,saved_beta,optimal_moves = cached_data
 
             # if using finite depth and stored depth is deeper than what's necessary, use it
             saved_deeper_search = depth>=0 and stored_depth>=depth
@@ -214,8 +215,6 @@ class Agent(Player):
             if (saved_deeper_search or state_fully_searched or tied_state):
                 if exact or prunable:
                     return saved_alpha,optimal_moves
-        except KeyError:
-            pass
         
         moves = state.getLegalMoves()
         numMoves = len(moves)
@@ -243,12 +242,16 @@ class Agent(Player):
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
             # if we've seen this state before, then we've seen it at a depth of at least check_tie_depth or negative depth
-            if next_state in self.seen and self.seen[next_state]>0:
+            num_seen = self.seen.get(next_state)
+            
+            if num_seen is None:
+                self.seen[next_state]=0
+                d=depth-1
+            elif num_seen>0:
                 d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
             else:
                 d = depth-1
-                self.seen[next_state]=0
-            
+                
             # v2 is the value of the best move for the opponent
             self.seen[next_state]+=1
             v2,_ = self.MinValueAB(next_state, d, v, beta)
@@ -274,8 +277,10 @@ class Agent(Player):
             print(f'Cached: {self.last} states')
         
         #if we have already finished evaluating this state with at least this much depth, return saved value
-        try:
-            stored_depth,saved_alpha,saved_beta,optimal_moves = self.finished[state]
+        cached_data = self.finished.get(state)
+        
+        if cached_data is not None:
+            stored_depth,saved_alpha,saved_beta,optimal_moves = cached_data
             saved_deeper_search = depth>=0 and stored_depth>=depth
             state_fully_searched = stored_depth<0
             tied_state = stored_depth>=self.check_tie_depth
@@ -284,8 +289,7 @@ class Agent(Player):
             if (saved_deeper_search or state_fully_searched or tied_state):
                 if exact or prunable:
                     return saved_beta,optimal_moves
-        except KeyError:
-            pass
+            
         #not prune on equality when saving equal states
         moves = state.getLegalMoves()
         numMoves = len(moves)
@@ -310,11 +314,15 @@ class Agent(Player):
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
             
-            if next_state in self.seen and self.seen[next_state]>0:
+            num_seen = self.seen.get(next_state)
+            
+            if num_seen is None:
+                self.seen[next_state]=0
+                d=depth-1
+            elif num_seen>0:
                 d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
             else:
                 d = depth-1
-                self.seen[next_state]=0
             
             self.seen[next_state]+=1
             v2,_ = self.MaxValueAB(next_state, d, alpha, v)
