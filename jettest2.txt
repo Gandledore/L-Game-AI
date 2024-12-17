@@ -1,0 +1,37 @@
+Loading Preprocessed States...Loaded Preprocessed States    
+
+Testing with players: (1, -1, 0) vs (1, -1, 1)
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+-------------
+|[33m○○[0m|  |  |  |
+-------------
+|[1;31m1□[0m|[32m2▲[0m|[32m2▲[0m|[32m2▲[0m|
+-------------
+|[1;31m1□[0m|[1;31m1□[0m|[1;31m1□[0m|[32m2▲[0m|
+-------------
+|  |  |  |[33m○○[0m|
+-------------
+
+Confirm this board? (y/n): Loading Solved Game...Loaded Solved Game    
+Loading Solved Game...Loaded Solved Game    
+
+
+            Instructions:
+            Move: x y d t1x t1y t2x  t2y
+            Undo: undo
+            Redo: redo
+            Replay: replay
+            Save Game: save
+            Transform Board: 'x' or 'y' or 't' or 'cw' or 'ccw'
+            Have AI take over: swap
+            Display Instructions: help
+    
+
+
+
+Menu:
+ Replay Game (r)
+ Save Game (s)
+ Continue (any key)
+
+

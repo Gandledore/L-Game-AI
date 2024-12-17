@@ -1,0 +1,232 @@
+Loading Preprocessed States...Loaded Preprocessed States    
+
+inf vs infp: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+Loading Solved Game...Loaded Solved Game    
+Loading Solved Game...Loaded Solved Game    
+
+Players tied 100000 times 100.000%
+
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 0.006ms | p2: 0.006ms
+First Turns took: p1: 0.110ms | p2 0.045ms
+Avg Turn Times after first turn: p1: 0.006ms | p2: 0.006ms
+
+inf vs ran: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+Loading Solved Game...Loaded Solved Game    
+
+Players tied 0 times 0.000%
+Player 1 won 100000 times (100.000%)
+
+Avg Turns: 7.6456
+Min Turns: 4
+Max Turns: 28
+Avg Turn Times: p1: 0.006ms | p2: 0.003ms
+First Turns took: p1: 0.025ms | p2 0.010ms
+Avg Turn Times after first turn: p1: 0.006ms | p2: 0.003ms
+
+ran vs inf: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+Loading Solved Game...Loaded Solved Game    
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 100000 times (100.000%)
+
+Avg Turns: 5.4735
+Min Turns: 3
+Max Turns: 25
+Avg Turn Times: p1: 0.004ms | p2: 0.006ms
+First Turns took: p1: 0.0s | p2 0.010ms
+Avg Turn Times after first turn: p1: 0.004ms | p2: 0.006ms
+[]
+[]
+
+inf vs inf: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+Loading Solved Game...Loaded Solved Game    
+Loading Solved Game...Loaded Solved Game    
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 0.006ms | p2: 0.006ms
+First Turns took: p1: 0.0s | p2 0.008ms
+Avg Turn Times after first turn: p1: 0.006ms | p2: 0.006ms
+
+inf vs d1: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+Loading Solved Game...Loaded Solved Game    
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 30.0
+Min Turns: 30
+Max Turns: 30
+Avg Turn Times: p1: 0.007ms | p2: 1.386ms
+First Turns took: p1: 0.0s | p2 2.539ms
+Avg Turn Times after first turn: p1: 0.007ms | p2: 1.304ms
+
+d1 vs inf: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+Loading Solved Game...Loaded Solved Game    
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 1 times (100.000%)
+Avg Turns: 19.0
+Min Turns: 19
+Max Turns: 19
+Avg Turn Times: p1: 1.989ms | p2: 0.007ms
+First Turns took: p1: 0.0s | p2 0.008ms
+Avg Turn Times after first turn: p1: 1.624ms | p2: 0.007ms
+
+d1 vs d1: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 14.0
+Min Turns: 14
+Max Turns: 14
+Avg Turn Times: p1: 2.492ms | p2: 0.894ms
+First Turns took: p1: 0.0s | p2 2.216ms
+Avg Turn Times after first turn: p1: 2.098ms | p2: 0.673ms
+
+d1p vs d1: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 14.0
+Min Turns: 14
+Max Turns: 14
+Avg Turn Times: p1: 2.443ms | p2: 0.898ms
+First Turns took: p1: 0.0s | p2 2.259ms
+Avg Turn Times after first turn: p1: 2.064ms | p2: 0.672ms
+
+d3 vs d3: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 81.770ms | p2: 75.509ms
+First Turns took: p1: 1.9s | p2 1375.050ms
+Avg Turn Times after first turn: p1: 24.545ms | p2: 33.588ms
+
+d5 vs d1: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 12.0
+Min Turns: 12
+Max Turns: 12
+Avg Turn Times: p1: 967.085ms | p2: 1.650ms
+First Turns took: p1: 5.8s | p2 2.771ms
+Avg Turn Times after first turn: p1: 0.337ms | p2: 1.425ms
+
+d5P vs d1: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 12.0
+Min Turns: 12
+Max Turns: 12
+Avg Turn Times: p1: 309.236ms | p2: 1.582ms
+First Turns took: p1: 1.2s | p2 2.586ms
+Avg Turn Times after first turn: p1: 122.548ms | p2: 1.381ms
+
+d1 vs d5: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 1 times (100.000%)
+Avg Turns: 5.0
+Min Turns: 5
+Max Turns: 5
+Avg Turn Times: p1: 3.914ms | p2: 2063.752ms
+First Turns took: p1: 0.0s | p2 4127.468ms
+Avg Turn Times after first turn: p1: 2.913ms | p2: 0.037ms
+
+d1 vs d5P: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 1 times (100.000%)
+Avg Turns: 5.0
+Min Turns: 5
+Max Turns: 5
+Avg Turn Times: p1: 4.190ms | p2: 443.127ms
+First Turns took: p1: 0.0s | p2 833.569ms
+Avg Turn Times after first turn: p1: 3.383ms | p2: 52.684ms
+
+d5P vs d5: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 41.415ms | p2: 135.962ms
+First Turns took: p1: 1.2s | p2 4209.150ms
+Avg Turn Times after first turn: p1: 3.006ms | p2: 4.569ms
+
+d5 vs d5P: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 184.999ms | p2: 37.162ms
+First Turns took: p1: 5.9s | p2 886.964ms
+Avg Turn Times after first turn: p1: 0.028ms | p2: 9.749ms
+
+d4 vs d4: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 149.776ms | p2: 132.311ms
+First Turns took: p1: 4.0s | p2 3930.199ms
+Avg Turn Times after first turn: p1: 26.826ms | p2: 9.798ms
+
+d5 vs d4: 
+
+Load Game? (y/n): Enter Initial State Coords [L1, L2, T1, T2] or Default: Using Default Initial Gamestate
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 181.474ms | p2: 126.631ms
+First Turns took: p1: 5.8s | p2 3601.465ms
+Avg Turn Times after first turn: p1: 0.068ms | p2: 14.540ms
