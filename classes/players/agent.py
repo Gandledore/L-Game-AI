@@ -99,7 +99,7 @@ class Agent(Player):
         
         #if file not found, process optimal moves and save
         except FileNotFoundError:
-            print('Game not Solved. Solving game now...')
+            print(f'Game not Solved. Player {self.id+1} solving game now...')
             #run through each state and optimize move for it
             for s in gamestate._legalMoves.keys():
                 if s.player==self.id:#only have to optimize for states I will see
