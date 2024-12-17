@@ -213,8 +213,8 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 success=True
                 break
             
-            # except ValueError as e:
-            #     print(f'Invalid Input. {e}\n')
+            except ValueError as e:
+                print(f'Invalid Input. {e}\n')
             except AssertionError as e:
                 print(f'Invalid Move. {e}\n')
 
