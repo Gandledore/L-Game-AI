@@ -2,6 +2,7 @@ from classes.players.player import Player
 from classes.base_structs.action import packed_action
 from classes.base_structs.gamestate import gamestate
 
+import numpy as np
 
 class Human(Player):
     _CORE = {(2,2), (2,3), (3,2), (3,3)}
@@ -42,97 +43,65 @@ class Human(Player):
     
 
     #interface for a play code to get human input
-    def getMove(self, state: gamestate, display:bool=True) -> packed_action:
+    def getMove(self, state: gamestate, move_parts) -> packed_action:
+        if len(move_parts)==7 or len(move_parts)==3:
+            try:    #raises value error if can't cast to int
+                new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
+            except ValueError as e:
+                raise ValueError('Use integers for x and y.')
+            
+            if len(move_parts)==7:
+                try:
+                    current_token_pos = (int(move_parts[3]), int(move_parts[4]))
+                    new_token_pos = (int(move_parts[5]), int(move_parts[6]))
+                except ValueError as e:
+                    raise ValueError('Use integers for token locations.')
+            elif len(move_parts)==3:
+                current_token_pos=(0,0)
+                new_token_pos = (0,0)
+        
+            move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,current_token_pos=current_token_pos,new_token_pos=new_token_pos)
+            move.normalize(state.transform)
+        else:
+            raise ValueError(f"Enter commands in specified format.")
+        return move
 
+    def instructionHandler(self, state:gamestate, display:bool=False):
         if display: print('Valid Moves:',len(state.getLegalMoves()))
         
-        bestVal = float('-inf')
-        bestMove = None
-        for suggestmove in state.getLegalMoves(): # i htink the iseu is the moves are normalized moves...
-            successor = state.getSuccessor(suggestmove)
-            v = self.heuristic(successor)
-            if v>bestVal:
-                bestVal = v
-                bestMove = suggestmove
+        moves = state.getLegalMoves()
+        vals = np.array([self.heuristic(state.getSuccessor(move)) for move in state.getLegalMoves()])
+        bestMove = moves[np.argmax(vals)]
+
         bestMove.denormalize(state.transform)
         print("Suggested Move: ", bestMove.suggest_format())
         bestMove.normalize(state.transform)
         
-        while True: #this is to capture a transform or a move
-            
-            print('Undo: u')
-            print('Redo: r')
-            print('Replay: replay')
-            print('Save: s')
-            print('Pass off to AI: ai')
-            wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty or x, y, t, cw, ccw transforms: ")
-            move_parts = wholeMoves.split()
-
-            if len(move_parts)==0:
-                move = bestMove
-                return move
-
-            #Transpose, Reflect x, Reflect y
-            if len(move_parts)==1:
-                instruction = move_parts[0].lower()
-                if instruction == 'u':
-                    return 'u'
-                elif instruction == 'r':
-                    return 'r'
-                elif instruction == 'replay':
-                    return 'replay'
-                elif instruction == 's':
-                    return 'save'
-                elif instruction == 'ai':
-                    return 'ai'
-                
-                elif instruction == "x":
-                # if instruction == "x":
-                    transformList = [True,False,False]
-                elif instruction == "y":
-                    transformList = [False,True,False]
-                elif instruction == "t":
-                    transformList = [False,False,True]
-                elif instruction == "cw":
-                    transformList = [True,False,True]
-                elif instruction == "ccw":
-                    transformList = [False,True,True]
-                else:
-                    raise ValueError("Enter commands in specified format")
-                
-                state.update_denormalization(transformList)
-                state.display()
-                bestMove.denormalize(state.transform)
-                print("Suggested Move: ", bestMove.suggest_format())
-                bestMove.normalize(state.transform)
-                continue
+        instruction = input("Enter instruction: ")
+        pieces = instruction.split()
+        if len(pieces)==0:
+            return ('move',bestMove)
+        instruction = pieces[0]
+        if instruction not in ('undo','redo','replay','save','swap','x','y','t','cw','ccw','help'):
+            return ('move',self.getMove(state,pieces))
+        elif instruction == "x":
+            return ('view',[True,False,False])
+        elif instruction == "y":
+            return ('view',[False,True,False])
+        elif instruction == "t":
+            return ('view',[False,False,True])
+        elif instruction == "cw":
+            return ('view',[True,False,True])
+        elif instruction == "ccw":
+            return ('view',[False,True,True])
+        elif instruction == 'replay':
+            return ('view','replay')
+        elif instruction in ('undo','redo','save','help'):
+            return ('control',instruction)
+        elif instruction=='swap':
+            return ('swap','ai')
+        else:
+            raise ValueError(f"Invalid instruction {instruction}.")
         
-            elif ( (len(move_parts) != 7) and (len(move_parts) != 3) ):
-                raise ValueError("Enter commands in specified format")
-            else:
-                #raises value error if can't cast to int
-                try:
-                    new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
-                except ValueError as e:
-                    raise ValueError('Use integers for xl1 yl1')
-                
-                if len(move_parts)==7:
-                    try:
-                        current_token_pos = (int(move_parts[3]), int(move_parts[4]))
-                        new_token_pos = (int(move_parts[5]), int(move_parts[6]))
-                    except ValueError as e:
-                        raise ValueError('Use integers for token locations')
-                    
-                elif len(move_parts)==3:
-                    current_token_pos=(0,0)
-                    new_token_pos = (0,0)
-            
-                move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,current_token_pos=current_token_pos,new_token_pos=new_token_pos)
-                move.normalize(state.transform)
-            return move
-
-    # def instructionHandler(self, state:gamestate, display:bool=False):
-    #     self.getMove(state, display)
-
     def game_reset(self):
         pass

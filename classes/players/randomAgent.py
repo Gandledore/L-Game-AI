@@ -11,19 +11,20 @@ class RandomAgent(Player):
         super().__init__(id)
         if seed!=-1:
             random.seed(seed)
-        
+    
     def getMove(self, state: gamestate,display:bool=False) -> packed_action:
         legal_moves = state.getLegalMoves()
         move = random.choice(legal_moves)
         move.denormalize(state.transform)
         if display: print(f"Random Agent played {move}")
         move.normalize(state.transform)
-        return random.choice(legal_moves)
+        return move
 
-    # def instructionHandler(self, state: gamestate, display:bool=False):
-    #     self.getMove(state,display)
+    def instructionHandler(self, state: gamestate, display:bool=False):
+        return ('move', self.getMove(state,display))
     
     def set_seed(self,s):
         random.seed(s)
+        
     def game_reset(self):
         pass

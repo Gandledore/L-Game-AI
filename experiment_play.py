@@ -76,7 +76,7 @@ def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Players.Player]]:
     player1 = player_dict[p1[0]](0) if p1[1]==None else player_dict[p1[0]](0,p1[1],p1[2])
     player2 = player_dict[p2[0]](1) if p2[1]==None else player_dict[p2[0]](1,p2[1],p2[2])
     players = np.array([player1,player2])
-    return players
+    return np.array([p1[0]==2,p2 [0]==2]),players
 
 # change player from human to agent and take input
 def changePlayer(player:Players.Player)->Players.Player:
@@ -92,7 +92,7 @@ def loadGame() -> Optional[Game]:
         if load.lower() == 'y':
             try:
                 filename = input('Enter filename: ')
-                return Game.load(filename)            
+                return Game.load(filename)
             except FileNotFoundError as e:
                 print('File not found')
         else:
@@ -134,123 +134,142 @@ def create_game():
                 del game
                 game = None
                 break
-            elif confirm.lower()=='y' or confirm.lower()=='':
+            elif confirm.lower()=='y':
                 return game
             else:
                 print("Please enter 'y' or 'n'")
-def print_instructions():
-    print("\n\n\
-            Instructions:\n\
-            Move: x y d t1x t1y t2x  t2y\n\
-            Undo: undo\n\
-            Redo: redo\n\
-            Replay: replay\n\
-            Save Game: save\n\
-            Transform Board: 'x' or 'y' or 't' or 'cw' or 'ccw'\n\
-            Have AI take over: swap\n\
-            Display Instructions: help\n\
-    \n\n")
+
+                
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
 
     game = loadGame()
 
-    if game is None:
+    if game is not None:
+        print(filename + " loaded.\n")
+    else:
         game = create_game()
 
     if gm==None:
-        players = setGameMode(*getPlayers())
+        randoms,players = setGameMode(*getPlayers())
     else:
-        players = setGameMode(*gm)
+        randoms,players = setGameMode(*gm)
 
-    print_instructions()
-
-    tie_end = 64
-    while game.whoWins()==None and game.totalTurns()<tie_end:
-        if display: game.display()
-        
-        turn = game.getTurn()
-        if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
-        
-        current_player = players[turn]
-        success=False
-        K = 5
-        for k in range(K):#while True
-            try:
-                instruction_type,instruction = current_player.instructionHandler(game.getState(),display) #value error if invalid input format
-
-                if instruction_type == 'move':
-                    game.apply_action(instruction)  #assertion error if invalid move
-                elif instruction_type == 'view':
-                    if instruction == 'replay':
-                        print('\nReplaying Game until current turn')
-                        game.replay()
-                    elif isinstance(instruction,List) and len(instruction)==3:#not checking that elements are bool
-                        game.state.update_denormalization(instruction)#bad practice
-                elif instruction_type=='control':
-                    if instruction == 'undo':
-                        if game.undo():
-                            print('\nUndo Successful\n')
-                        else:
-                            print('\nUndo Unsuccessful\n')
-                    elif instruction == 'redo':
-                        if game.redo():
-                            print('\nRedo Successful\n')
-                            game.display()
-                        else:
-                            print('\nRedo Unsuccessful\n')
-                    elif instruction == 'save':
-                        filename = input('Enter filename: ')
-                        game.save(filename)
-                    elif instruction == 'help':
-                        print_instructions()
-                elif instruction_type=='swap':
-                    if instruction=='ai':
-                        current_player = changePlayer(current_player)
-                        players[turn] = current_player
-                        print(f'Player {turn+1} changed to AI')
-                else:
-                    raise ValueError(f"Invalid instruction {instruction}.")
-                success=True
-                break
+    winners  = np.empty(shape=(N),dtype=int)
+    turns = np.empty(shape=(N),dtype=int)
+    turn_times = [[],[]]
+    # for n in tqdm(range(N)):
+    for n in range(N):
+        for i,r in enumerate(randoms):
+            if r:
+                players[i].set_seed(n+i)
+        while game.whoWins()==None and game.totalTurns()<64:
+            if display:
+                print()
+                # print(game.state)
+                # game.display(internal_display=True)
+                game.display()
+            turn = game.getTurn()
+            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
             
-            # except ValueError as e:
-            #     print(f'Invalid Input. {e}\n')
-            except AssertionError as e:
-                print(f'Invalid Move. {e}\n')
+            current_player = players[turn]
+            success=False
+            K = 5
+            for k in range(K):#while True
+                try:
+                    start = time.time()
+                    move = current_player.getMove(game.getState(),display) #value error if invalid input format
+                    # move = current_player.instructionHandler(game.getState(),display) #value error if invalid input format
+                    
+                    if isinstance(move, str) and move in {'u','r','replay','save', 'ai'}:
 
-        if not success: #if no valid move provided after K attempts, kill game
-            print(f'\n\nNo valid play after {K} moves. Game over.')
-            break
+                        # ensures repeated u/r/re does not trigger the auto game termination (parsed as valid move)
+                        success=True
 
-    winner = game.whoWins()
-    winner = int(not game.getTurn())+1 if winner==None else winner+1
-    winner = winner if game.totalTurns()<tie_end else 0
+                        if move == 'u':
+                            if game.undo():
+                                print('\nUndo Successful\n')
+                                game.display()
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
+                                continue
+                            else:
+                                print('\nUndo Unsuccessful\n')
+                                continue
+                        elif move == 'r':
+                            if game.redo():
+                                print('\nRedo Successful\n')
+                                game.display()
+                                print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
+                                continue
+                            else:
+                                print('\nRedo Unsuccessful\n')
+                                continue
+                        elif move == 'replay':
+                            print('\nReplaying Game until current turn')
+                            game.replay()
+                            continue
+                        elif move == 'save':
+                            filename = input('Enter filename: ')
+                            game.save(filename)
+                            continue
+                        elif move == 'ai':
+                            players[turn] = changePlayer(current_player)
+                            current_player = players[turn]
+                            print(f'Player {turn+1} changed to AI')
+                            continue
 
-    if display: 
-        game.display()
+                    end=time.time()
+                    # if display: print("Move:",move)
+                    game.apply_action(move)  #assertion error if invalid move
+                    success=True
+                    turn_times[turn].append(end-start)
+                    break
+                except ValueError as e:
+                    print(f'Invalid Input. {e}\n')
+                except AssertionError as e:
+                    print(f'Invalid Move. {e}\n')
 
-        if game.totalTurns()==tie_end:
-            print('Draw!')
-        else:
-            print('Player',winner,'wins!')
-            print('Total Turns',game.totalTurns())
-    
-    while True:
-        menu = input("\nMenu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n\n")
-        print()
+            if not success: #if no valid move provided after K attempts, kill game
+                print(f'\n\nNo valid play after {K} moves. Game over.')
+                break
 
-        if menu == 'r':
-            print('Replaying Game')
-            game.replay()
-            continue
-        elif menu == 's':
-            filename = input('Enter filename: ')
-            game.save(filename)
-            continue
-        else:
-            break
+        winner = game.whoWins()
+        winner = int(not game.getTurn())+1 if winner==None else winner+1
+        winner = winner if game.totalTurns()<64 else 0
+        winners[n] = winner
+        turns[n] = game.totalTurns()
 
-    return winner
+        if display: 
+            game.display()
+
+            if game.totalTurns()==64:
+                print('Draw!')
+            else:                
+                print('Player',winner,'wins!')
+                print('Total Turns',game.totalTurns())
+        
+        while True:
+            menu = input("\nMenu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n\n")
+            print()
+
+            if menu == 'r':
+                print('Replaying Game')
+                game.replay()
+                continue
+            elif menu == 's':
+                filename = input('Enter filename: ')
+                game.save(filename)
+                continue
+            else:
+                break
+
+        game.reset()
+        for player in players:
+            player.game_reset()
+    print()
+    length = max(len(turn_times[0]),len(turn_times[1]))
+    turn_times = [row + [0] * (length - len(row)) for row in turn_times]
+    return winners, turns, turn_times
+
 if __name__ == "__main__":
     # profiler = cProfile.Profile()
     # profiler.enable()
@@ -259,7 +278,7 @@ if __name__ == "__main__":
 
     # Play again?
     while True:
-        _ = play()
+        _,_,_ = play()
         cont = input('Play again? (y/n): ')
         if cont.lower() != 'y'.strip():
             break
