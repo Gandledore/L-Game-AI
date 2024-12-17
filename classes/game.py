@@ -47,9 +47,9 @@ class Game:
         return True
         
     def replay(self) -> None:
-        for i in range(self.turns):
+        for i in range(self.turns-1):
             self.history[i].display()
-            time.sleep(1)
+            time.sleep(.5)
 
     def getTurn(self)->int:
         return self.state.player
@@ -104,9 +104,10 @@ class Game:
         with open(filename, 'rb') as f:
             save_dict = pickle.load(f)
         
-        print()
         game = Game()
         game.history = save_dict['history']
         game.turns = save_dict['turns']
         game.state = game.history[game.turns-1]
+        
+        print('Game',filename,"loaded.\n")
         return game

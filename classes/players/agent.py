@@ -140,6 +140,9 @@ class Agent(Player):
             bestAction.normalize(state.transform)   #to return as game expects
             print(f'Time: {1000*(end-start):.3f}ms | Pruned: {100*self.num_prune/self.max_prune:.2f}% ({self.num_prune}/{self.max_prune})')
         return bestAction
+
+    def instructionHandler(self, state:gamestate, display:bool=False):
+        return ('move',self.getMove(state,display))
     
     #heuristic to estimate how good an action is (current version not very good)
     def action_heuristic(self,move:packed_action)->int:

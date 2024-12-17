@@ -24,26 +24,25 @@ class gamestate():
     #normalized state defined as L1 piece in upper left quadrant (x,y)<=2, long leg east (6 total possible tuples)
     _normalized_L_tuples = [(x,y,d) for x in range(1,3) for y in range(1,3) for d in ['N','S'] if not (y==1 and d=='N')]
     
-    #horizontal initial state
-    def __init__(self,
-                    player:int=0,
-                    L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')],
-                    token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
-                    transform:np.ndarray[bool]=np.array([False,False,False])):
-    
     #vertical initial state
     # def __init__(self, 
     #                 player:int=0,
     #                 L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
     #                 token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
     #                 transform:np.ndarray[bool]=np.array([False,False,False])):
+    
+    #horizontal initial state
+    def __init__(self,
+                    player:int=0,
+                    L_pieces:List[L_piece]=None,
+                    token_pieces:Set[token_piece]=None,
+                    transform:np.ndarray[bool]=None):
         
         self.player:int = player
-        self.L_pieces: List[L_piece] = L_pieces
-        self.token_pieces: Set[token_piece] = token_pieces
-        self.transform = transform
+        self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')]
+        self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1,y=1),token_piece(x=4,y=4)}
+        self.transform = transform if transform is not None else np.array([False,False,False])
         self.renormalize()
-
 
         #compute a unique token id for hashing the set of tokens. gives a unique binary number for each cell, such that summing any pair is also unique
         self.token_pair_id = sum(1 << (token.x+4*token.y) for token in self.token_pieces)
