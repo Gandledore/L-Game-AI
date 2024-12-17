@@ -1,156 +1,3 @@
-import sys
-import subprocess
-import time
-
-# profiling (built in?)
-# import cProfile
-# import pstats
-
-# Package install routine
-
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package],
-                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-def install_all():
-
-    install('numpy')
-    install('tqdm')
-
-try:
-    import numpy as np
-    from tqdm import tqdm
-except ImportError:
-    install_all()
-
-# End package install routine
-
-
-import struct
-
-from typing import Tuple
-import numpy as np
-
-class packed_action:
-    __slots__ = ('data',)
-    _format = '3B c 4B'
-
-    def __init__(self, l_piece_id:int=0, new_l_pos:Tuple[int,int,str]=(1, 3, 'S'), current_token_pos:Tuple[int,int]=(1,1), new_token_pos:Tuple[int,int]=(3, 1)):
-        assert l_piece_id in {0,1},f"action L_id={l_piece_id} not in {0,1}"
-        assert current_token_pos in token_piece._POSSIBLE_POS,f"action current_t_pos={current_token_pos} not in {token_piece._POSSIBLE_POS}"
-        assert new_token_pos in token_piece._POSSIBLE_POS,f"action current_t_pos={new_token_pos} not in {token_piece._POSSIBLE_POS}"
-        assert new_l_pos[0] in L_piece._POSSIBLE_SETS['x'], f"action Lx={new_l_pos[0]} not in {L_piece._POSSIBLE_SETS['x']}"
-        assert new_l_pos[1] in L_piece._POSSIBLE_SETS['y'], f"action Lx={new_l_pos[0]} not in {L_piece._POSSIBLE_SETS['y']}"
-        assert new_l_pos[2] in L_piece._POSSIBLE_SETS['d'], f"action Lx={new_l_pos[0]} not in {L_piece._POSSIBLE_SETS['d']}"
-        
-        self.data = struct.pack(packed_action._format, 
-                                 l_piece_id, new_l_pos[0], new_l_pos[1], new_l_pos[2].encode('utf-8'), 
-                                 current_token_pos[0], current_token_pos[1],
-                                 new_token_pos[0], new_token_pos[1])
-
-    def get_rep(self):
-        return struct.unpack(packed_action._format, self.data)
-    def __hash__(self):
-        return hash(self.data)
-    def __eq__(self, other):
-        return self.data == other.data
-    def __repr__(self):
-        unpacked = struct.unpack(packed_action._format,self.data)
-        return f'({unpacked[0]},({unpacked[1]},{unpacked[2]},{unpacked[3].decode('utf-8')}),({unpacked[4]},{unpacked[5]}),({unpacked[6]},{unpacked[7]}))'
-    
-    def suggest_format(self):
-        unpacked = struct.unpack(packed_action._format,self.data)
-        return f"{unpacked[1]} {unpacked[2]} {unpacked[3].decode('utf-8')} " + (f"{unpacked[4]} {unpacked[5]} {unpacked[6]} {unpacked[7]}" if unpacked[4] != 0 else f"")
-    
-    def normalize(self,transform:np.ndarray[bool])->None:
-        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = struct.unpack(packed_action._format,self.data)
-        new_l_pos_d = new_l_pos_d.decode('utf-8')
-        
-        #reflect x
-        if transform[0]:
-            new_l_pos_x = 5 - new_l_pos_x
-            if curr_token_pos_x != 0:
-                curr_token_pos_x = 5 - curr_token_pos_x
-                new_token_pos_x = 5 - new_token_pos_x
-            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d
-        
-        #reflect y
-        if transform[1]:
-            new_l_pos_y = 5 - new_l_pos_y
-            if curr_token_pos_y != 0:
-                # print("if ther is  token move")
-                curr_token_pos_y = 5 - curr_token_pos_y
-                new_token_pos_y = 5 - new_token_pos_y
-            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['N','S'] else new_l_pos_d
-        
-        #transpose
-        if transform[2]:
-            new_l_pos_d = (L_piece._transpose_map[new_l_pos_d])
-            
-            temp = new_l_pos_x
-            new_l_pos_x = new_l_pos_y
-            new_l_pos_y = temp
-            
-            temp = curr_token_pos_x
-            curr_token_pos_x = curr_token_pos_y
-            curr_token_pos_y = temp
-            
-            temp = new_token_pos_x
-            new_token_pos_x = new_token_pos_y
-            new_token_pos_y = temp
-        
-        #save transformed data
-        self.data = struct.pack(packed_action._format,
-                                l_piece_id,new_l_pos_x,new_l_pos_y,new_l_pos_d.encode('utf-8'),
-                                curr_token_pos_x,curr_token_pos_y,
-                                new_token_pos_x,new_token_pos_y)
-        
-    def denormalize(self,transform:np.ndarray[bool])->None:
-        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = struct.unpack(packed_action._format,self.data)
-        new_l_pos_d = new_l_pos_d.decode('utf-8')
-        
-        #transpose
-        if transform[2]:
-            new_l_pos_d = (L_piece._transpose_map[new_l_pos_d])
-            
-            temp = new_l_pos_x
-            new_l_pos_x = new_l_pos_y
-            new_l_pos_y = temp
-            
-            temp = curr_token_pos_x
-            curr_token_pos_x = curr_token_pos_y
-            curr_token_pos_y = temp
-            
-            temp = new_token_pos_x
-            new_token_pos_x = new_token_pos_y
-            new_token_pos_y = temp
-        
-        #reflect y
-        if transform[1]:
-            new_l_pos_y = 5 - new_l_pos_y
-            curr_token_pos_y = 5 - curr_token_pos_y
-            new_token_pos_y = 5 - new_token_pos_y
-            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['N','S'] else new_l_pos_d
-        
-        #reflect x
-        if transform[0]:
-            new_l_pos_x = 5 - new_l_pos_x
-            curr_token_pos_x = 5 - curr_token_pos_x
-            new_token_pos_x = 5 - new_token_pos_x
-            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d
-
-        #save transformed data
-        self.data = struct.pack(packed_action._format,
-                                l_piece_id,new_l_pos_x,new_l_pos_y,new_l_pos_d.encode('utf-8'),
-                                curr_token_pos_x,curr_token_pos_y,
-                                new_token_pos_x,new_token_pos_y)
-                                
-                                
-                                
-                                
-                                
-                                
-                                
 from typing import Tuple,Set,List,Union
 import numpy as np
 
@@ -217,8 +64,6 @@ class token_piece():
             self.reflect_y()
         if transform[0]:
             self.reflect_x()
-            
-            
             
             
             
@@ -358,12 +203,131 @@ class L_piece():
             self.reflect_y()
         if transform[0]:
             self.reflect_x()
+
+
+
+import struct
+
+
+from typing import Tuple
+import numpy as np
+
+class packed_action:
+    __slots__ = ('data',)
+    _format = '3B c 4B'
+
+    def __init__(self, l_piece_id:int=0, new_l_pos:Tuple[int,int,str]=(1, 3, 'S'), current_token_pos:Tuple[int,int]=(1,1), new_token_pos:Tuple[int,int]=(3, 1)):
+        assert l_piece_id in {0,1},f"action L_id={l_piece_id} not in {0,1}"
+        assert current_token_pos in token_piece._POSSIBLE_POS,f"action current_t_pos={current_token_pos} not in {token_piece._POSSIBLE_POS}"
+        assert new_token_pos in token_piece._POSSIBLE_POS,f"action current_t_pos={new_token_pos} not in {token_piece._POSSIBLE_POS}"
+        assert new_l_pos[0] in L_piece._POSSIBLE_SETS['x'], f"action Lx={new_l_pos[0]} not in {L_piece._POSSIBLE_SETS['x']}"
+        assert new_l_pos[1] in L_piece._POSSIBLE_SETS['y'], f"action Lx={new_l_pos[0]} not in {L_piece._POSSIBLE_SETS['y']}"
+        assert new_l_pos[2] in L_piece._POSSIBLE_SETS['d'], f"action Lx={new_l_pos[0]} not in {L_piece._POSSIBLE_SETS['d']}"
+        
+        self.data = struct.pack(packed_action._format, 
+                                 l_piece_id, new_l_pos[0], new_l_pos[1], new_l_pos[2].encode('utf-8'), 
+                                 current_token_pos[0], current_token_pos[1],
+                                 new_token_pos[0], new_token_pos[1])
+
+    def get_rep(self):
+        return struct.unpack(packed_action._format, self.data)
+    def __hash__(self):
+        return hash(self.data)
+    def __eq__(self, other):
+        return self.data == other.data
+    def __repr__(self):
+        unpacked = struct.unpack(packed_action._format,self.data)
+        return f'({unpacked[0]},({unpacked[1]},{unpacked[2]},{unpacked[3].decode('utf-8')}),({unpacked[4]},{unpacked[5]}),({unpacked[6]},{unpacked[7]}))'
+    
+    def suggest_format(self):
+        unpacked = struct.unpack(packed_action._format,self.data)
+        return f"{unpacked[1]} {unpacked[2]} {unpacked[3].decode('utf-8')} " + (f"{unpacked[4]} {unpacked[5]} {unpacked[6]} {unpacked[7]}" if unpacked[4] != 0 else f"")
+    
+    def normalize(self,transform:np.ndarray[bool])->None:
+        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = struct.unpack(packed_action._format,self.data)
+        new_l_pos_d = new_l_pos_d.decode('utf-8')
+        
+        #reflect x
+        if transform[0]:
+            new_l_pos_x = 5 - new_l_pos_x
+            if curr_token_pos_x != 0:
+                curr_token_pos_x = 5 - curr_token_pos_x
+                new_token_pos_x = 5 - new_token_pos_x
+            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d
+        
+        #reflect y
+        if transform[1]:
+            new_l_pos_y = 5 - new_l_pos_y
+            if curr_token_pos_y != 0:
+                curr_token_pos_y = 5 - curr_token_pos_y
+                new_token_pos_y = 5 - new_token_pos_y
+            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['N','S'] else new_l_pos_d
+        
+        #transpose
+        if transform[2]:
+            new_l_pos_d = (L_piece._transpose_map[new_l_pos_d])
             
+            temp = new_l_pos_x
+            new_l_pos_x = new_l_pos_y
+            new_l_pos_y = temp
             
+            temp = curr_token_pos_x
+            curr_token_pos_x = curr_token_pos_y
+            curr_token_pos_y = temp
             
+            temp = new_token_pos_x
+            new_token_pos_x = new_token_pos_y
+            new_token_pos_y = temp
+        
+        #save transformed data
+        self.data = struct.pack(packed_action._format,
+                                l_piece_id,new_l_pos_x,new_l_pos_y,new_l_pos_d.encode('utf-8'),
+                                curr_token_pos_x,curr_token_pos_y,
+                                new_token_pos_x,new_token_pos_y)
+        
+    def denormalize(self,transform:np.ndarray[bool])->None:
+        l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = struct.unpack(packed_action._format,self.data)
+        new_l_pos_d = new_l_pos_d.decode('utf-8')
+        
+        #transpose
+        if transform[2]:
+            new_l_pos_d = (L_piece._transpose_map[new_l_pos_d])
             
+            temp = new_l_pos_x
+            new_l_pos_x = new_l_pos_y
+            new_l_pos_y = temp
             
+            temp = curr_token_pos_x
+            curr_token_pos_x = curr_token_pos_y
+            curr_token_pos_y = temp
             
+            temp = new_token_pos_x
+            new_token_pos_x = new_token_pos_y
+            new_token_pos_y = temp
+        
+        #reflect y
+        if transform[1]:
+            new_l_pos_y = 5 - new_l_pos_y
+            curr_token_pos_y = 5 - curr_token_pos_y
+            new_token_pos_y = 5 - new_token_pos_y
+            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['N','S'] else new_l_pos_d
+        
+        #reflect x
+        if transform[0]:
+            new_l_pos_x = 5 - new_l_pos_x
+            curr_token_pos_x = 5 - curr_token_pos_x
+            new_token_pos_x = 5 - new_token_pos_x
+            new_l_pos_d = L_piece._reflection_map[new_l_pos_d] if new_l_pos_d in ['E','W'] else new_l_pos_d
+
+        #save transformed data
+        self.data = struct.pack(packed_action._format,
+                                l_piece_id,new_l_pos_x,new_l_pos_y,new_l_pos_d.encode('utf-8'),
+                                curr_token_pos_x,curr_token_pos_y,
+                                new_token_pos_x,new_token_pos_y)
+
+
+
+
 import pickle
 import numpy as np
 
@@ -386,27 +350,25 @@ class gamestate():
     #normalized state defined as L1 piece in upper left quadrant (x,y)<=2, long leg east (6 total possible tuples)
     _normalized_L_tuples = [(x,y,d) for x in range(1,3) for y in range(1,3) for d in ['N','S'] if not (y==1 and d=='N')]
     
-    #horizontal initial state
-    # def __init__(self,
+    #vertical initial state
+    # def __init__(self, 
     #                 player:int=0,
-    #                 L_pieces:List[L_piece]=[L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')],
+    #                 L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
     #                 token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
     #                 transform:np.ndarray[bool]=np.array([False,False,False])):
     
-    #vertical initial state
-    def __init__(self, 
+    #horizontal initial state
+    def __init__(self,
                     player:int=0,
-                    L_pieces:List[L_piece]=[L_piece(x=2,y=4,d='E'),L_piece(x=3,y=1,d='W')],
-                    token_pieces:Set[token_piece]={token_piece(x=1,y=1),token_piece(x=4,y=4)},
-                    transform:np.ndarray[bool]=np.array([False,False,False])):
-        
+                    L_pieces:List[L_piece]=None,
+                    token_pieces:Set[token_piece]=None,
+                    transform:np.ndarray[bool]=None):
         
         self.player:int = player
-        self.L_pieces: List[L_piece] = L_pieces
-        self.token_pieces: Set[token_piece] = token_pieces
-        self.transform = transform
+        self.L_pieces: List[L_piece] = L_pieces if L_pieces is not None else [L_piece(x=1,y=3,d='N'),L_piece(x=4,y=2,d='S')]
+        self.token_pieces: Set[token_piece] = token_pieces if token_pieces is not None else {token_piece(x=1,y=1),token_piece(x=4,y=4)}
+        self.transform = transform if transform is not None else np.array([False,False,False])
         self.renormalize()
-
 
         #compute a unique token id for hashing the set of tokens. gives a unique binary number for each cell, such that summing any pair is also unique
         self.token_pair_id = sum(1 << (token.x+4*token.y) for token in self.token_pieces)
@@ -519,12 +481,41 @@ class gamestate():
             
             #save legal moves since not already saved
             with open(cls._legalMoves_path,'wb') as f:
-                print('Saving Legal Moves...',end='',flush=True)
+                print('Saving Legal Moves...',end='')
                 pickle.dump(cls._legalMoves,f)
                 print('\rSaved Legal Moves')
         
     def __repr__(self):
         return f"Player: {self.player}\nL pieces: {self.L_pieces}\nT pieces: {self.token_pieces}\nTransform:{self.transform}"
+    
+    def display(self,internal_display=False):
+        board = np.full((4, 4), "  ", dtype=object) # 4 by 4 of empty string
+        
+        #denormalize to display what human expects to see
+        if not internal_display: self.denormalize()
+        
+        for i, l in enumerate(self.L_pieces):
+            color = "\033[1;31m1□\033[0m" if i == 0 else "\033[32m2▲\033[0m"  # Red for L1, Blue for L2
+            for px, py in l.get_coords():
+                board[py - 1, px - 1] = color #+ "L" + str(i + 1) + "\033[0m"
+        
+        for i, t in enumerate(self.token_pieces):
+            tx, ty = t.get_position()
+            board[ty - 1, tx - 1] = "\033[33m○○\033[0m"
+
+
+        rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
+        #left wall then the row then the ending right wall
+        # f"{cell:>2}" align cell to the right > with a width of 2 spaces. 
+
+        horizontal_separator = "-------------\n"
+        
+        board_str = horizontal_separator + f"\n{horizontal_separator}".join(rows) + "\n" + horizontal_separator
+        print(board_str)
+        
+        #renormalize for internal use
+        if not internal_display: self.normalize(self.transform)
+    
     def __hash__(self):
         return hash((self.player,*self.L_pieces[0].get_tuple(),*self.L_pieces[1].get_tuple(),self.token_pair_id))
     
@@ -540,6 +531,14 @@ class gamestate():
         if self.transform[2] and transform[0]!=transform[1]:
             transform[:2] = np.logical_not(transform[:2])
             
+        #take xor between states because doing something twice cancels it
+        self.transform = np.logical_xor(self.transform,transform)
+
+    def update_denormalization(self,transform:np.ndarray[bool])->None:
+        #if new state is transposed, swap original reflect x and reflect y to compensate cause that's what transpose does
+        if transform[2] and self.transform[0]!=self.transform[1]:
+            self.transform[:2] = np.logical_not(self.transform[:2])
+        
         #take xor between states because doing something twice cancels it
         self.transform = np.logical_xor(self.transform,transform)
         
@@ -669,46 +668,87 @@ class gamestate():
         return None
     
 
-    
+    #interface to display game board and pieces, added for Human transform display
+    #self.state._____ becomes self.______
+    def display(self,internal_display:bool=False)->None:
+        board = np.full((4, 4), "  ", dtype=object) # 4 by 4 of empty string
+        
+        #denormalize to display what human expects to see
+        if not internal_display: self.denormalize()
+        
+        for i, l in enumerate(self.L_pieces):
+            color = "\033[1;31m1□\033[0m" if i == 0 else "\033[32m2▲\033[0m"  # Red for L1, Blue for L2
+            for px, py in l.get_coords():
+                board[py - 1, px - 1] = color #+ "L" + str(i + 1) + "\033[0m"
+        
+        for i, t in enumerate(self.token_pieces):
+            tx, ty = t.get_position()
+            board[ty - 1, tx - 1] = "\033[33m○○\033[0m"
+
+
+        rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
+        #left wall then the row then the ending right wall
+        # f"{cell:>2}" align cell to the right > with a width of 2 spaces. 
+
+        horizontal_separator = "-------------\n"
+        
+        board_str = horizontal_separator + f"\n{horizontal_separator}".join(rows) + "\n" + horizontal_separator
+        print(board_str)
+        
+        #renormalize for internal use
+        if not internal_display: self.normalize(self.transform)
+
+
 
 
 from abc import ABC,abstractmethod
 
+from typing import Tuple,Union,List
 class Player(ABC):
 
     def __init__(self,id:int):
         self.id = id
     
     @abstractmethod
-    def getMove(self, game: gamestate,display:bool=False) -> packed_action:
+    def instructionHandler(self, state: gamestate, display:bool=False) -> Tuple[str,Union[packed_action,str,List[bool]]]:
         pass
     
+    @abstractmethod
+    def getMove(self, state: gamestate, display:bool=False) -> packed_action:
+        pass
+
+
 
 
 import random
+
 
 class RandomAgent(Player):
     def __init__(self, id, seed=-1):
         super().__init__(id)
         if seed!=-1:
             random.seed(seed)
-        
+    
     def getMove(self, state: gamestate,display:bool=False) -> packed_action:
         legal_moves = state.getLegalMoves()
         move = random.choice(legal_moves)
-        move.denormalize(state.transform)
-        print(f"Random Agent played {move}")
-        move.normalize(state.transform)
-        return random.choice(legal_moves)
+        if display: 
+            move.denormalize(state.transform)
+            print(f"Random Agent played {move}")
+            move.normalize(state.transform)
+        return move
+
+    def instructionHandler(self, state: gamestate, display:bool=False):
+        return ('move', self.getMove(state,display))
     
     def set_seed(self,s):
         random.seed(s)
+        
     def game_reset(self):
         pass
-    
-    
-    
-    
+
+import numpy as np
+
 class Human(Player):
     _CORE = {(2,2), (2,3), (3,2), (3,3)}
     _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
@@ -748,143 +788,220 @@ class Human(Player):
     
 
     #interface for a play code to get human input
-    def getMove(self, state: gamestate, display:bool=True) -> packed_action:
-
-        if display: print('Valid Moves:',len(state.getLegalMoves()))
-        
-        bestVal = float('-inf')
-        bestMove = None
-        for suggestmove in state.getLegalMoves(): # i htink the iseu is the moves are normalized moves...
-            successor = state.getSuccessor(suggestmove)
-            v = self.heuristic(successor)
-            if v>bestVal:
-                bestVal = v
-                bestMove = suggestmove
-        bestMove.denormalize(state.transform)
-        print("Suggested Move: ", bestMove.suggest_format())
-        bestMove.normalize(state.transform)
-        
-        # print('\nRecieved State:',state)
-        wholeMoves = input(f"Player {state.player+1}: Enter xl1 yl1 dl1 tx ty tx ty: ")
-        move_parts = wholeMoves.split()
-        
-        if len(move_parts)==0:
-            move = bestMove
-        
-        elif ( (len(move_parts) != 7) and (len(move_parts) != 3) ):
-            raise ValueError("Enter commands in specified format")
-        else:
-            #raises value error if can't cast to int
-            try:
+    def getMove(self, state: gamestate, move_parts) -> packed_action:
+        if len(move_parts)==7 or len(move_parts)==3:
+            try:    #raises value error if can't cast to int
                 new_l_pos = (int(move_parts[0]), int(move_parts[1]),move_parts[2])
             except ValueError as e:
-                raise ValueError('Use integers for xl1 yl1')
+                raise ValueError('Use integers for x and y.')
             
             if len(move_parts)==7:
                 try:
                     current_token_pos = (int(move_parts[3]), int(move_parts[4]))
                     new_token_pos = (int(move_parts[5]), int(move_parts[6]))
                 except ValueError as e:
-                    raise ValueError('Use integers for token locations')
-                
+                    raise ValueError('Use integers for token locations.')
             elif len(move_parts)==3:
                 current_token_pos=(0,0)
                 new_token_pos = (0,0)
         
             move = packed_action(l_piece_id=state.player,new_l_pos=new_l_pos,current_token_pos=current_token_pos,new_token_pos=new_token_pos)
             move.normalize(state.transform)
+        else:
+            raise ValueError(f"Enter commands in specified format.")
         return move
+
+    def instructionHandler(self, state:gamestate, display:bool=False):
+        if display: print('Valid Moves:',len(state.getLegalMoves()))
+        
+        moves = state.getLegalMoves()
+        vals = np.array([self.heuristic(state.getSuccessor(move)) for move in state.getLegalMoves()])
+        bestMove = moves[np.argmax(vals)]
+
+        bestMove.denormalize(state.transform)
+        print("Suggested Move: ", bestMove.suggest_format())
+        bestMove.normalize(state.transform)
+        
+        instruction = input("Enter instruction: ")
+        pieces = instruction.split()
+        if len(pieces)==0:
+            return ('move',bestMove)
+        instruction = pieces[0]
+        if instruction not in ('undo','redo','replay','save','swap','x','y','t','cw','ccw','help'):
+            return ('move',self.getMove(state,pieces))
+        elif instruction == "x":
+            return ('view',[True,False,False])
+        elif instruction == "y":
+            return ('view',[False,True,False])
+        elif instruction == "t":
+            return ('view',[False,False,True])
+        elif instruction == "cw":
+            return ('view',[True,False,True])
+        elif instruction == "ccw":
+            return ('view',[False,True,True])
+        elif instruction == 'replay':
+            return ('view','replay')
+        elif instruction in ('undo','redo','save','help'):
+            return ('control',instruction)
+        elif instruction=='swap':
+            return ('swap','ai')
+        else:
+            raise ValueError(f"Invalid instruction {instruction}.")
+        
     def game_reset(self):
         pass
-    
-    
-    
-    
-    
 
 from typing import Tuple
 import time
 import numpy as np
 import pickle
+from tqdm import tqdm
+
+import sys
+sys.setrecursionlimit(5000)#maybe this can be improved
 
 class Agent(Player):
 
     # Constants for heuristic
-
-    _CORE = {(2,2), (2,3), (3,2), (3,3)}
-    _CORNERS = {(1,1), (1,4), (4,1), (4,4)}
-    _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}
-    _optimal_moves_path = 'optimal_moves'
+    _CORE = {(2,2), (2,3), (3,2), (3,3)}                                        #the coordinates of the core
+    _CORNERS = {(1,1), (1,4), (4,1), (4,4)}                                     #the coordinates of the corner
+    _KILLER_TOKENS = {(2,1), (3,1), (1,2), (1,3), (4,2), (4,3), (2,4), (3,4)}   #the coordinates of the attacking token positions
     
-    def __init__(self, id:int, depth=-1, prune:bool=False):
+    #states where an optimal oponent can force us to loss, according to wikipedia (and confirmed via previous testing)
+    _death_states = {  gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(1,3),token_piece(4,1)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(1,4),token_piece(4,2)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(1,4),token_piece(4,1)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(4,3),token_piece(4,1)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(3,4),token_piece(4,3)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(4,3),token_piece(4,2)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(3,4),token_piece(4,2)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(3,4),token_piece(4,1)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(2,2,'E')],token_pieces={token_piece(4,2),token_piece(4,1)}),
+                            gamestate(0,L_pieces=[L_piece(1,1,'S'),L_piece(3,3,'N')],token_pieces={token_piece(4,2),token_piece(4,1)}),
+                            gamestate(0,L_pieces=[L_piece(2,1,'S'),L_piece(1,3,'N')],token_pieces={token_piece(3,2),token_piece(3,4)}),
+                            gamestate(0,L_pieces=[L_piece(2,1,'S'),L_piece(3,3,'N')],token_pieces={token_piece(1,2),token_piece(4,2)}),
+                            gamestate(0,L_pieces=[L_piece(2,1,'S'),L_piece(1,3,'N')],token_pieces={token_piece(3,2),token_piece(4,4)}),
+                            gamestate(0,L_pieces=[L_piece(1,2,'N'),L_piece(1,3,'S')],token_pieces={token_piece(3,1),token_piece(4,2)}),
+                            
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(1,3),token_piece(4,1)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(1,4),token_piece(4,2)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(1,4),token_piece(4,1)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(4,3),token_piece(4,1)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(3,4),token_piece(4,3)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(4,3),token_piece(4,2)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(3,4),token_piece(4,2)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(3,4),token_piece(4,1)}),
+                            gamestate(1,L_pieces=[L_piece(2,2,'E'),L_piece(1,1,'S')],token_pieces={token_piece(4,2),token_piece(4,1)}),
+                            gamestate(1,L_pieces=[L_piece(3,3,'N'),L_piece(1,1,'S')],token_pieces={token_piece(4,2),token_piece(4,1)}),
+                            gamestate(1,L_pieces=[L_piece(1,3,'N'),L_piece(2,1,'S')],token_pieces={token_piece(3,2),token_piece(3,4)}),
+                            gamestate(1,L_pieces=[L_piece(3,3,'N'),L_piece(2,1,'S')],token_pieces={token_piece(1,2),token_piece(4,2)}),
+                            gamestate(1,L_pieces=[L_piece(1,3,'N'),L_piece(2,1,'S')],token_pieces={token_piece(3,2),token_piece(4,4)}),
+                            gamestate(1,L_pieces=[L_piece(1,3,'S'),L_piece(1,2,'N')],token_pieces={token_piece(3,1),token_piece(4,2)})}
+    
+    
+    def __init__(self, id:int, depth=-1, prune:bool=False,):
         super().__init__(id)
         
-        self.display=False
+        self.prune = bool(prune)
+        
+        #default depth to search a state, -1 does infinite depth and solves whole game
         self.depth = depth
-        if depth<0: self.prune = False
-        else: self.prune = bool(prune)
-        # TRANSPOSITION TABLE
-        # check bugs here (saving depth it solved to)
-        # <1 = assuming fully solved, may not be correct assumption
-        # stores all moves of equivalent value
-        self.finished = {} #stores state:(d,v) tuple of depth and best backpropagated value of highest depth search (-1 = infinite depth)
-        self.check_tie_depth = 11#min(depth,11)%12 #look >5 ply ahead, cause according to wikipedia, you can avoid losing if you look 5 steps ahead
-        # how to check ties: if encounter a looped state or a state we've already seen, say hey we've already seen this state, potentially a tie, then depth limited search starting from depth 11 because wikipedia says a player can win in 4 turns (check assumption)
-        # in the next 11 turns, can a win or loss be forced? backtrack
-        self.last = 0
-        # not actually the max score, a lazy approximation of it (did not want to compute max score)
-        # if the |score| is >900 consider a forced terminal state
-        # forced = one player can win no matter what the opponent plays -> can force a terminal state
-        self.max_score = 900
+        
+        # TRANSPOSITION TABLE (state: (depth,alpha,beta,optimal_moves_list))
+        # depth=d means the state was searched up to depth d (equivalent to directly calling search from the state with depth d)
+        # alpha,beta are pruning bounds.  alpha==beta implies all children were evaluated, or its a terminal node, or state is a death state
+        # optimal moves stores all moves of equivalent value (best value found for the node so far)
+        self.finished = {}
+        
+        #save heuristics for actions cause they're called a lot for sorting moves
+        self.action_heuristics = {}
+        
+        # depth necessary to be confident a repeated state is a tie
+        # 2 because we have stored all possible death states
+        self.check_tie_depth = 2
+        
+        #keep track of states seen in current game, so that we can switch moves to hopefully confuse opponent
         self.played_states = {}
-        if self.depth<0:self.preprocess_optimal_moves(gamestate(player=self.id))
+        
+        #location for saved optimal moves, or location to save it
+        self.optimal_moves_path = 'optimal_moves_id'+str(self.id)+'.pkl'
+        self.display=False
+        
+        #only pre-process optimal moves for states when running infinite depth
+        if self.depth<0:self.preprocess_optimal_moves()
     
-    def preprocess_optimal_moves(self,state):
-        solved_path = Agent._optimal_moves_path+'_id'+str(self.id)+'.pkl'
+    #load or precompute and save optimal moves
+    def preprocess_optimal_moves(self):
+        """
+            loads or precomputes and save optimal moves
+            looks for file stored in self.optimal_moves_path
+            if it doesn't exist, runs through states solving optimal moves and saves in file specified by self.optimal_moves_path
+        """
+        #try to load saved file
         try:
-            with open(solved_path,'rb') as f:
+            with open(self.optimal_moves_path,'rb') as f:
                 print('Loading Solved Game...',end='')
                 self.finished = pickle.load(f)
                 print('\rLoaded Solved Game    ')
+        
+        #if file not found, process optimal moves and save
         except FileNotFoundError:
-            print('Game not Solved. Solving game now...')
-            _,_ = self.AlphaBetaSearch(state)
+            print(f'Game not Solved. Player {self.id+1} solving game now...')
+            #run through each state and optimize move for it
+            for s in gamestate._legalMoves.keys():
+                if s.player==self.id:#only have to optimize for states I will see
+                    _,_ = self.AlphaBetaSearch(s)
             
-            with open(solved_path,'wb') as f:
+            #save optimal moves in pickle file
+            with open(self.optimal_moves_path,'wb') as f:
                 print('Saving Optimal Moves...',end='')
                 pickle.dump(self.finished,f)
                 print('\rSaved Optimal Moves    ')
-            
+           
+    #takes a state and wether do display information, and returns an action
+    #called by play when this players turn 
     def getMove(self, state: gamestate,display:bool=False) -> packed_action:
         self.display=display
-        if self.display: 
-            print('Thinking...')
-            # print(len(state.getLegalMoves()))
+        if self.display: print('Thinking...')
+        
+        #call alpha beta search and measure time to compute next move
         start = time.time()
         value, bestActions = self.AlphaBetaSearch(state)
         end = time.time()
-        try:
-            attempt = self.played_states[state]
-        except KeyError:
-            attempt = 0
+
+        #keep track of number of times seen this state in a game
+        attempt = self.played_states.get(state)
+        if attempt is None:
+            attempt=0
             self.played_states[state]=0
         self.played_states[state]+=1
         
+        #choose the kth move of bestActions after seeing it k times.
+        #this switches up move to throw off opponent
         bestAction = bestActions[attempt%len(bestActions)]
-        
+
         if self.display:
-            print(f'Finished MinMaxing {len(self.finished)} states')
-            bestAction.denormalize(state.transform)
-            # print(f'Choosing Move:{bestAction} for value: {value} from depth {self.finished[state][0]} out of {len(bestActions)} options')
+            if self.depth>0: print(f'Finished MinMaxing {len(self.finished)} states')
+            bestAction.denormalize(state.transform) #to print as human expects
             print(f'Choosing Move:{bestAction} for value: {value}')
-            bestAction.normalize(state.transform)
-            print(f'Time: {end-start:.1f}s | Pruned: {100*self.num_prune/self.max_prune:.1f}% ({self.num_prune}/{self.max_prune})')
+            bestAction.normalize(state.transform)   #to return as game expects
+            print(f'Time: {1000*(end-start):.3f}ms | Pruned: {100*self.num_prune/self.max_prune:.2f}% ({self.num_prune}/{self.max_prune})')
         return bestAction
+
+    def instructionHandler(self, state:gamestate, display:bool=False):
+        return ('move',self.getMove(state,display))
     
+    #heuristic to estimate how good an action is (current version not very good)
     def action_heuristic(self,move:packed_action)->int:
-        core_weight = 20
-        corner_weight = 40
-        killer_token_weight = 10
+        #if already known, return it
+        h = self.action_heuristics.get(move)
+        if h is not None:
+            return h
+        
+        #otherwise compute it
+        core_weight = 25                #weight for being in the core
+        corner_weight = 40              #weight for being in the corner
+        killer_token_weight = 10        #weight for placing a token in a killer position
         
         l_piece_id, new_l_pos_x, new_l_pos_y, new_l_pos_d, curr_token_pos_x, curr_token_pos_y, new_token_pos_x,new_token_pos_y = move.get_rep()
         new_l_pos = (new_l_pos_x,new_l_pos_y,new_l_pos_d.decode('utf-8'))
@@ -893,177 +1010,196 @@ class Agent(Player):
         
         l_set = L_piece._compute_L_coords(*new_l_pos)
 
-        control_core = core_weight * len(l_set & Agent._CORE)           #reward controlling core
-        avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))   #penalize touching corner
+        control_core = core_weight * len(l_set & Agent._CORE)                   #reward controlling core
+        avoid_corner = -1*corner_weight * int(bool(l_set & Agent._CORNERS))     #penalize touching corner
         killer_token = killer_token_weight * int(new_t_pos in Agent._KILLER_TOKENS if curr_t_pos!=(0,0) else 0) #reward placing tokens in killer positions
         
-        return control_core + avoid_corner + killer_token
+        score = control_core + avoid_corner + killer_token
+        self.action_heuristics[move]=score      #save score for later
+        return score
     
-    def heuristic(self, state:gamestate) -> int:
+    #estimate how good a state is (current version not very good)
+    def heuristic(self, state:gamestate) -> float:
         player = self.id
         opponent = int(not self.id)
         flip_factor = 2*int(player == state.player) - 1 #1 if my turn, -1 if opponent's turn
 
-        options_weight = 1
-        core_weight = 25
-        corner_weight = 40
-        win_weight = 1000
+        options_weight = 1          #weight for how many moves this state has
+        core_weight = 25            #weight for being in the core
+        corner_weight = 40          #weight for being in the corner
+        win_weight = float('inf')   #weight for winning or losing
 
         #penalize number of moves other person has
-        control_options = flip_factor * options_weight * len(state.getLegalMoves()) #state is already the other player, just call getLegalMoves
+        control_options = flip_factor * options_weight * len(state.getLegalMoves()) #reward me having moves, penalize moves for opponent
         
         player_l_set = state.L_pieces[player].get_coords()
         opponent_l_set = state.L_pieces[opponent].get_coords()
         
-        control_core = core_weight * len(player_l_set & Agent._CORE)           #reward controlling core
-        expel_core = -1*core_weight * len(opponent_l_set & Agent._CORE)        #penalize oponent in core
-        avoid_corner = -1*corner_weight * len(player_l_set & Agent._CORNERS)   #penalize touching corner
-        force_corner = corner_weight * len(opponent_l_set & Agent._CORNERS)    #reward oponent being in corner
+        # reward for controlling core
+        control_core = core_weight * len(player_l_set & Agent._CORE)
+        # penalize opponent in core
+        expel_core = -1*core_weight * len(opponent_l_set & Agent._CORE)
+        # penalize touching corner
+        avoid_corner = -1*corner_weight * len(player_l_set & Agent._CORNERS)
+        # reward opponent being in corner (we want to trap them in a corner / basically all win states involve opponent in corner)
+        force_corner = corner_weight * len(opponent_l_set & Agent._CORNERS)
 
-        #negative flip because if state is goal, current player lost. 
-        # flip is +1 when its agent's turn, but want to penalize losing
-        winning = -1*flip_factor*win_weight * state.isGoal() #colinear with legalmovesofother
+        # negative flip because if state is goal, current player lost.
+        # flip_factor is +1 when its agent's turn, but want to penalize losing
+        endgame = state in Agent._death_states
+        winning = -1*flip_factor*win_weight if state.isGoal() or endgame else 0 #colinear with legalmovesofother
 
         score = control_options + control_core + expel_core + avoid_corner + force_corner + winning
         return score
     
     # wrapper for max value with some setup
     def AlphaBetaSearch(self, state: gamestate) -> Tuple[int,packed_action]:
+        #for pruning quanitfication
         self.max_prune = 1
         self.num_prune = 0
-        self.seen = {state:[self.depth]}
+        
+        #keeps track of dfs path to detect tie
+        self.seen = {state:1}
         return self.MaxValueAB(state, self.depth)
 
-    # max and min are basically the same, difference = sign flips
+    # max and min are basically the same
     def MaxValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
-        if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
-            self.last = len(self.finished)
-            # print(f'Cached: {self.last} states')
-
-        #if we have already finished evaluating this state with at least this much depth, return saved value
-        # try except = reduces hash lookups
-        try:
+        
+        # if we have already finished evaluating this state with at least this much depth, return saved value
+        cached_data = self.finished.get(state)
+        if cached_data is not None:
             # finished state stores
             # - initiating a search from that depth on that state, as in knows the depth # of next moves
-            # - value it backpropagated
-            # - optimal move for state being accessed (var "state")
+            # - alpha and beta as bounds for pruning
+            # - optimal moves for state being accessed (any moves with equivalent value to best so far)
 
-            stored_depth,val,optimal_moves = self.finished[state]
+            stored_depth,saved_alpha,saved_beta,optimal_moves = cached_data
 
             # if using finite depth and stored depth is deeper than what's necessary, use it
             saved_deeper_search = depth>=0 and stored_depth>=depth
 
-            # if the value we backpropagated is greater than the max score (or our estimate of the max score), then no matter what depth you searched from, someone can force a win or loss (force a terminal state)
-            # CHECK THIS
-            guaranteed_terminal = abs(val)>=self.max_score
-
-            # we want for negative depth saved = this has been fully searched
-            # CHECK THIS (check maintaining)
-            # the only way to have negative depth is if you start with negative depth (so this is only a check for negative depth)
+            # negative depth saved => state fully searched
+            # the only way to have negative depth is if you start with negative depth (so this is only true when solving whole game)
             state_fully_searched = stored_depth<0
 
-            # if we've seen this state before, and we've seen it at a depth greater than the check_tie_depth, then we can assume it's a tie
+            # if the depth searched is greater than tie state, we can assume it is a tie
             tied_state = stored_depth>=self.check_tie_depth
 
-            #
-            if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
-                # if self.display and depth==-1: print(f'MAX USING Saved evaluation {stored_depth,val,move} for depth {depth}')
-                return val,optimal_moves
-        except KeyError:
-            pass
-        
-        if depth == 0 or state.isGoal():
-            h =self.heuristic(state)
-            self.finished[state] = (depth,h,[])
-            # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
-            return h, []
+            #if the state being accessed was pruned, then check if it can be pruned again without any searching
+            prunable = saved_alpha>beta
+            exact = saved_beta==saved_alpha #state fully searched for saved depth, or endgame state (terminal or death)
+            if (saved_deeper_search or state_fully_searched or tied_state):
+                if exact or prunable:
+                    return saved_alpha,optimal_moves
         
         moves = state.getLegalMoves()
         numMoves = len(moves)
-        self.max_prune+= numMoves
+        self.max_prune+= numMoves       #keep track for pruning data
         
         # calculate heuristic score for each move
         # sort by score (descending) and then apply that order to moves
+        # if action heuristic is good, should prune a lot
         heuristics = np.array([self.action_heuristic(move) for move in moves])
-        sort_indexes = np.argsort(heuristics)[::-1]
+        sort_indexes = np.argsort(heuristics,stable=True)[::-1]     #sort reverse cause standard sorts in increasing order, but higher heuristic is better
         moves = moves[sort_indexes]
+        
+        if state in Agent._death_states:
+            h = self.heuristic(state)
+            self.finished[state] = (-1,h,h,moves)
+            return h,moves
+        
+        if depth == 0 or state.isGoal():
+            h = self.heuristic(state)
+            self.finished[state] = (depth,h,h,None)
+            return h, None
         
         # v is the value of the best move
         v = float('-inf')
-        optimal_moves = None
+        optimal_moves = []
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
-            # if we've seen this state before, then we've seen it at a depth of at least check_tie_depth or negative depth
-            if next_state in self.seen and len(self.seen[next_state])>0:
-                d = self.check_tie_depth-1 if depth<0 else min(depth-1,self.check_tie_depth-1)
-                self.seen[next_state].append(d)
+            # if we've seen this state before, then start a check from check_tie_depth instead of continuing infinite search
+            num_seen = self.seen.get(next_state)
+            
+            if num_seen is None:
+                self.seen[next_state]=0
+                d=depth-1
+            elif num_seen>0:
+                d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
             else:
                 d = depth-1
-                self.seen[next_state] = [depth]
+                
+            # v2 is the value of the best move for the opponent (could be a pruned value, in which case its ignored)
+            self.seen[next_state]+=1
+            v2,_ = self.MinValueAB(next_state, d, v, beta)      #pass v to ensure not pruning on parent's data (because saving to transposition table)
+            self.seen[next_state]-=1
             
-            # v2 is the value of the best move for the opponent
-            v2,_ = self.MinValueAB(next_state, d, alpha, beta)
-            self.seen[next_state].pop()
-            
+            #if new best, update optimal moves and v
             if v2 > v:
                 v, optimal_moves = v2, [m]
                 alpha = max(alpha, v)
             elif v2==v:
-                optimal_moves.append(m)
-            if self.prune and v > beta:
+                optimal_moves.append(m)         #save other moves with value equal to current equivalent
+            if self.prune and v > beta:         #don't prune on equality because saving equal values. parent node would add it to its optimal moves list
                 self.num_prune+= numMoves-i-1
+                self.finished[state] = (depth,v, float('inf'),optimal_moves)        #max can do at least as well as alpha, could be any amount higher
                 return v,optimal_moves
-
-        self.finished[state] = (depth,v,optimal_moves)
+        
+        self.finished[state] = (depth,v,v,optimal_moves)
         return v, optimal_moves
     
     def MinValueAB(self, state: gamestate, depth:int, alpha:float = float('-inf'), beta:float=float('inf')) -> Tuple[int, packed_action]:
-        if self.display and self.last < len(self.finished) and len(self.finished)%100==0:
-            self.last = len(self.finished)
-            # print(f'Cached: {self.last} states')
-        
         #if we have already finished evaluating this state with at least this much depth, return saved value
-        try:
-            stored_depth,val,optimal_moves = self.finished[state]
-            saved_deeper_search = depth>=0 and stored_depth>=depth
-            guaranteed_terminal = abs(val)>=self.max_score
-            state_fully_searched = stored_depth<0
-            tied_state = stored_depth>=self.check_tie_depth-1
-            if (saved_deeper_search or guaranteed_terminal or state_fully_searched or tied_state):
-                # print(f'USING Saved evaluation | {self.finished[state]}')
-                return val,optimal_moves
-            # else: print(f'NOT using saved {stored_depth,val,move} for current depth {depth}')
-        except KeyError:
-            pass
+        cached_data = self.finished.get(state)
         
-        if depth == 0 or state.isGoal():
-            h = self.heuristic(state)
-            self.finished[state] = (depth,h,[])
-            # print(f'SAVING evaluation {state}\n(D,V):{self.finished[state]}')
-            return h, []
-      
+        if cached_data is not None:
+            stored_depth,saved_alpha,saved_beta,optimal_moves = cached_data
+            saved_deeper_search = depth>=0 and stored_depth>=depth
+            state_fully_searched = stored_depth<0
+            tied_state = stored_depth>=self.check_tie_depth
+            prunable = saved_beta<alpha
+            exact = saved_beta==saved_alpha
+            if (saved_deeper_search or state_fully_searched or tied_state):
+                if exact or prunable:
+                    return saved_beta,optimal_moves
+            
+        #not prune on equality when saving equal states
         moves = state.getLegalMoves()
         numMoves = len(moves)
         self.max_prune+= numMoves
         
         heuristics = np.array([self.action_heuristic(move) for move in moves])
-        sort_indexes = np.argsort(heuristics)[::-1]
+        sort_indexes = np.argsort(heuristics,stable=True)[::-1]
         moves = moves[sort_indexes]
         
+        if state in Agent._death_states:
+            h = self.heuristic(state)
+            self.finished[state] = (-1,h,h,moves)
+            return h,moves
+      
+        if depth == 0 or state.isGoal():
+            h = self.heuristic(state)
+            self.finished[state] = (depth,h,h,None)
+            return h, None
+        
         v = float('inf')
-        optimal_moves = None
+        optimal_moves = []
         for i,m in enumerate(moves):
             next_state = state.getSuccessor(m)
             
-            if next_state in self.seen and len(self.seen[next_state])>0:
+            num_seen = self.seen.get(next_state)
+            
+            if num_seen is None:
+                self.seen[next_state]=0
+                d=depth-1
+            elif num_seen>0:
                 d = self.check_tie_depth if depth<0 else min(depth-1,self.check_tie_depth)
-                self.seen[next_state].append(d)
             else:
                 d = depth-1
-                self.seen[next_state] = [depth]
-                
-            v2,_ = self.MaxValueAB(next_state, d, alpha, beta)
-            self.seen[next_state].pop()
+            
+            self.seen[next_state]+=1
+            v2,_ = self.MaxValueAB(next_state, d, alpha, v)
+            self.seen[next_state]-=1
             
             if v2 < v:
                 v, optimal_moves = v2, [m]
@@ -1072,71 +1208,85 @@ class Agent(Player):
                 optimal_moves.append(m)
             if self.prune and v < alpha:
                 self.num_prune+=numMoves-i-1
+                self.finished[state] = (depth,float('-inf'),v,optimal_moves)
                 return v,optimal_moves
-            
-        self.finished[state] = (depth,v,optimal_moves)
+
+        self.finished[state] = (depth,v,v,optimal_moves)
         return v, optimal_moves
 
     def game_reset(self):
         # pass
-        self.played_states = {}
-        
-        
-        
-        
-        
-        
+        self.played_states = {}#reset this so that it starts from best of bestActions
+
+
 import numpy as np
+import time
+import pickle
 
 from typing import Optional
+
 class Game:
     def __init__(self, L_pieces=None, token_pieces=None):
         if L_pieces and token_pieces:
             self.state = gamestate(L_pieces=L_pieces, token_pieces=token_pieces)
         else: 
             self.state = gamestate()
-        self.turns = 0
         
+        self.turns = 0
+
+        # List of moves for undoing and redoing
+        self.history = []
+
+        # Save initial state
+        self.saveMove()
+    
+    def saveMove(self)->None:
+        try:
+            self.history[self.turns] = self.state
+        except IndexError:
+            self.history.append(self.state)
+        self.turns+=1
+    
+    def undo(self) -> bool:
+
+        if self.turns < 3:
+            return False
+
+        # undo -- this should go back to this players previous move
+        self.turns -= 2
+        self.state = self.history[self.turns-1]
+        return True
+
+    def redo(self) -> bool:
+        if self.turns==len(self.history):
+            return False
+        self.turns += 2
+        self.state = self.history[self.turns-1]
+        return True
+        
+    def replay(self) -> None:
+        for i in range(self.turns-1):
+            self.history[i].display()
+            time.sleep(.5)
+
     def getTurn(self)->int:
         return self.state.player
     
     def getState(self)->gamestate:
-        return gamestate(self.state.player,self.state.L_pieces[:],self.state.token_pieces.copy(),self.state.transform[:])
+        return gamestate(self.state.player,
+                        self.state.L_pieces[:],
+                        self.state.token_pieces.copy(),
+                        self.state.transform[:])
     
     #updates game state with action if it is valid, returns true iff successfuly
     #feedback passed through to valid moves
     def apply_action(self,move:packed_action)->None:
         self.state = self.state.getSuccessor(move)
-        self.turns+=1
+        self.saveMove()
         
     #interface to display game board and pieces
     def display(self,internal_display:bool=False)->None:
-        board = np.full((4, 4), "  ", dtype=object) # 4 by 4 of empty string
-        
-        #denormalize to display what human expects to see
-        if not internal_display: self.state.denormalize()
-        
-        for i, l in enumerate(self.state.L_pieces):
-            color = "\033[1;31m1□\033[0m" if i == 0 else "\033[32m2▲\033[0m"  # Red for L1, Blue for L2
-            for px, py in l.get_coords():
-                board[py - 1, px - 1] = color #+ "L" + str(i + 1) + "\033[0m"
-        
-        for i, t in enumerate(self.state.token_pieces):
-            tx, ty = t.get_position()
-            board[ty - 1, tx - 1] = "\033[33m○○\033[0m"
-
-
-        rows = ["|" + "|".join(f"{cell:>2}" for cell in row) + "|" for row in board]
-        #left wall then the row then the ending right wall
-        # f"{cell:>2}" align cell to the right > with a width of 2 spaces. 
-
-        horizontal_separator = "-------------\n"
-        
-        board_str = horizontal_separator + f"\n{horizontal_separator}".join(rows) + "\n" + horizontal_separator
-        print(board_str)
-        
-        #renormalize for internal use
-        if not internal_display: self.state.normalize(self.state.transform)
+        self.state.display(internal_display=internal_display)
     
     #determines who wins, returns None, 0 or 1
     # made a copy of this in gamestate
@@ -1147,13 +1297,73 @@ class Game:
         return self.turns
     
     def reset(self)->None:
-        self.state = gamestate()
-        self.turns = 0
-    
+        self.history.clear()
 
+        self.turns = 0
+        self.state = gamestate()
+        self.saveMove()
+
+    def save(self, filename: str = None) -> None:
+        save_dict = {'history': self.history[:self.turns], 'turns': self.turns}
+        if filename is None:
+            filename = str(round(time.time())) + '.pkl'
+        else:
+            if filename[-4:] != '.pkl':
+                filename = filename + '.pkl'
+        with open(filename, 'wb') as f:
+            pickle.dump(save_dict, f)
+        print('Game saved to',filename)
+
+    @staticmethod
+    def load(filename: str) -> 'Game':
+        # if filename doesnt end with pkl, add it
+        if filename[-4:] != '.pkl':
+            filename = filename + '.pkl'
+        # filename = filename + '.pkl'
+        with open(filename, 'rb') as f:
+            save_dict = pickle.load(f)
+        
+        game = Game()
+        game.history = save_dict['history']
+        game.turns = save_dict['turns']
+        game.state = game.history[game.turns-1]
+        
+        print('Game',filename,"loaded.\n")
+        return game
+
+
+# our imports
+import Players
 
 # use Python 3.5 and up (typing library built in)
 from typing import Tuple,List,Optional
+
+import sys
+import subprocess
+import time
+
+# profiling (built in?)
+import cProfile
+import pstats
+
+# Package install routine
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def install_all():
+
+    install('numpy')
+    install('tqdm')
+
+try:
+    import numpy as np
+    from tqdm import tqdm
+except ImportError:
+    install_all()
+
+# End package install routine
 
 # gamemode input, exception handling
 def getPlayers()->Tuple[
@@ -1197,12 +1407,29 @@ def setGameMode(p1,p2)->Tuple[np.ndarray[bool],np.ndarray[Player]]:
     player1 = player_dict[p1[0]](0) if p1[1]==None else player_dict[p1[0]](0,p1[1],p1[2])
     player2 = player_dict[p2[0]](1) if p2[1]==None else player_dict[p2[0]](1,p2[1],p2[2])
     players = np.array([player1,player2])
-    return np.array([p1[0]==2,p2[0]==2]),players
+    return players
 
-def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
+# change player from human to agent and take input
+def changePlayer(player:Player)->Player:
+    if isinstance(player,Human):
+        depth = int(input(f"Enter Depth (int or -1): "))
+        prune = bool(int(input(f"Enter Prune (0 or 1): ")))
+        return Agent(player.id,depth,prune)
+    return player
 
-    # Set initial state
-    
+def loadGame() -> Optional[Game]:
+    while True:
+        load = input('Load Game? (y/n): ')
+        if load.lower() == 'y':
+            try:
+                filename = input('Enter filename: ')
+                return Game.load(filename)            
+            except FileNotFoundError as e:
+                print('File not found')
+        else:
+            return None
+        
+def create_game():
     while True:
         InitialStateCoordinates = input(f"Enter Initial State Coords [L1, L2, T1, T2] or Default: ")
         InitialStateCoordinatesList = InitialStateCoordinates.split()
@@ -1222,97 +1449,146 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
                 token_pieces = {token_piece(x=T1_x, y=T1_y), token_piece(x=T2_x, y=T2_y)}
 
                 game = Game(L_pieces=L_pieces, token_pieces=token_pieces)
-            break
+
         except (ValueError,AssertionError) as e:
             print('Invalid Intial State')
+            continue
         except IndexError as e:
             print('Enter Moves in correct Format')
+            continue
         
-        # End set initial state
+        # print board to get confirmation from user that they want to use this board
+        game.display()
+        while True:
+            confirm = input('Confirm this board? (y/n): ')
+            if confirm.lower() == 'n':
+                del game
+                game = None
+                break
+            elif confirm.lower()=='y' or confirm.lower()=='':
+                return game
+            else:
+                print("Please enter 'y' or 'n'")
+def print_instructions():
+    print("\n\n\
+            Instructions:\n\
+            Move: x y d t1x t1y t2x  t2y\n\
+            Undo: undo\n\
+            Redo: redo\n\
+            Replay: replay\n\
+            Save Game: save\n\
+            Transform Board: 'x' or 'y' or 't' or 'cw' or 'ccw'\n\
+            Have AI take over: swap\n\
+            Display Instructions: help\n\
+    \n\n")
+def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
+
+    game = loadGame()
+
+    if game is None:
+        game = create_game()
 
     if gm==None:
-        randoms,players = setGameMode(*getPlayers())
+        players = setGameMode(*getPlayers())
     else:
-        randoms,players = setGameMode(*gm)
-    winners  = np.empty(shape=(N),dtype=int)
-    turns = np.empty(shape=(N),dtype=int)
-    turn_times = [[],[]]
-    # for n in tqdm(range(N)):
-    for n in range(N):
-        for i,r in enumerate(randoms):
-            if r:
-                players[i].set_seed(n+i)
-        while game.whoWins()==None and game.totalTurns()<64:
-            if display:
-                print()
-                # print(game.state)
-                # game.display(internal_display=True)
-                game.display()
-            turn = game.getTurn()
-            if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()+1})")
-            
-            current_player = players[turn]
-            success=False
-            K = 3
-            for k in range(K):#while True
-                try:
-                    start = time.time()
-                    move = current_player.getMove(game.getState(),display) #value error if invalid input format
-                    end=time.time()
-                    # if display: print("Move:",move)
-                    game.apply_action(move)  #assertion error if invalid move
-                    success=True
-                    turn_times[turn].append(end-start)
-                    break
-                except ValueError as e:
-                    print(f'Invalid Input. {e}\n')
-                except AssertionError as e:
-                    print(f'Invalid Move. {e}\n')
-            if not success: #if no valid move provided after K attempts, kill game
-                print(f'\n\nNo valid play after {K} moves. Game over.')
+        players = setGameMode(*gm)
+
+    print_instructions()
+
+    tie_end = 64
+    while game.whoWins()==None and game.totalTurns()<tie_end:
+        if display: game.display()
+        
+        turn = game.getTurn()
+        if display: print(f"Player {turn+1}'s turn (Turn {game.totalTurns()})")
+        
+        current_player = players[turn]
+        success=False
+        K = 5
+        for k in range(K):#while True
+            try:
+                instruction_type,instruction = current_player.instructionHandler(game.getState(),display) #value error if invalid input format
+
+                if instruction_type == 'move':
+                    game.apply_action(instruction)  #assertion error if invalid move
+                elif instruction_type == 'view':
+                    if instruction == 'replay':
+                        print('\nReplaying Game until current turn')
+                        game.replay()
+                    elif isinstance(instruction,List) and len(instruction)==3:#not checking that elements are bool
+                        game.state.update_denormalization(instruction)#bad practice
+                elif instruction_type=='control':
+                    if instruction == 'undo':
+                        if game.undo():
+                            print('\nUndo Successful\n')
+                        else:
+                            print('\nUndo Unsuccessful\n')
+                    elif instruction == 'redo':
+                        if game.redo():
+                            print('\nRedo Successful\n')
+                            game.display()
+                        else:
+                            print('\nRedo Unsuccessful\n')
+                    elif instruction == 'save':
+                        filename = input('Enter filename: ')
+                        game.save(filename)
+                    elif instruction == 'help':
+                        print_instructions()
+                elif instruction_type=='swap':
+                    if instruction=='ai':
+                        current_player = changePlayer(current_player)
+                        players[turn] = current_player
+                        print(f'Player {turn+1} changed to AI')
+                else:
+                    raise ValueError(f"Invalid instruction {instruction}.")
+                success=True
                 break
-
-        winner = game.whoWins()
-        winner = int(not turn)+1 if winner==None else winner+1
-        winner = winner if game.totalTurns()<64 else 0
-        winners[n] = winner
-        turns[n] = game.totalTurns()
-
-        if display: 
-            game.display()
-
-            if game.totalTurns()==64:
-                print('Draw!')
-            else:                
-                print('Player',winner,'wins!')
-                print('Total Turns',game.totalTurns())
             
-        game.reset()
-        for player in players:
-            player.game_reset()
-    print()
-    length = max(len(turn_times[0]),len(turn_times[1]))
-    turn_times = [row + [0] * (length - len(row)) for row in turn_times]
-    return winners, turns, turn_times
+            except ValueError as e:
+                print(f'Invalid Input. {e}\n')
+            except AssertionError as e:
+                print(f'Invalid Move. {e}\n')
 
-if __name__ == "__main__":
-    # profiler = cProfile.Profile()
-    # profiler.enable()
+        if not success: #if no valid move provided after K attempts, kill game
+            print(f'\n\nNo valid play after {K} moves. Game over.')
+            break
+
+    winner = game.whoWins()
+    winner = int(not game.getTurn())+1 if winner==None else winner+1
+    winner = winner if game.totalTurns()<tie_end else 0
+
+    if display: 
+        game.display()
+
+        if game.totalTurns()==tie_end:
+            print('Draw!')
+        else:
+            print('Player',winner,'wins!')
+            print('Total Turns',game.totalTurns())
     
-    # _,_,_ = play()
-
-    # Play again?
     while True:
-        _,_,_ = play()
+        menu = input("\nMenu:\n Replay Game (r)\n Save Game (s)\n Continue (any key)\n\n")
+        print()
+
+        if menu == 'r':
+            print('Replaying Game')
+            game.replay()
+            continue
+        elif menu == 's':
+            filename = input('Enter filename: ')
+            game.save(filename)
+            continue
+        else:
+            break
+
+    return winner
+if __name__ == "__main__":
+    
+    # Keep Playing?
+    while True:
+        _ = play()
         cont = input('Play again? (y/n): ')
         if cont.lower() != 'y'.strip():
             break
-    
-    # profiler.disable()
-    
-    # stats = pstats.Stats(profiler)
-    
-    # Sort by 'time' (total time in each function) and print the top 10 functions
-    # stats.strip_dirs()  # Optional: remove long file paths for readability
-    # stats.sort_stats("time").print_stats(16)
-    
+
+
