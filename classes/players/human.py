@@ -48,7 +48,7 @@ class Human(Player):
         
         bestVal = float('-inf')
         bestMove = None
-        for suggestmove in state.getLegalMoves(): # i htink the iseu is the moves are normalized moves...
+        for suggestmove in state.getLegalMoves():
             successor = state.getSuccessor(suggestmove)
             v = self.heuristic(successor)
             if v>bestVal:

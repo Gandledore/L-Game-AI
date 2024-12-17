@@ -15,9 +15,11 @@ class RandomAgent(Player):
     def getMove(self, state: gamestate,display:bool=False) -> packed_action:
         legal_moves = state.getLegalMoves()
         move = random.choice(legal_moves)
-        move.denormalize(state.transform)
-        if display: print(f"Random Agent played {move}")
-        move.normalize(state.transform)
+        
+        if display: 
+            move.denormalize(state.transform)
+            print(f"Random Agent played {move}")
+            move.normalize(state.transform)
         return move
     
     def set_seed(self,s):

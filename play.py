@@ -12,8 +12,8 @@ import subprocess
 import time
 
 # profiling (built in?)
-# import cProfile
-# import pstats
+import cProfile
+import pstats
 
 # Package install routine
 
@@ -88,6 +88,8 @@ def changePlayer(player:Players.Player)->Players.Player:
 
 def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int],Optional[int]]]=None,N:int=1,display=True)->Tuple[np.ndarray,np.ndarray,List[List[float]]]:
 
+    # handling loading game
+
     # Set initial state
 
     fileLoaded = False
@@ -154,12 +156,14 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     winners  = np.empty(shape=(N),dtype=int)
     turns = np.empty(shape=(N),dtype=int)
     turn_times = [[],[]]
-    # for n in tqdm(range(N)):
-    for n in range(N):
+    # for n in range(N):
+    for n in tqdm(range(N)):
         for i,r in enumerate(randoms):
             if r:
-                players[i].set_seed(n+i)
+                players[i].set_seed(2900+n+i)
         while game.whoWins()==None and game.totalTurns()<64:
+            turn = game.getTurn()
+            
             if display:
                 print()
                 # print(game.state)
@@ -267,23 +271,23 @@ def play(gm:Tuple[Tuple[int,Optional[int],Optional[int]],Tuple[int,Optional[int]
     return winners, turns, turn_times
 
 if __name__ == "__main__":
-    # profiler = cProfile.Profile()
-    # profiler.enable()
+    profiler = cProfile.Profile()
+    profiler.enable()
     
-    # _,_,_ = play()
+    _,_,_ = play()
 
-    # Play again?
-    while True:
-        _,_,_ = play()
-        cont = input('Play again? (y/n): ')
-        if cont.lower() != 'y'.strip():
-            break
+    # # Play again?
+    # while True:
+    #     _,_,_ = play()
+    #     cont = input('Play again? (y/n): ')
+    #     if cont.lower() != 'y'.strip():
+    #         break
     
-    # profiler.disable()
+    profiler.disable()
     
-    # stats = pstats.Stats(profiler)
+    stats = pstats.Stats(profiler)
     
     # Sort by 'time' (total time in each function) and print the top 10 functions
-    # stats.strip_dirs()  # Optional: remove long file paths for readability
-    # stats.sort_stats("time").print_stats(16)
+    stats.strip_dirs()  # Optional: remove long file paths for readability
+    stats.sort_stats("time").print_stats(16)
     
