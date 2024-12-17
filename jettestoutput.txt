@@ -1,0 +1,181 @@
+
+inf vs ran: 
+
+Players tied 0 times 0.000%
+Player 1 won 100000 times (100.000%)
+
+Avg Turns: 7.58444
+Min Turns: 4
+Max Turns: 26
+Avg Turn Times: p1: 0.006ms | p2: 0.003ms
+First Turns took: p1: 0.136ms | p2 0.016ms
+Avg Turn Times after first turn: p1: 0.006ms | p2: 0.003ms
+
+ran vs inf: 
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 100000 times (100.000%)
+
+Avg Turns: 5.4735
+Min Turns: 3
+Max Turns: 25
+Avg Turn Times: p1: 0.004ms | p2: 0.006ms
+First Turns took: p1: 0.0s | p2 0.012ms
+Avg Turn Times after first turn: p1: 0.004ms | p2: 0.006ms
+[]
+[]
+
+inf vs inf: 
+
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 0.007ms | p2: 0.006ms
+First Turns took: p1: 0.0s | p2 0.007ms
+Avg Turn Times after first turn: p1: 0.006ms | p2: 0.006ms
+
+inf vs d1: 
+
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 28.0
+Min Turns: 28
+Max Turns: 28
+Avg Turn Times: p1: 0.009ms | p2: 1.460ms
+First Turns took: p1: 0.0s | p2 2.667ms
+Avg Turn Times after first turn: p1: 0.008ms | p2: 1.368ms
+
+d1 vs inf: 
+
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 1 times (100.000%)
+Avg Turns: 19.0
+Min Turns: 19
+Max Turns: 19
+Avg Turn Times: p1: 2.063ms | p2: 0.009ms
+First Turns took: p1: 0.0s | p2 0.008ms
+Avg Turn Times after first turn: p1: 1.684ms | p2: 0.009ms
+
+d1 vs d1: 
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 14.0
+Min Turns: 14
+Max Turns: 14
+Avg Turn Times: p1: 4.995ms | p2: 1.687ms
+First Turns took: p1: 0.0s | p2 6.113ms
+Avg Turn Times after first turn: p1: 2.840ms | p2: 0.950ms
+
+d1p vs d1: 
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 14.0
+Min Turns: 14
+Max Turns: 14
+Avg Turn Times: p1: 4.453ms | p2: 1.297ms
+First Turns took: p1: 0.0s | p2 4.426ms
+Avg Turn Times after first turn: p1: 2.176ms | p2: 0.776ms
+
+d3 vs d3: 
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 87.607ms | p2: 79.587ms
+First Turns took: p1: 2.0s | p2 1457.600ms
+Avg Turn Times after first turn: p1: 25.932ms | p2: 35.135ms
+
+d5 vs d1: 
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 12.0
+Min Turns: 12
+Max Turns: 12
+Avg Turn Times: p1: 1028.172ms | p2: 1.635ms
+First Turns took: p1: 6.2s | p2 2.728ms
+Avg Turn Times after first turn: p1: 0.318ms | p2: 1.416ms
+
+d5P vs d1: 
+
+Players tied 0 times 0.000%
+Player 1 won 1 times (100.000%)
+Avg Turns: 12.0
+Min Turns: 12
+Max Turns: 12
+Avg Turn Times: p1: 322.037ms | p2: 1.627ms
+First Turns took: p1: 1.3s | p2 2.704ms
+Avg Turn Times after first turn: p1: 127.329ms | p2: 1.412ms
+
+d1 vs d5: 
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 1 times (100.000%)
+Avg Turns: 5.0
+Min Turns: 5
+Max Turns: 5
+Avg Turn Times: p1: 3.966ms | p2: 2179.812ms
+First Turns took: p1: 0.0s | p2 4359.586ms
+Avg Turn Times after first turn: p1: 2.879ms | p2: 0.037ms
+
+d1 vs d5P: 
+
+Players tied 0 times 0.000%
+Player 1 won 0 times (0.000%)
+Player 2 won 1 times (100.000%)
+Avg Turns: 5.0
+Min Turns: 5
+Max Turns: 5
+Avg Turn Times: p1: 4.070ms | p2: 452.785ms
+First Turns took: p1: 0.0s | p2 852.671ms
+Avg Turn Times after first turn: p1: 2.831ms | p2: 52.898ms
+
+d5P vs d5: 
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 44.557ms | p2: 144.619ms
+First Turns took: p1: 1.3s | p2 4514.054ms
+Avg Turn Times after first turn: p1: 4.150ms | p2: 3.669ms
+
+d5 vs d5P: 
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 192.425ms | p2: 37.756ms
+First Turns took: p1: 6.2s | p2 905.443ms
+Avg Turn Times after first turn: p1: 0.040ms | p2: 9.766ms
+
+d4 vs d4: 
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 156.323ms | p2: 137.229ms
+First Turns took: p1: 4.1s | p2 4074.493ms
+Avg Turn Times after first turn: p1: 27.906ms | p2: 10.220ms
+
+d5 vs d4: 
+
+Players tied 1 times 100.000%
+Avg Turns: 64.0
+Min Turns: 64
+Max Turns: 64
+Avg Turn Times: p1: 199.976ms | p2: 129.916ms
+First Turns took: p1: 6.4s | p2 3694.524ms
+Avg Turn Times after first turn: p1: 0.066ms | p2: 14.928ms
